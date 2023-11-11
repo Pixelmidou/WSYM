@@ -1,4 +1,7 @@
 # WSYM
+Here is the live preview of this project : <be>
+Next Steps in the project : <be>
+Admin Welcome Page : <br>
 people balance : show a person's balance - edit a person's balance <br>
 people transactions : show a person's latest X (number) deposit / withdraw <br>
 blocking people : block people from submitting a ticket / depositing / withdrawing <br>
