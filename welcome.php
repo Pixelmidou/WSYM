@@ -126,7 +126,7 @@ if ($con->connect_error) {
                 <li class="navitem" id="withdrawv">Withdraw Money</li>
                 <li class="navitem" id="wirev">Wire Money</li>
                 <li class="navitem" id="ticketv">Submit a Ticket</li>
-                <form method="post"><input class="logoutbut" name="logout" type="submit" value="logout"></form>
+                <form method="post"><input class="logoutbut" name="logout" type="submit" value="logout" onclick="return logoutconfirm()" id="log"></form>
             </ul>
         </nav>
     </header>

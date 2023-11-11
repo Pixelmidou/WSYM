@@ -116,3 +116,6 @@ function ticketconfirm() {
         return confirm("Are you sure you want to submit this ticket ?")
     }
 }
+function logoutconfirm() {
+    return confirm("Are you sure you want to logout ?")
+}
