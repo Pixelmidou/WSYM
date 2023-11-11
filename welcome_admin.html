@@ -7,6 +7,7 @@
     <title>WSYM Banking</title>
     <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
     <link href="./bootstrap-5.0.2-dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="./css/welcome_admin.css">
 
     <style>
       .bd-placeholder-img {
@@ -125,70 +126,84 @@
 
 
 <main class="d-flex flex-nowrap">
-  <div class="d-flex flex-column flex-shrink-0 p-3 bg-body-tertiary" style="width: 280px;">
-    <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
+  <div class="d-flex flex-column flex-shrink-0 p-3 bg-body-tertiary containerdiv" style="width: 280px;">
+    <a href="" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
       <svg class="bi pe-none me-2" width="40" height="32"><use xlink:href="#wsym"/></svg>
       <span class="fs-4">WSYM Banking</span>
     </a>
     <hr>
     <ul class="nav nav-pills flex-column mb-auto">
       <li class="nav-item">
-        <a href="#" class="nav-link active" data-bs-toggle="pill" aria-current="page">
-          <svg class="bi pe-none me-2" width="16" height="16" href="#homesec"><use xlink:href="#home"/></svg>
+        <a class="nav-link active" data-bs-toggle="pill" href="#homesec">
+          <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#home"/></svg>
           Home
         </a>
       </li>
       <li class="nav-item">
-        <a href="#" data-bs-toggle="pill" class="nav-link link-body-emphasis">
-          <svg class="bi pe-none me-2" width="16" height="16" hrhref="#balance"><use xlink:href="#dollar"/></svg>
-          Balance
+        <a data-bs-toggle="pill" class="nav-link link-body-emphasis" href="#balance">
+          <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#dollar"/></svg>
+          Balances
         </a>
       </li>
       <li class="nav-item">
-        <a href="#" data-bs-toggle="pill" class="nav-link link-body-emphasis">
-          <svg class="bi pe-none me-2" width="16" height="16" href="#transactions"><use xlink:href="#bank"/></svg>
+        <a data-bs-toggle="pill" class="nav-link link-body-emphasis" href="#transactions">
+          <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#bank"/></svg>
           Transactions
         </a>
       </li>
       <li class="nav-item">
-        <a href="#" class="nav-link link-body-emphasis" data-bs-toggle="pill">
-          <svg class="bi pe-none me-2" width="16" height="16" href="#blockactions"><use xlink:href="#stop"/></svg>
+        <a class="nav-link link-body-emphasis" data-bs-toggle="pill" href="#blockactions">
+          <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#stop"/></svg>
           Block actions
         </a>
       </li>
       <li class="nav-item">
-        <a href="#" data-bs-toggle="pill" class="nav-link link-body-emphasis">
-          <svg class="bi pe-none me-2" width="16" height="16" href="#infomanagment"><use xlink:href="#people-circle"/></svg>
+        <a data-bs-toggle="pill" class="nav-link link-body-emphasis" href="#infomanagment">
+          <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#people-circle"/></svg>
           Info managment
         </a>
       </li>
       <li class="nav-item">
-        <a href="#" data-bs-toggle="pill" class="nav-link link-body-emphasis">
-          <svg class="bi pe-none me-2" width="16" height="16" href="#tickets"><use xlink:href="#ticket"/></svg>
+        <a data-bs-toggle="pill" class="nav-link link-body-emphasis" href="#tickets">
+          <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#ticket"/></svg>
           Tickets
         </a>
       </li>
     </ul>
     <hr>
     <div class="dropdown">
-      <a href="#" class="d-flex align-items-center link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+      <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+        <img src="" alt="pfp" width="32" height="32" class="rounded-circle me-2">
         <strong>mdo</strong>
       </a>
-      <ul class="dropdown-menu text-small shadow">
+      <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
+        <li><a class="dropdown-item" href="#">Upload your photo</a></li>
         <li><a class="dropdown-item" href="#">Sign out</a></li>
       </ul>
     </div>
   </div>
-  <div class="tab-content">
-    <div class="tab-pane container active" id="homesec">1</div>
-    <div class="tab-pane container fade" id="balance">2</div>
-    <div class="tab-pane container fade" id="transactions">3</div>
-    <div class="tab-pane container fade" id="blockactions">4</div>
-    <div class="tab-pane container fade" id="infomanagment">5</div>
-    <div class="tab-pane container fade" id="tickets">6</div>
+  <div class="tab-content container-fluid d-flex justify-content-center align-items-center">
+    <div class="tab-pane active homeseccont" id="homesec">
+      <h1 class="h2">Welcome Back</h1>
+    </div>
+    <div class="tab-pane fade balancecont" id="balance">2
+
+    </div>
+    <div class="tab-pane fade transactionscont" id="transactions">3
+
+    </div>
+    <div class="tab-pane fade blockactionscont" id="blockactions">4
+
+    </div>
+    <div class="tab-pane fade infomanagmentcont" id="infomanagment">5
+
+    </div>
+    <div class="tab-pane fade ticketscont" id="tickets">6
+      
+    </div>
   </div>
 </main>
-<script src="./bootstrap-5.0.2-dist/js/bootstrap.min.js"></script>
+<script src="./bootstrap-5.0.2-dist/js/bootstrap.bundle.min.js"></script>
 
     <script src="./js/sidebars.js"></script></body>
 </html>
