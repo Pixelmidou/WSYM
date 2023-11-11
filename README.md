@@ -1,6 +1,6 @@
 # WSYM
-Here is the live preview of this project : <br>
-Next Steps in the project : <br>
+Here is the live preview of this project : https://wsym.000webhostapp.com/ <br><br><br>
+Next Steps in the project : <br><br>
 Admin Welcome Page : <br>
 people balance : show a person's balance - edit a person's balance <br>
 people transactions : show a person's latest X (number) deposit / withdraw <br>
