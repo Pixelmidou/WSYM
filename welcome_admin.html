@@ -183,34 +183,69 @@
     </div>
   </div>
   <div class="tab-content container-fluid d-flex justify-content-center align-items-center">
-    <div class="tab-pane active homeseccont d-flex justify-content-center align-items-center" id="homesec">
-      <h1 class="h2 mb-3 text-center">Welcome Back</h1>
-      <div class="mt-auto mb-auto">
-        <span class="push">Clients Number : xxx</span>
-        <span class="push">Stored Money : $xxx</span>
+    <div class="tab-pane active" id="homesec">
+      <div class="homeseccont d-flex flex-column justify-content-center align-items-center">
+        <h1 class="h2 mb-3 text-center">Welcome Back</h1>
+        <div class="mt-auto mb-auto">
+          <span class="push">Clients Number : xxx</span>
+          <span class="push">Stored Money : $xxx</span>
+        </div>
+        <div class="" style="font-size: 15px;">In the last 24 Hours, there has been XX deposits</div>
+        <div class="" style="font-size: 15px;">In the last 24 Hours, there has been XX withdraws</div>
+        <div class="mb-3" style="font-size: 15px;">In the last 24 Hours, there has been XX wires</div>
       </div>
-      <div class="" style="font-size: 15px;">x</div>
-      <div class="" style="font-size: 15px;">x</div>
-      <div class="mb-3" style="font-size: 15px;">x</div>
     </div>
-    <div class="tab-pane fade balancecont" id="balance">2
+    <div class="tab-pane fade" id="balance">
+      <form method="post" class="balancecont d-flex flex-column justify-content-center align-items-center">
+        <h1>Check/Edit Balances</h1>
+        <div class="desc text-center" style="font-size: 15px;">Insert the email or the username of the person you want to check/edit the money of (Information doesn't have to be percise)</div>
+        <label class="labbor lab">
+            <img src="./data/mail.svg" alt="">
+            <input type="email" placeholder="Email">
+        </label>
+        <label class="labbor lab">
+          <img src="./data/user.svg" alt="">
+          <input type="text" placeholder="Username">
+        </label>
+        <table border="" class="mt-auto mb-auto">
+          <tr>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Balance</th>
+          </tr>
+          <tr>
+            <td>x</td>
+            <td>x</td>
+            <td>x</td>
+          </tr>
+        </table>
+        <input type="submit" value="Search" class="but">
+    </form>
+    </div>
+    <div class="tab-pane fade" id="transactions">
+      <div class="transactionscont d-flex flex-column justify-content-center align-items-center">3
 
+      </div>
     </div>
-    <div class="tab-pane fade transactionscont" id="transactions">3
+    <div class="tab-pane fade" id="blockactions">
+      <div class="blockactionscont d-flex flex-column justify-content-center align-items-center">4
 
+      </div>
     </div>
-    <div class="tab-pane fade blockactionscont" id="blockactions">4
+    <div class="tab-pane fade" id="infomanagment">
+      <div class="infomanagmentcont d-flex flex-column justify-content-center align-items-center">5
 
+      </div>
     </div>
-    <div class="tab-pane fade infomanagmentcont" id="infomanagment">5
+    <div class="tab-pane fade" id="tickets">
+      <div class="ticketscont d-flex flex-column justify-content-center align-items-center">6
 
-    </div>
-    <div class="tab-pane fade ticketscont" id="tickets">6
-      
+      </div>
     </div>
   </div>
 </main>
-<script src="./bootstrap-5.0.2-dist/js/bootstrap.bundle.min.js"></script>
-
-    <script src="./js/sidebars.js"></script></body>
+    <script src="./bootstrap-5.0.2-dist/js/bootstrap.bundle.min.js"></script>
+    <script src="./js/welcome_admin.js"></script>
+    <script src="./js/sidebars.js"></script>
+  </body>
 </html>
