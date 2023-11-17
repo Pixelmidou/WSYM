@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 11, 2023 at 09:05 PM
+-- Generation Time: Nov 17, 2023 at 09:57 PM
 -- Server version: 5.7.17
 -- PHP Version: 5.6.30
 
@@ -25,6 +25,26 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `adminusers`
+--
+
+CREATE TABLE `adminusers` (
+  `username` varchar(30) NOT NULL,
+  `pass` varchar(255) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `rank` varchar(10) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `adminusers`
+--
+
+INSERT INTO `adminusers` (`username`, `pass`, `email`, `rank`) VALUES
+('salah', '$2y$10$arEluj.rGqgZCK.eG.gw4ubYCzLM.Yz676o/jb09Ow2bGnYLZCNL.', 'salah@gmail.com', 'admin');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `balance`
 --
 
@@ -33,6 +53,14 @@ CREATE TABLE `balance` (
   `email` varchar(100) NOT NULL,
   `balance` decimal(6,1) DEFAULT '0.0'
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `balance`
+--
+
+INSERT INTO `balance` (`username`, `email`, `balance`) VALUES
+('pixel', 'pixel@gmail.com', '10.0'),
+('yessine', 'yessine@gmail.com', '10.0');
 
 -- --------------------------------------------------------
 
@@ -46,6 +74,15 @@ CREATE TABLE `deposit` (
   `deposit_date` datetime NOT NULL,
   `deposit_amount` decimal(6,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `deposit`
+--
+
+INSERT INTO `deposit` (`id`, `username`, `deposit_date`, `deposit_amount`) VALUES
+(1, 'pixel', '2023-11-17 08:24:15', '45.00'),
+(2, 'yessine', '2023-11-16 12:22:00', '88.00'),
+(3, 'yessine', '2023-11-17 00:00:00', '448.00');
 
 -- --------------------------------------------------------
 
@@ -69,6 +106,14 @@ CREATE TABLE `login_credentials` (
   `pass` varchar(255) NOT NULL,
   `email` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `login_credentials`
+--
+
+INSERT INTO `login_credentials` (`username`, `pass`, `email`) VALUES
+('pixel', '$2y$10$arEluj.rGqgZCK.eG.gw4ubYCzLM.Yz676o/jb09Ow2bGnYLZCNL.', 'pixel@gmail.com'),
+('yessine', '$2y$10$ECxdedkPizxS2HKw.ntDh.QG/0BVNqKTrVTyWpN7.LtS0.oXh8GEe', 'yessine@gmail.com');
 
 -- --------------------------------------------------------
 
@@ -111,6 +156,12 @@ CREATE TABLE `withdraw` (
 --
 -- Indexes for dumped tables
 --
+
+--
+-- Indexes for table `adminusers`
+--
+ALTER TABLE `adminusers`
+  ADD PRIMARY KEY (`username`);
 
 --
 -- Indexes for table `balance`
@@ -168,7 +219,7 @@ ALTER TABLE `withdraw`
 -- AUTO_INCREMENT for table `deposit`
 --
 ALTER TABLE `deposit`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 --
 -- AUTO_INCREMENT for table `wire`
 --
