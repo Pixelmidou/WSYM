@@ -1,4 +1,63 @@
-<!doctype html>
+<?php
+require ("linking.php");
+if ($con->connect_error) {
+    die("Connection Failed" . $con->connect_error);
+} else { 
+  session_start();
+  if (isset($_POST['logout'])) {
+      session_destroy();
+      header("Location: index.html");
+      exit;
+  }
+  $username = $_SESSION['username'];
+  $admin_type_query = mysqli_query($con,"SELECT rank FROM adminusers WHERE username = '$username'");
+  if (mysqli_num_rows($admin_type_query) > 0) {
+      $admin_type_array = mysqli_fetch_all($admin_type_query, MYSQLI_ASSOC);
+      foreach ($admin_type_array as $row) {
+          $admin_type = $row["rank"];
+      }
+  }
+  $clients_number_query = mysqli_query($con,"SELECT count(*) AS clients_number FROM login_credentials");
+  if (mysqli_num_rows($clients_number_query) > 0) {
+      $clients_number_array = mysqli_fetch_all($clients_number_query, MYSQLI_ASSOC);
+      foreach ($clients_number_array as $row) {
+          $clients_number = $row["clients_number"];
+      }
+  }
+  $stored_money_query = mysqli_query($con,"SELECT SUM(balance) AS stored_money from balance");
+  if (mysqli_num_rows($stored_money_query) > 0) {
+      $stored_money_array = mysqli_fetch_all($stored_money_query, MYSQLI_ASSOC);
+      foreach ($stored_money_array as $row) {
+          $stored_money = $row["stored_money"];
+      }
+  }
+  $today_deposits_query = mysqli_query($con,"SELECT count(deposit_date) AS today_deposits FROM deposit WHERE year(deposit_date) = year(now()) AND month(deposit_date) = month(now()) AND day(deposit_date) = day(now())");
+  if (mysqli_num_rows($today_deposits_query) > 0) {
+      $today_deposits_array = mysqli_fetch_all($today_deposits_query, MYSQLI_ASSOC);
+      foreach ($today_deposits_array as $row) {
+          $today_deposits = $row["today_deposits"];
+          $today_deposits_msg = "In the last 24 Hours, there has been $today_deposits deposits";
+      }
+  }
+  $today_withdraws_query = mysqli_query($con,"SELECT count(withdraw_date) AS today_withdraws FROM withdraw WHERE year(withdraw_date) = year(now()) AND month(withdraw_date) = month(now()) AND day(withdraw_date) = day(now())");
+  if (mysqli_num_rows($today_withdraws_query) > 0) {
+      $today_withdraws_array = mysqli_fetch_all($today_withdraws_query, MYSQLI_ASSOC);
+      foreach ($today_withdraws_array as $row) {
+          $today_withdraws = $row["today_withdraws"];
+          $today_withdraws_msg = "In the last 24 Hours, there has been $today_withdraws withdraws";
+      }
+  }
+  $today_wires_query = mysqli_query($con,"SELECT count(wire_date) AS today_wires FROM wire WHERE year(wire_date) = year(now()) AND month(wire_date) = month(now()) AND day(wire_date) = day(now())");
+  if (mysqli_num_rows($today_wires_query) > 0) {
+      $today_wires_array = mysqli_fetch_all($today_wires_query, MYSQLI_ASSOC);
+      foreach ($today_wires_array as $row) {
+          $today_wires = $row["today_wires"];
+          $today_wires_msg = "In the last 24 Hours, there has been $today_wires withdraws";
+      }
+  }
+}
+?>
+<!DOCTYPE html>
 <html lang="en" data-bs-theme="auto">
   <head>
 
@@ -145,24 +204,28 @@
           Balances
         </a>
       </li>
+      <?php if ($admin_type === "superadmin"): ?>
       <li class="nav-item">
         <a data-bs-toggle="pill" class="nav-link link-body-emphasis" href="#transactions">
           <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#bank"/></svg>
           Transactions
         </a>
       </li>
+      <?php endif; ?>
       <li class="nav-item">
         <a class="nav-link link-body-emphasis" data-bs-toggle="pill" href="#blockactions">
           <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#stop"/></svg>
           Block actions
         </a>
       </li>
+      <?php if ($admin_type === "superadmin"): ?>
       <li class="nav-item">
         <a data-bs-toggle="pill" class="nav-link link-body-emphasis" href="#infomanagment">
           <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#people-circle"/></svg>
           Info managment
         </a>
       </li>
+      <?php endif; ?>
       <li class="nav-item">
         <a data-bs-toggle="pill" class="nav-link link-body-emphasis" href="#tickets">
           <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#ticket"/></svg>
@@ -174,11 +237,11 @@
     <div class="dropdown">
       <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
         <img src="" alt="pfp" width="32" height="32" class="rounded-circle me-2">
-        <strong>mdo</strong>
+        <strong><?php echo "$username"; ?></strong>
       </a>
       <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
         <li><a class="dropdown-item" href="#">Upload your photo</a></li>
-        <li><a class="dropdown-item" href="#">Sign out</a></li>
+        <li><form method="post"><input class="dropdown-item" name="logout" type="submit" value="Sign Out"></form></li>
       </ul>
     </div>
   </div>
@@ -187,40 +250,32 @@
       <div class="homeseccont d-flex flex-column justify-content-center align-items-center">
         <h1 class="h2 mb-3 text-center">Welcome Back</h1>
         <div class="mt-auto mb-auto">
-          <span class="push">Clients Number : xxx</span>
-          <span class="push">Stored Money : $xxx</span>
+          <span class="push">Clients Number : <?php echo "$clients_number"; ?></span>
+          <span class="push">Stored Money : $<?php echo "$stored_money"; ?></span>
         </div>
-        <div class="" style="font-size: 15px;">In the last 24 Hours, there has been XX deposits</div>
-        <div class="" style="font-size: 15px;">In the last 24 Hours, there has been XX withdraws</div>
-        <div class="mb-3" style="font-size: 15px;">In the last 24 Hours, there has been XX wires</div>
+        <div class="" style="font-size: 15px;"><?php echo "$today_deposits_msg"; ?></div>
+        <div class="" style="font-size: 15px;"><?php echo "$today_withdraws_msg"; ?></div>
+        <div class="mb-3" style="font-size: 15px;"><?php echo "$today_wires_msg"; ?></div>
       </div>
     </div>
     <div class="tab-pane fade" id="balance">
       <form method="post" class="balancecont d-flex flex-column justify-content-center align-items-center">
         <h1>Check/Edit Balances</h1>
         <div class="desc text-center" style="font-size: 15px;">Insert the email or the username of the person you want to check/edit the money of (Information doesn't have to be percise)</div>
-        <label class="labbor lab">
-            <img src="./data/mail.svg" alt="">
-            <input type="email" placeholder="Email">
-        </label>
-        <label class="labbor lab">
-          <img src="./data/user.svg" alt="">
-          <input type="text" placeholder="Username">
-        </label>
-        <table border="" class="mt-auto mb-auto">
-          <tr>
-            <th>Username</th>
-            <th>Email</th>
-            <th>Balance</th>
-          </tr>
-          <tr>
-            <td>x</td>
-            <td>x</td>
-            <td>x</td>
-          </tr>
-        </table>
-        <input type="submit" value="Search" class="but">
+        <div class="mt-auto mb-auto d-flex flex-column justify-content-center align-items-center">
+          <label class="labbor lab">
+              <img src="./data/mail.svg" alt="">
+              <input type="email" placeholder="Email">
+          </label>
+          <label class="labbor lab">
+            <img src="./data/user.svg" alt="">
+            <input type="text" placeholder="Username">
+          </label>
+        </div>
+        <input type="submit" value="Search" class="but" name="submitbut">
     </form>
+    <?php if (isset($_POST['submitbut'])): ?>
+    <?php endif; ?>
     </div>
     <div class="tab-pane fade" id="transactions">
       <div class="transactionscont d-flex flex-column justify-content-center align-items-center">3
