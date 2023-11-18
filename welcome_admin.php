@@ -55,6 +55,41 @@ if ($con->connect_error) {
           $today_wires_msg = "In the last 24 Hours, there has been $today_wires withdraws";
       }
   }
+  if (isset($_POST['balance_submit'])) {
+    $balanceemail = filter_input(INPUT_POST, 'balanceemail', FILTER_SANITIZE_EMAIL);
+    $balanceusername = filter_input(INPUT_POST, 'balanceusername', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    if ($balanceemail != "") {
+      $balance_query = mysqli_query($con,"SELECT * FROM balance WHERE email LIKE '%$balanceemail%'");
+      if (mysqli_num_rows($balance_query) > 0) {
+        $_SESSION['balance_query_array'] = mysqli_fetch_all($balance_query, MYSQLI_ASSOC);
+        header("Location: welcome_admin_forms.php?verif_balance=success");
+        exit;
+      } else {
+        header("Location: welcome_admin_forms.php?verif_balance=fail");
+        exit;
+      }
+    } else if ($balanceusername != "") {
+      $balance_query = mysqli_query($con,"SELECT * FROM balance WHERE username LIKE '%$balanceusername%'");
+      if (mysqli_num_rows($balance_query) > 0) {
+        $_SESSION['balance_query_array'] = mysqli_fetch_all($balance_query, MYSQLI_ASSOC);
+        header("Location: welcome_admin_forms.php?verif_balance=success");
+        exit;
+      } else {
+        header("Location: welcome_admin_forms.php?verif_balance=fail");
+        exit;
+      }
+    } else if ($balanceemail != "" && $balanceusername != "") {
+      $balance_query = mysqli_query($con,"SELECT * FROM balance WHERE username LIKE '%$balanceusername%' AND email LIKE '%$balanceemail%'");
+      if (mysqli_num_rows($balance_query) > 0) {
+        $_SESSION['balance_query_array'] = mysqli_fetch_all($balance_query, MYSQLI_ASSOC);
+        header("Location: welcome_admin_forms.php?verif_balance=success");
+        exit;
+      } else {
+        header("Location: welcome_admin_forms.php?verif_balance=fail");
+        exit;
+      }
+    }
+  }
 }
 ?>
 <!DOCTYPE html>
@@ -261,21 +296,19 @@ if ($con->connect_error) {
     <div class="tab-pane fade" id="balance">
       <form method="post" class="balancecont d-flex flex-column justify-content-center align-items-center">
         <h1>Check/Edit Balances</h1>
-        <div class="desc text-center" style="font-size: 15px;">Insert the email or the username of the person you want to check/edit the money of (Information doesn't have to be percise)</div>
+        <div class="desc text-center" style="font-size: 15px;">Insert the email or the username of the person you want to check/edit the money of (Information doesn't have to be percise) <br> (at least one of the inputs needs to be filled)</div>
         <div class="mt-auto mb-auto d-flex flex-column justify-content-center align-items-center">
           <label class="labbor lab">
               <img src="./data/mail.svg" alt="">
-              <input type="email" placeholder="Email">
+              <input type="email" placeholder="Email" id="mail" name="balanceemail">
           </label>
           <label class="labbor lab">
             <img src="./data/user.svg" alt="">
-            <input type="text" placeholder="Username">
+            <input type="text" placeholder="Username" id="user" name="balanceusername">
           </label>
         </div>
-        <input type="submit" value="Search" class="but" name="submitbut">
+        <input type="submit" value="Search" class="but" name="balance_submit" onclick="return verifsub()">
     </form>
-    <?php if (isset($_POST['submitbut'])): ?>
-    <?php endif; ?>
     </div>
     <div class="tab-pane fade" id="transactions">
       <div class="transactionscont d-flex flex-column justify-content-center align-items-center">3

@@ -45,30 +45,7 @@ if ($con->connect_error) {
                     </html>
                 <?php }
             }
-        } else { ?>
-            <!DOCTYPE html>
-            <html lang="en">
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <meta http-equiv="refresh" content="4; url=index.html">
-                <title>WSYM Banking</title>
-                <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
-                <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
-                <link rel="stylesheet" href="./css/redirections_style.css">
-            </head>
-            <body>
-                <div class="container1">
-                    <div class="container2">
-                        <h1 style="text-align: center;">Access Denied : Check the provided info !</h1>
-                        <h4 style="text-align: center;">Possible Problems : Wrong Password or Username / Account does not exist</h4>
-                        <div style="text-align: center; font-size: small;">You will be automatically redirected back to the login page in 4 seconds.</div>
-                    </div>
-                </div>
-            </body>
-            </html>
-        <?php }
-        if (mysqli_num_rows($user_query) > 0) {
+        } else if (mysqli_num_rows($user_query) > 0) {
             while ($row_user = mysqli_fetch_array($user_query, MYSQLI_ASSOC)) {
                 if (password_verify($password,$row_user['pass'])) {
                     $_SESSION['username'] = $username;
