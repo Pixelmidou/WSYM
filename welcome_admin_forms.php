@@ -2,7 +2,13 @@
 session_start();
 $verif_balance = filter_input(INPUT_GET, 'verif_balance', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 if($verif_balance === "success") {
-    $balance_query_array = $_SESSION['balance_query_array'];
+    $balance_query_array_all = $_SESSION['balance_query_array_all']; // all fetch
+    $balance_query_array_per_row = $_SESSION['balance_query_array_per_row']; // array fetch
+    while ($row = $balance_query_array_per_row) {
+        echo $row['username'];
+        echo $row['email'];
+        echo $row['balance'];
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -86,6 +92,11 @@ if($verif_balance === "success") {
             color: white;
             font-size: medium;
         }
+        #but {
+            width: 100%;
+            padding-left: 50px;
+            padding-right: 50px;
+        }
     </style>
     <div class="container1">
         <?php if($verif_balance === "success"): ?>
@@ -99,10 +110,10 @@ if($verif_balance === "success") {
                 </tr>
                 </thead>
                 <tbody>
-                <?php foreach ($balance_query_array as $sub_array): ?>
+                <?php foreach ($balance_query_array_all as $sub_array): ?>
                     <tr>
-                        <?php foreach ($sub_array as $sub_array): ?>
-                            <td><?php echo $sub_array; ?></td>
+                        <?php foreach ($sub_array as $value): ?>
+                            <td><?php echo $value; ?></td>
                         <?php endforeach; ?>
                     </tr>
                 <?php endforeach; ?>
@@ -119,7 +130,10 @@ if($verif_balance === "success") {
                   <input type="text" placeholder="Value in Dollars" required>
                 </label>
             </div>
-            <input type="submit" class="but text-center mb-2 mt-2" id="but" value="Submit Change">
+            <div class="d-flex gap-4 mt-2 mb-2">
+                <input type="submit" class="but text-center" id="but" value="Submit Change">
+                <a href="welcome_admin.php"><input type="button" id="but" class="but text-center" value="Back to the admin page"></a>
+            </div>
         </form>
         <?php endif; ?>
         <?php if($verif_balance === "fail"): ?>
@@ -135,8 +149,8 @@ if($verif_balance === "success") {
             <body>
                 <div class="container1">
                     <div class="container2">
-                        <h1 style="text-align: center;">Error 500 : Internal Server Error</h1>
-                        <div style="text-align: center; font-size: small;">You will be automatically redirected back to the welcome page in 4 seconds.</div>
+                        <h1 style="text-align: center;">Error 404 : Not Found</h1>
+                        <div style="text-align: center; font-size: small;">You will be automatically redirected back to the admin page in 4 seconds.</div>
                     </div>
                 </div>
             </body>

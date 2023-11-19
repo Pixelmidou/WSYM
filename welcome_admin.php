@@ -56,12 +56,13 @@ if ($con->connect_error) {
       }
   }
   if (isset($_POST['balance_submit'])) {
-    $balanceemail = filter_input(INPUT_POST, 'balanceemail', FILTER_SANITIZE_EMAIL);
+    $balanceemail = filter_input(INPUT_POST, 'balanceemail', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     $balanceusername = filter_input(INPUT_POST, 'balanceusername', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     if ($balanceemail != "") {
       $balance_query = mysqli_query($con,"SELECT * FROM balance WHERE email LIKE '%$balanceemail%'");
       if (mysqli_num_rows($balance_query) > 0) {
-        $_SESSION['balance_query_array'] = mysqli_fetch_all($balance_query, MYSQLI_ASSOC);
+        $_SESSION['balance_query_array_all'] = mysqli_fetch_all($balance_query, MYSQLI_ASSOC);
+        $_SESSION['balance_query_array_per_row'] = mysqli_fetch_array($balance_query, MYSQLI_ASSOC);
         header("Location: welcome_admin_forms.php?verif_balance=success");
         exit;
       } else {
@@ -71,7 +72,8 @@ if ($con->connect_error) {
     } else if ($balanceusername != "") {
       $balance_query = mysqli_query($con,"SELECT * FROM balance WHERE username LIKE '%$balanceusername%'");
       if (mysqli_num_rows($balance_query) > 0) {
-        $_SESSION['balance_query_array'] = mysqli_fetch_all($balance_query, MYSQLI_ASSOC);
+        $_SESSION['balance_query_array_all'] = mysqli_fetch_all($balance_query, MYSQLI_ASSOC);
+        $_SESSION['balance_query_array_per_row'] = mysqli_fetch_array($balance_query, MYSQLI_ASSOC);
         header("Location: welcome_admin_forms.php?verif_balance=success");
         exit;
       } else {
@@ -79,9 +81,10 @@ if ($con->connect_error) {
         exit;
       }
     } else if ($balanceemail != "" && $balanceusername != "") {
-      $balance_query = mysqli_query($con,"SELECT * FROM balance WHERE username LIKE '%$balanceusername%' AND email LIKE '%$balanceemail%'");
+      $balance_query = mysqli_query($con,"SELECT * FROM balance WHERE username LIKE '%$balanceusername%' OR email LIKE '%$balanceemail%'");
       if (mysqli_num_rows($balance_query) > 0) {
-        $_SESSION['balance_query_array'] = mysqli_fetch_all($balance_query, MYSQLI_ASSOC);
+        $_SESSION['balance_query_array_all'] = mysqli_fetch_all($balance_query, MYSQLI_ASSOC);
+        $_SESSION['balance_query_array_per_row'] = mysqli_fetch_array($balance_query, MYSQLI_ASSOC);
         header("Location: welcome_admin_forms.php?verif_balance=success");
         exit;
       } else {
@@ -300,7 +303,7 @@ if ($con->connect_error) {
         <div class="mt-auto mb-auto d-flex flex-column justify-content-center align-items-center">
           <label class="labbor lab">
               <img src="./data/mail.svg" alt="">
-              <input type="email" placeholder="Email" id="mail" name="balanceemail">
+              <input type="text" placeholder="Email without (@example.ex)" id="mail" name="balanceemail">
           </label>
           <label class="labbor lab">
             <img src="./data/user.svg" alt="">
