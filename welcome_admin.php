@@ -58,37 +58,47 @@ if ($con->connect_error) {
   if (isset($_POST['balance_submit'])) {
     $balanceemail = filter_input(INPUT_POST, 'balanceemail', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     $balanceusername = filter_input(INPUT_POST, 'balanceusername', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-    if ($balanceemail != "") {
+    if (!empty($balanceemail) && empty($balanceusername)) {
+      $_SESSION['balanceemail'] = $balanceemail;
       $balance_query = mysqli_query($con,"SELECT * FROM balance WHERE email LIKE '%$balanceemail%'");
-      if (mysqli_num_rows($balance_query) > 0) {
+      if (mysqli_num_rows($balance_query)) {
         $_SESSION['balance_query_array_all'] = mysqli_fetch_all($balance_query, MYSQLI_ASSOC);
-        $_SESSION['balance_query_array_per_row'] = mysqli_fetch_array($balance_query, MYSQLI_ASSOC);
-        header("Location: welcome_admin_forms.php?verif_balance=success");
+        $_SESSION['verif_balance'] = "success";
+        $_SESSION['verif_balance_case'] = "1";
+        header("Location: welcome_admin_forms.php");
         exit;
       } else {
-        header("Location: welcome_admin_forms.php?verif_balance=fail");
+        $_SESSION['verif_balance'] = "fail";
+        header("Location: welcome_admin_forms.php");
         exit;
       }
-    } else if ($balanceusername != "") {
+    } else if (!empty($balanceusername) && empty($balanceemail)) {
+      $_SESSION['balanceusername'] = $balanceusername;
       $balance_query = mysqli_query($con,"SELECT * FROM balance WHERE username LIKE '%$balanceusername%'");
-      if (mysqli_num_rows($balance_query) > 0) {
+      if (mysqli_num_rows($balance_query)) {
         $_SESSION['balance_query_array_all'] = mysqli_fetch_all($balance_query, MYSQLI_ASSOC);
-        $_SESSION['balance_query_array_per_row'] = mysqli_fetch_array($balance_query, MYSQLI_ASSOC);
-        header("Location: welcome_admin_forms.php?verif_balance=success");
+        $_SESSION['verif_balance'] = "success";
+        $_SESSION['verif_balance_case'] = "2";
+        header("Location: welcome_admin_forms.php");
         exit;
       } else {
-        header("Location: welcome_admin_forms.php?verif_balance=fail");
+        $_SESSION['verif_balance'] = "fail";
+        header("Location: welcome_admin_forms.php");
         exit;
       }
-    } else if ($balanceemail != "" && $balanceusername != "") {
+    } else if (!empty($balanceemail) && !empty($balanceusername)) {
+      $_SESSION['balanceemail'] = $balanceemail;
+      $_SESSION['balanceusername'] = $balanceusername;
       $balance_query = mysqli_query($con,"SELECT * FROM balance WHERE username LIKE '%$balanceusername%' OR email LIKE '%$balanceemail%'");
-      if (mysqli_num_rows($balance_query) > 0) {
+      if (mysqli_num_rows($balance_query)) {
         $_SESSION['balance_query_array_all'] = mysqli_fetch_all($balance_query, MYSQLI_ASSOC);
-        $_SESSION['balance_query_array_per_row'] = mysqli_fetch_array($balance_query, MYSQLI_ASSOC);
-        header("Location: welcome_admin_forms.php?verif_balance=success");
+        $_SESSION['verif_balance'] = "success";
+        $_SESSION['verif_balance_case'] = "3";
+        header("Location: welcome_admin_forms.php");
         exit;
       } else {
-        header("Location: welcome_admin_forms.php?verif_balance=fail");
+        $_SESSION['verif_balance'] = "fail";
+        header("Location: welcome_admin_forms.php");
         exit;
       }
     }
