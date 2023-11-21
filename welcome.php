@@ -5,6 +5,10 @@ if ($con->connect_error) {
 } else {
     session_start();
     $username = $_SESSION['username'];
+    if(empty($_SESSION['username']) || $_SESSION['username'] == ''){
+        header("Location: index.html");
+        die();
+    }
     $balance_query = mysqli_query($con,"SELECT balance FROM balance WHERE username = '$username'");
     if (mysqli_num_rows($balance_query) > 0) {
         $balance_array = mysqli_fetch_all($balance_query, MYSQLI_ASSOC);
@@ -50,10 +54,12 @@ if ($con->connect_error) {
         $depval = filter_input(INPUT_POST,"depval",FILTER_SANITIZE_NUMBER_FLOAT);
         $_SESSION['depval'] = $depval;
         if (mysqli_query($con,"INSERT INTO deposit VALUES (id,'$username',now(),$depval)") && mysqli_query($con,"UPDATE balance SET balance = balance + $depval WHERE username = '$username'")) {
-            header("Location: welcome_verif.php?deposit_verif=success");
+            $_SESSION['deposit_verif'] = true;
+            header("Location: welcome_verif.php");
             exit;
         } else {
-            header("Location: welcome_verif.php?deposit_verif=fail");
+            $_SESSION['deposit_verif'] = false;
+            header("Location: welcome_verif.php");
             exit;
         }
     }
@@ -61,10 +67,12 @@ if ($con->connect_error) {
         $withval = filter_input(INPUT_POST,"withval",FILTER_SANITIZE_NUMBER_FLOAT);
         $_SESSION['withval'] = $withval;
         if (mysqli_query($con,"INSERT INTO withdraw VALUES (id,'$username',now(),$withval)") && mysqli_query($con,"UPDATE balance SET balance = balance - $withval WHERE username = '$username'")) {
-            header("Location: welcome_verif.php?withdraw_verif=success");
+            $_SESSION['withdraw_verif'] = true;
+            header("Location: welcome_verif.php");
             exit;
         } else {
-            header("Location: welcome_verif.php?&withdraw_verif=fail");
+            $_SESSION['withdraw_verif'] = false;
+            header("Location: welcome_verif.php");
             exit;
         }
     }
@@ -74,20 +82,24 @@ if ($con->connect_error) {
         $_SESSION['wireval'] = $wireval;
         $_SESSION['wireemail'] = $wireemail;
         if (mysqli_query($con,"INSERT INTO wire VALUES (id,'$username','$wireemail',now(),$wireval)") && mysqli_query($con,"UPDATE balance SET balance = balance + $wireval WHERE email = '$wireemail'") && mysqli_query($con,"UPDATE balance SET balance = balance - $wireval WHERE username = '$username'")) {
-            header("Location: welcome_verif.php?wire_verif=success");
+            $_SESSION['wire_verif'] = true;
+            header("Location: welcome_verif.php");
             exit;
         } else {
-            header("Location: welcome_verif.php?wire_verif=fail");
+            $_SESSION['wire_verif'] = false;
+            header("Location: welcome_verif.php");
             exit;
         }
     }
     if (isset($_POST['ticket_submit'])) {
         $tickettext = filter_input(INPUT_POST,"tickettext",FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         if (mysqli_query($con,"INSERT INTO ticket VALUES ('$username','$tickettext')")) {
-            header("Location: welcome_verif.php?ticket_verif=success");
+            $_SESSION['ticket_verif'] = true;
+            header("Location: welcome_verif.php");
             exit;
         } else {
-            header("Location: welcome_verif.php?ticket_verif=fail");
+            $_SESSION['ticket_verif'] = false;
+            header("Location: welcome_verif.php");
             exit;
         }
     }
@@ -98,8 +110,9 @@ if ($con->connect_error) {
     }
     $now = time();
     if($now > $_SESSION['expire']) { 
-        session_destroy(); 
-        header("Location: welcome_verif.php?session_verif=true");
+        session_destroy();
+        $_SESSION['session_verif'] = true;
+        header("Location: welcome_verif.php");
         exit;
     } 
 }

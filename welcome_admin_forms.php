@@ -5,35 +5,38 @@ if ($con->connect_error) {
 } else { 
     session_start();
     $verif_balance = $_SESSION["verif_balance"];
-    if($verif_balance === "success") {
-        $balance_query_array_all = $_SESSION['balance_query_array_all'];
+    if($verif_balance === true) {
         $verif_balance_case = $_SESSION['verif_balance_case'];
         switch ($verif_balance_case) {
             case "1":
                 $balanceemail = $_SESSION["balanceemail"];
-                $balance_query = mysqli_query($con,"SELECT * FROM balance WHERE email LIKE '%$balanceemail%'");
+                $balance_query1 = mysqli_query($con,"SELECT * FROM balance WHERE email LIKE '%$balanceemail%'");
+                $balance_query2 = mysqli_query($con,"SELECT * FROM balance WHERE email LIKE '%$balanceemail%'");
                 break;
             case "2":
                 $balanceusername = $_SESSION["balanceusername"];
-                $balance_query = mysqli_query($con,"SELECT * FROM balance WHERE username LIKE '%$balanceusername%'");
+                $balance_query1 = mysqli_query($con,"SELECT * FROM balance WHERE username LIKE '%$balanceusername%'");
+                $balance_query2 = mysqli_query($con,"SELECT * FROM balance WHERE username LIKE '%$balanceusername%'");
                 break;
             case "3":
                 $balanceemail = $_SESSION["balanceemail"];
                 $balanceusername = $_SESSION["balanceusername"];
-                $balance_query = mysqli_query($con,"SELECT * FROM balance WHERE username LIKE '%$balanceusername%' OR email LIKE '%$balanceemail%'");
+                $balance_query1 = mysqli_query($con,"SELECT * FROM balance WHERE username LIKE '%$balanceusername%' AND email LIKE '%$balanceemail%'");
+                $balance_query2 = mysqli_query($con,"SELECT * FROM balance WHERE username LIKE '%$balanceusername%' AND email LIKE '%$balanceemail%'");
                 break;
         }
+        $balance_query_array_all = mysqli_fetch_all($balance_query1, MYSQLI_ASSOC);
         if (isset($_POST["balance_submit"])) {
-            while ($row = mysqli_fetch_array($balance_query, MYSQLI_ASSOC)) {
+            while ($row = mysqli_fetch_array($balance_query2, MYSQLI_ASSOC)) {
                 $username = filter_input(INPUT_POST,"username",FILTER_SANITIZE_FULL_SPECIAL_CHARS);
                 if (in_array($username,$row)) {
                     $bval = filter_input(INPUT_POST,"bval",FILTER_SANITIZE_NUMBER_FLOAT);
                     $bval = floatval($bval);
                     mysqli_query($con,"UPDATE balance SET balance = $bval WHERE username = '$username'");
+                    header("Refresh:0");
                 }
             }
         }
-
     }
 }
 ?>
@@ -125,7 +128,7 @@ if ($con->connect_error) {
         }
     </style>
     <div class="container1">
-        <?php if($verif_balance === "success"): ?>
+        <?php if($verif_balance === true): ?>
         <form method="post" class="container2">
             <table class="table table-hover">
                 <thead>
@@ -162,7 +165,7 @@ if ($con->connect_error) {
             </div>
         </form>
         <?php endif; ?>
-        <?php if($verif_balance === "fail"): ?>
+        <?php if($verif_balance === false): ?>
             <head>
                 <meta charset="UTF-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
