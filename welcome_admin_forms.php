@@ -38,6 +38,10 @@ if ($con->connect_error) {
             }
         }
     }
+    $verif_deposit = $_SESSION["verif_deposit"];
+    if($verif_deposit === true) { 
+        
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -183,6 +187,75 @@ if ($con->connect_error) {
                     </div>
                 </div>
             </body>
+        <?php endif; ?>
+        <?php if($verif_deposit === true): ?>
+        <form method="post" class="container2">
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Deposit_Date</th>
+                    <th>Deposit_Amount</th>
+                </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="mt-2">P.S. : If you just want to check records omit these inputs</div>
+            <div class="d-flex gap-4">
+                <label class="labbor lab">
+                  <img src="./data/calender.svg" alt="">
+                  <input type="text" placeholder="Filter by date" required>
+                </label>
+                <label class="labbor lab">
+                  <img src="./data/dollar.svg" alt="">
+                  <input type="text" placeholder="Filter by amount" required>
+                </label>
+            </div>
+            <div class="d-flex gap-4 mt-2 mb-2">
+                <input type="submit" class="but text-center" id="but" value="Filter">
+                <input value="Open filtering manual" class="but text-center" type="button" data-bs-toggle="offcanvas" data-bs-target="#manual">
+                <a href="welcome_admin.php"><input type="button" id="but" class="but text-center" value="Back to the admin page" onclick="location.reload()"></a>
+            </div>
+            <div class="offcanvas offcanvas-start" id="manual">
+            <div class="offcanvas-header">
+                <h1 class="offcanvas-title">Filtering Manual</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+            </div>
+            <div class="offcanvas-body">
+                <div class="mb-3 h3">Date Filtering :</div>
+                <div class="mt-3 mb-3">P.S. : At least one of the year , month or day needs to be an exact known value</div>
+                <div class="mt-3 mb-3">Date's Format is YYYY-MM-DD : use % operator for more general filterting</div>
+                <div class="mt-3 mb-3">It is Mandatory! to keep the format as it is even with the "-"</div>
+                <div class="mt-3">Examples :</div>
+                <ul>
+                    <li class="mt-1">" 2023-%-% " (records during 2023 at any day or month)</li>
+                    <li class="mt-1">" 2023-01-% " (records during January 2023 at any day)</li>
+                    <li class="mt-1">" %-06-01 " (records during the 1st of June at any year)</li>
+                    <li class="mt-1">" %-%-01 " (records during the 1st of any month at any year)</li>
+                    <li class="mt-1">etc ...</li>
+                </ul>
+                <div class="mb-3 mt-5 h3">Amount Filtering :</div>
+                <div class="mt-3 mb-3">The format is " keywordnumber "</div>
+                <div class="mt-3 mb-3">Examples : sg90.8 / e120 / etc ...</div>
+                <div class="mt-3 mb-2">Keywords : sg / g / sl / l / e</div>
+                <div class="mt-3">Explication :</div>
+                <ul>
+                    <li class="mt-1">sg : strictly greater than </li>
+                    <li class="mt-1">g : greater than</li>
+                    <li class="mt-1">sl : strictly less than</li>
+                    <li class="mt-1">l : less than</li>
+                    <li class="mt-1">e : equals to</li>
+                </ul>
+                <div class="mt-3 mb-2">P.S. : Keywords are not case-sensitive</div>
+            </div>
+            </div>
+        </form>
         <?php endif; ?>
     </div>
     <script src="./bootstrap-5.0.2-dist/js/bootstrap.bundle.min.js"></script>

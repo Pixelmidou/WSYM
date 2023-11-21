@@ -9,10 +9,17 @@ if ($con->connect_error) {
       header("Location: index.html");
       exit;
   }
+  // $now = time();
+  // if($now > $_SESSION['expire']) { 
+  //     session_destroy();
+  //     $_SESSION['session_verif'] = true;
+  //     header("Location: welcome_verif.php");
+  //     exit;
+  // } 
   $username = $_SESSION['username'];
   if(empty($_SESSION['username']) || $_SESSION['username'] == ''){
     header("Location: index.html");
-    die();
+    exit;
   }
   $admin_type_query = mysqli_query($con,"SELECT rank FROM adminusers WHERE username = '$username'");
   if (mysqli_num_rows($admin_type_query) > 0) {
@@ -60,7 +67,7 @@ if ($con->connect_error) {
       }
   }
   if (isset($_POST['balance_submit'])) {
-    $balanceemail = filter_input(INPUT_POST, 'balanceemail', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $balanceemail = filter_input(INPUT_POST, 'balanceemail', FILTER_SANITIZE_EMAIL);
     $balanceusername = filter_input(INPUT_POST, 'balanceusername', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     if (!empty($balanceemail) && empty($balanceusername)) {
       $_SESSION['balanceemail'] = $balanceemail;
@@ -103,6 +110,57 @@ if ($con->connect_error) {
         exit;
       }
     }
+  }
+  if (isset($_POST['deposit_transactions_submit'])) { 
+    $transemail = filter_input(INPUT_POST, 'transemail', FILTER_SANITIZE_EMAIL);
+    $transusername = filter_input(INPUT_POST, 'transusername', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $translimit = filter_input(INPUT_POST, 'translimit', FILTER_SANITIZE_NUMBER_FLOAT);
+    if (!empty($transusername) && empty($transemail)) {
+      $_SESSION['transusername'] = $transusername;
+      $deposit_query = mysqli_query($con,"SELECT username,deposit_date,deposit_amount FROM deposit WHERE username LIKE '%$transusername%' LIMIT $translimit");
+      if (mysqli_num_rows($deposit_query)) {
+        $_SESSION['verif_deposit'] = true;
+        $_SESSION['verif_deposit_case'] = "1";
+        header("Location: welcome_admin_forms.php");
+        exit;
+      } else {
+        $_SESSION['verif_deposit'] = false;
+        header("Location: welcome_admin_forms.php");
+        exit;
+      }
+    } else if (!empty($transemail) && empty($transusername)) {
+        $_SESSION['transusername'] = $transemail;
+        $deposit_query = mysqli_query($con,"");
+        if (mysqli_num_rows($deposit_query)) {
+          $_SESSION['verif_deposit'] = true;
+          $_SESSION['verif_deposit_case'] = "2";
+          header("Location: welcome_admin_forms.php");
+          exit;
+        } else {
+          $_SESSION['verif_deposit'] = false;
+          header("Location: welcome_admin_forms.php");
+          exit;
+        }
+    } else if (!empty($transemail) && !empty($transusername)) {
+      $_SESSION['transusername'] = $transusername;
+      $_SESSION['transusername'] = $transemail;
+      $deposit_query = mysqli_query($con,"");
+      if (mysqli_num_rows($deposit_query)) {
+        $_SESSION['verif_deposit'] = true;
+        $_SESSION['verif_deposit_case'] = "3";
+        header("Location: welcome_admin_forms.php");
+        exit;
+      } else {
+        $_SESSION['verif_deposit'] = false;
+        header("Location: welcome_admin_forms.php");
+        exit;
+      }
+    }
+  if (isset($_POST['withdraw_transactions_submit'])) { 
+    
+  }
+  if (isset($_POST['wire_transactions_submit'])) { 
+    
   }
 }
 ?>
@@ -253,20 +311,20 @@ if ($con->connect_error) {
           Balances
         </a>
       </li>
-      <?php if ($admin_type === "superadmin"): ?>
       <li class="nav-item">
         <a data-bs-toggle="pill" class="nav-link link-body-emphasis" href="#transactions">
           <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#bank"/></svg>
           Transactions
         </a>
       </li>
-      <?php endif; ?>
+      <?php if ($admin_type === "superadmin"): ?>
       <li class="nav-item">
         <a class="nav-link link-body-emphasis" data-bs-toggle="pill" href="#blockactions">
           <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#stop"/></svg>
           Block actions
         </a>
       </li>
+      <?php endif; ?>
       <?php if ($admin_type === "superadmin"): ?>
       <li class="nav-item">
         <a data-bs-toggle="pill" class="nav-link link-body-emphasis" href="#infomanagment">
@@ -285,11 +343,13 @@ if ($con->connect_error) {
     <hr>
     <div class="dropdown">
       <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-        <img src="" alt="pfp" width="32" height="32" class="rounded-circle me-2">
+        <img src="" alt="pfp" width="32" height="32" class="rounded-circle me-2" id="output">
         <strong><?php echo "$username"; ?></strong>
       </a>
       <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
-        <li><a class="dropdown-item" href="#">Upload your photo</a></li>
+        <li><label for="file" class="dropdown-item">Upload Your Photo
+          <input class="invisible" type="file" accept="image/*" name="image" id="file" onchange="loadFile(event)" value="Upload Your Photo" style="width: 0;">
+        </label></li>
         <li><form method="post"><input class="dropdown-item" name="logout" type="submit" value="Sign Out"></form></li>
       </ul>
     </div>
@@ -322,12 +382,33 @@ if ($con->connect_error) {
           </label>
         </div>
         <input type="submit" value="Search" class="but" name="balance_submit" onclick="return verifsub()">
-    </form>
+      </form>
     </div>
     <div class="tab-pane fade" id="transactions">
-      <div class="transactionscont d-flex flex-column justify-content-center align-items-center">3
-
-      </div>
+      <form method="post" class="transactionscont d-flex flex-column justify-content-center align-items-center" style="height: 450px;">
+      <h1>Check Transactions</h1>
+        <div class="desc text-center" style="font-size: 15px;">Insert the email or the username of the person you want to check the transactions of (Information doesn't have to be percise) <br> (at least one of the email/username inputs needs to be filled)</div>
+        <div class="mt-auto mb-auto d-flex flex-column justify-content-center align-items-center">
+          <label class="labbor lab">
+              <img src="./data/mail.svg" alt="">
+              <input type="text" placeholder="Email without (@example.ex)" id="mail2" name="transemail">
+          </label>
+          <label class="labbor lab">
+            <img src="./data/user.svg" alt="">
+            <input type="text" placeholder="Username" id="user2" name="transusername">
+          </label>
+          <label class="labbor lab">
+            <img src="./data/stop.svg" alt="">
+            <input type="number" placeholder="Nb of records" min="1" max="20" required  name="translimit">
+          </label>
+        </div>
+        <div class="mb-3 mt-3">P.S. You are limited to only to see the 20 recent records</div>
+        <div class="d-flex gap-4 mt-2 mb-3">
+            <input type="submit" class="but text-center t-but" id="but" value="Deposit Search" name="deposit_transactions_submit" onclick="return verifsub2()">
+            <input type="submit" class="but text-center t-but" id="but" value="Withdraw Search" name="withdraw_transactions_submit" onclick="return verifsub2()">
+            <input type="submit" class="but text-center t-but" id="but" value="Wire Search" name="wire_transactions_submit" onclick="return verifsub2()">
+        </div>
+      </form>
     </div>
     <div class="tab-pane fade" id="blockactions">
       <div class="blockactionscont d-flex flex-column justify-content-center align-items-center">4
@@ -349,5 +430,11 @@ if ($con->connect_error) {
     <script src="./bootstrap-5.0.2-dist/js/bootstrap.bundle.min.js"></script>
     <script src="./js/welcome_admin.js"></script>
     <script src="./js/sidebars.js"></script>
+    <script type="text/javascript">
+        var loadFile = function(event) {
+          var image = document.getElementById('output');
+          image.src = URL.createObjectURL(event.target.files[0]);
+        };
+  </script>
   </body>
 </html>

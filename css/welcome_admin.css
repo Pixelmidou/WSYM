@@ -46,7 +46,7 @@ body {
   margin-bottom: 0;
 }
 
-input[type=text], .valbuts, input[type=email] {
+input[type=text], .valbuts, input[type=email], input[type=number] {
   background: none;
   border: 0;
   margin-left: 5px;
@@ -58,7 +58,7 @@ input[type=text], .valbuts, input[type=email] {
   width: 270px;
 }
 
-input[type=text]:focus, input[type=email]:focus, .valbuts:hover {
+input[type=text]:focus, input[type=email]:focus, .valbuts:hover, input[type=number]:focus {
   background: none;
   border: 0;
   caret-color: lightskyblue;
@@ -92,4 +92,9 @@ input[type=text]:focus, input[type=email]:focus, .valbuts:hover {
 ::placeholder {
   color: white;
   font-size: medium;
+}
+
+.t-but {
+  padding-left: 30px;
+  padding-right: 30px;
 }/*# sourceMappingURL=welcome_admin.css.map */
