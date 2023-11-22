@@ -128,7 +128,7 @@ if ($con->connect_error) {
         header("Location: welcome_admin_forms.php");
         exit;
       }
-    } else if (!empty($transemail) && empty($transusername)) {
+      } else if (!empty($transemail) && empty($transusername)) {
         $_SESSION['transusername'] = $transemail;
         $deposit_query = mysqli_query($con,"");
         if (mysqli_num_rows($deposit_query)) {
@@ -141,26 +141,27 @@ if ($con->connect_error) {
           header("Location: welcome_admin_forms.php");
           exit;
         }
-    } else if (!empty($transemail) && !empty($transusername)) {
-      $_SESSION['transusername'] = $transusername;
-      $_SESSION['transusername'] = $transemail;
-      $deposit_query = mysqli_query($con,"");
-      if (mysqli_num_rows($deposit_query)) {
-        $_SESSION['verif_deposit'] = true;
-        $_SESSION['verif_deposit_case'] = "3";
-        header("Location: welcome_admin_forms.php");
-        exit;
-      } else {
-        $_SESSION['verif_deposit'] = false;
-        header("Location: welcome_admin_forms.php");
-        exit;
-      }
+      } else if (!empty($transemail) && !empty($transusername)) {
+        $_SESSION['transusername'] = $transusername;
+        $_SESSION['transusername'] = $transemail;
+        $deposit_query = mysqli_query($con,"");
+        if (mysqli_num_rows($deposit_query)) {
+          $_SESSION['verif_deposit'] = true;
+          $_SESSION['verif_deposit_case'] = "3";
+          header("Location: welcome_admin_forms.php");
+          exit;
+        } else {
+          $_SESSION['verif_deposit'] = false;
+          header("Location: welcome_admin_forms.php");
+          exit;
+        }
     }
-  if (isset($_POST['withdraw_transactions_submit'])) { 
+    if (isset($_POST['withdraw_transactions_submit'])) { 
     
-  }
-  if (isset($_POST['wire_transactions_submit'])) { 
+    }
+    if (isset($_POST['wire_transactions_submit'])) { 
     
+    }
   }
 }
 ?>
@@ -435,6 +436,6 @@ if ($con->connect_error) {
           var image = document.getElementById('output');
           image.src = URL.createObjectURL(event.target.files[0]);
         };
-  </script>
+    </script>
   </body>
 </html>
