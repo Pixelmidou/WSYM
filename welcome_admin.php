@@ -130,7 +130,7 @@ if ($con->connect_error) {
       }
       } else if (!empty($transemail) && empty($transusername)) {
         $_SESSION['transusername'] = $transemail;
-        $deposit_query = mysqli_query($con,"");
+        $deposit_query = mysqli_query($con,"SELECT deposit.username,email,deposit_date,deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') LIMIT $translimit");
         if (mysqli_num_rows($deposit_query)) {
           $_SESSION['verif_deposit'] = true;
           $_SESSION['verif_deposit_case'] = "2";
@@ -144,7 +144,7 @@ if ($con->connect_error) {
       } else if (!empty($transemail) && !empty($transusername)) {
         $_SESSION['transusername'] = $transusername;
         $_SESSION['transusername'] = $transemail;
-        $deposit_query = mysqli_query($con,"");
+        $deposit_query = mysqli_query($con,"SELECT deposit.username,email,deposit_date,deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%yes%') AND deposit.username LIKE '%yes%' LIMIT $translimit");
         if (mysqli_num_rows($deposit_query)) {
           $_SESSION['verif_deposit'] = true;
           $_SESSION['verif_deposit_case'] = "3";
