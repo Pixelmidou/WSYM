@@ -1,15 +1,15 @@
 <?php
 session_start();
 $deposit_verif = $_SESSION['deposit_verif'];
-if ($deposit_verif === true) {
+if ($deposit_verif === "success") {
     $depval = $_SESSION['depval'];
 }
 $withdraw_verif = $_SESSION['withdraw_verif'];
-if ($withdraw_verif === true) {
+if ($withdraw_verif === "success") {
     $withval = $_SESSION['withval'];
 }
 $wire_verif = $_SESSION['wire_verif'];
-if ($wire_verif === true) {
+if ($wire_verif === "success") {
     $wireval = $_SESSION['wireval'];
     $wireemail = $_SESSION['wireemail'];
 }
@@ -18,7 +18,7 @@ $session_verif = $_SESSION['session_verif'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
-<?php if ($deposit_verif === true) {  ?>
+<?php if ($deposit_verif === "success") {  ?>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -37,7 +37,7 @@ $session_verif = $_SESSION['session_verif'];
         </div>
     </div>
 </body>
-<?php } else if ($deposit_verif === false) { ?>
+<?php } else if ($deposit_verif === "fail") { ?>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -56,7 +56,7 @@ $session_verif = $_SESSION['session_verif'];
     </div>
 </body>
 <?php } ?>
-<?php if ($withdraw_verif === true) {  ?>
+<?php if ($withdraw_verif === "success") {  ?>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -75,7 +75,7 @@ $session_verif = $_SESSION['session_verif'];
         </div>
     </div>
 </body>
-<?php } else if ($withdraw_verif === false) { ?>
+<?php } else if ($withdraw_verif === "fail") { ?>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -94,7 +94,7 @@ $session_verif = $_SESSION['session_verif'];
     </div>
 </body>
 <?php } ?>
-<?php if ($wire_verif === true) {  ?>
+<?php if ($wire_verif === "success") {  ?>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -113,7 +113,7 @@ $session_verif = $_SESSION['session_verif'];
         </div>
     </div>
 </body>
-<?php } else if ($wire_verif === false) { ?>
+<?php } else if ($wire_verif === "fail") { ?>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -132,7 +132,7 @@ $session_verif = $_SESSION['session_verif'];
     </div>
 </body>
 <?php } ?>
-<?php if ($ticket_verif === true) {  ?>
+<?php if ($ticket_verif === "success") {  ?>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -150,7 +150,7 @@ $session_verif = $_SESSION['session_verif'];
         </div>
     </div>
 </body>
-<?php } else if ($ticket_verif === false) { ?>
+<?php } else if ($ticket_verif === "fail") { ?>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -169,7 +169,7 @@ $session_verif = $_SESSION['session_verif'];
     </div>
 </body>
 <?php } ?>
-<?php if ($session_verif === true) {  ?>
+<?php if ($session_verif === "success") {  ?>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
