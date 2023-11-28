@@ -6,7 +6,7 @@ if ($con->connect_error) {
     session_start();
     if (isset($_SESSION["verif_balance"])) {
         $verif_balance = $_SESSION["verif_balance"];
-        if($verif_balance === true) {
+        if($verif_balance === "success") {
             $verif_balance_case = $_SESSION['verif_balance_case'];
             switch ($verif_balance_case) {
                 case "1":
@@ -42,13 +42,13 @@ if ($con->connect_error) {
     }
     if (isset($_SESSION["verif_deposit"])) { 
         $verif_deposit = $_SESSION["verif_deposit"];
-        if($verif_deposit === true) { 
+        if($verif_deposit === "success") { 
         
         }
     }
 }
 ?>
-<?php if(isset($verif_balance) && $verif_balance === true): ?>
+<?php if(isset($verif_balance) && $verif_balance === "success"): ?>
     <!DOCTYPE html>
     <html lang="en">
     <head>
@@ -94,7 +94,7 @@ if ($con->connect_error) {
                 </div>
                 <div class="d-flex gap-4 mt-2 mb-2">
                     <input type="submit" class="but text-center" id="but" value="Submit Change" name="balance_submit">
-                    <a href="welcome_admin.php"><input type="submit" name="returnbut" id="but" class="but text-center" value="Back to the admin page" onclick="location.reload()"></a>
+                    <a href="welcome_admin.php"><input type="button" name="returnbut" id="but" class="but text-center" value="Back to the admin page" onclick="location.reload()"></a>
                 </div>
             </form>
         </div>
@@ -102,7 +102,7 @@ if ($con->connect_error) {
     </body>
     </html>
 <?php endif; ?>
-<?php if(isset($verif_deposit) && $verif_deposit === true): ?>
+<?php if(isset($verif_deposit) && $verif_deposit === "success"): ?>
     <!DOCTYPE html>
     <html lang="en">
     <head>
@@ -188,7 +188,7 @@ if ($con->connect_error) {
     </body>
     </html>
 <?php endif; ?>
-<?php if(isset($verif_balance) && $verif_balance === false || isset($verif_deposit) &&  $verif_deposit === false): ?>
+<?php if(isset($verif_balance) && $verif_balance === "fail" || isset($verif_deposit) &&  $verif_deposit === "fail"): ?>
     <!DOCTYPE html>
     <html lang="en">
     <head>
