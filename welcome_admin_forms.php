@@ -39,11 +39,21 @@ if ($con->connect_error) {
                 }
             }
         }
+        if (isset($_POST['balback'])) {
+            header("Location: welcome_admin.php");
+            unset($_SESSION['verif_balance']);
+            exit;
+        }
     }
     if (isset($_SESSION["verif_deposit"])) { 
         $verif_deposit = $_SESSION["verif_deposit"];
         if($verif_deposit === "success") { 
-        
+            
+            if (isset($_POST['depback'])) {
+                header("Location: welcome_admin.php");
+                unset($_SESSION['verif_deposit']);
+                exit;
+            }
         }
     }
 }
@@ -94,8 +104,9 @@ if ($con->connect_error) {
                 </div>
                 <div class="d-flex gap-4 mt-2 mb-2">
                     <input type="submit" class="but text-center" id="but" value="Submit Change" name="balance_submit">
-                    <a href="welcome_admin.php"><input type="button" name="returnbut" id="but" class="but text-center" value="Back to the admin page" onclick="location.reload()"></a>
+                    <input type="submit" name="balback" id="but" class="but text-center" value="Back to the admin page" formnovalidate>
                 </div>
+                <div class="mb-2 mt-2" style="font-size: 15px;">Please do not use the browser's back button , use the one provided instead</div>
             </form>
         </div>
         <script src="./bootstrap-5.0.2-dist/js/bootstrap.bundle.min.js"></script>
@@ -121,8 +132,8 @@ if ($con->connect_error) {
                     <thead>
                     <tr>
                         <th>Username</th>
-                        <th>Deposit_Date</th>
-                        <th>Deposit_Amount</th>
+                        <th>Deposit Date</th>
+                        <th>Deposit Amount</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -147,29 +158,28 @@ if ($con->connect_error) {
                 <div class="d-flex gap-4 mt-2 mb-2">
                     <input type="submit" class="but text-center" id="but" value="Filter">
                     <input value="Open filtering manual" class="but text-center" type="button" data-bs-toggle="offcanvas" data-bs-target="#manual">
-                    <a href="welcome_admin.php"><input type="button" id="but" class="but text-center" value="Back to the admin page" onclick="location.reload()"></a>
                 </div>
                 <div class="offcanvas offcanvas-start" id="manual">
-                <div class="offcanvas-header">
-                    <h1 class="offcanvas-title">Filtering Manual</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
-                </div>
-                <div class="offcanvas-body">
-                    <div class="mb-3 h3">Date Filtering :</div>
-                    <div class="mt-3 mb-3">P.S. : At least one of the year , month or day needs to be an exact known value</div>
-                    <div class="mt-3 mb-3">Date's Format is YYYY-MM-DD : use % operator for more general filterting</div>
-                    <div class="mt-3 mb-3">It is Mandatory! to keep the format as it is even with the "-"</div>
-                    <div class="mt-3">Examples :</div>
-                    <ul>
-                        <li class="mt-1">" 2023-%-% " (records during 2023 at any day or month)</li>
-                        <li class="mt-1">" 2023-01-% " (records during January 2023 at any day)</li>
-                        <li class="mt-1">" %-06-01 " (records during the 1st of June at any year)</li>
-                        <li class="mt-1">" %-%-01 " (records during the 1st of any month at any year)</li>
-                        <li class="mt-1">etc ...</li>
-                    </ul>
-                    <div class="mb-3 mt-5 h3">Amount Filtering :</div>
-                    <div class="mt-3 mb-3">The format is " keywordnumber "</div>
-                    <div class="mt-3 mb-3">Examples : sg90.8 / e120 / etc ...</div>
+                    <div class="offcanvas-header">
+                        <h1 class="offcanvas-title">Filtering Manual</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+                    </div>
+                    <div class="offcanvas-body">
+                        <div class="mb-3 h3">Date Filtering :</div>
+                        <div class="mt-3 mb-3">P.S. : At least one of the year , month or day needs to be an exact known value</div>
+                        <div class="mt-3 mb-3">Date's Format is YYYY-MM-DD : use % operator for more general filterting</div>
+                        <div class="mt-3 mb-3">It is Mandatory! to keep the format as it is even with the "-"</div>
+                        <div class="mt-3">Examples :</div>
+                        <ul>
+                            <li class="mt-1">" 2023-%-% " (records during 2023 at any day or month)</li>
+                            <li class="mt-1">" 2023-01-% " (records during January 2023 at any day)</li>
+                            <li class="mt-1">" %-06-01 " (records during the 1st of June at any year)</li>
+                            <li class="mt-1">" %-%-01 " (records during the 1st of any month at any year)</li>
+                            <li class="mt-1">etc ...</li>
+                        </ul>
+                        <div class="mb-3 mt-5 h3">Amount Filtering :</div>
+                        <div class="mt-3 mb-3">The format is " keywordnumber "</div>
+                        <div class="mt-3 mb-3">Examples : sg90.8 / e120 / etc ...</div>
                     <div class="mt-3 mb-2">Keywords : sg / g / sl / l / e</div>
                     <div class="mt-3">Explication :</div>
                     <ul>
@@ -181,12 +191,13 @@ if ($con->connect_error) {
                     </ul>
                     <div class="mt-3 mb-2">P.S. : Keywords are not case-sensitive</div>
                 </div>
-                </div>
-            </form>
-        </div>
-        <script src="./bootstrap-5.0.2-dist/js/bootstrap.bundle.min.js"></script>
-    </body>
-    </html>
+            </div>
+        </form>
+        <form method="post"><input type="submit" id="but" name="depback" class="but text-center" value="Back to the admin page"></form>
+    </div>
+    <script src="./bootstrap-5.0.2-dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
 <?php endif; ?>
 <?php if(isset($verif_balance) && $verif_balance === "fail" || isset($verif_deposit) &&  $verif_deposit === "fail"): ?>
     <!DOCTYPE html>
