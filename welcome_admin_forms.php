@@ -59,28 +59,63 @@ if ($con->connect_error) {
                 case "2":
                     $transemail = $_SESSION["transemail"];
                     $translimit = $_SESSION['translimit'];
-                    $deposit_query1 = mysqli_query($con,"SELECT deposit.username,email,deposit_date,deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') LIMIT $translimit");
-                    $deposit_query2 = mysqli_query($con,"SELECT deposit.username,email,deposit_date,deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') LIMIT $translimit");
+                    $deposit_query1 = mysqli_query($con,"SELECT deposit.username,deposit_date,deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') LIMIT $translimit");
+                    $deposit_query2 = mysqli_query($con,"SELECT deposit.username,deposit_date,deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') LIMIT $translimit");
                     break;
                 case "3":
                     $transemail = $_SESSION["transemail"];
                     $transusername = $_SESSION["transusername"];
                     $translimit = $_SESSION['translimit'];
-                    $deposit_query1 = mysqli_query($con,"SELECT deposit.username,email,deposit_date,deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit.username LIKE '%$transusername%' LIMIT $translimit");
-                    $deposit_query2 = mysqli_query($con,"SELECT deposit.username,email,deposit_date,deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit.username LIKE '%$transusername%' LIMIT $translimit");
+                    $deposit_query1 = mysqli_query($con,"SELECT deposit.username,deposit_date,deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit.username LIKE '%$transusername%' LIMIT $translimit");
+                    $deposit_query2 = mysqli_query($con,"SELECT deposit.username,deposit_date,deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit.username LIKE '%$transusername%' LIMIT $translimit");
                     break;
             }
             $deposit_query_array_all = mysqli_fetch_all($deposit_query1, MYSQLI_ASSOC);
+            $depficase = "initial";
             if (isset($_POST["deposit_submit"])) {
                 $depfidate = filter_input(INPUT_POST, 'depfidate', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
                 $depfiamount = filter_input(INPUT_POST, 'depfiamount', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
                 if (!empty($depfidate) && empty($depfiamount)) {
                     $depficase = "1";
+                    switch ($verif_deposit_case) { 
+                        case "1":
+                            $depfi_query = mysqli_query($con,"SELECT username,deposit_date,deposit_amount FROM deposit WHERE username LIKE '%$transusername%' HAVING LEFT(deposit_date, 10) LIKE '$depfidate' LIMIT $translimit");
+                            break;
+                        case "2":
+                            $depfi_query = mysqli_query($con,"SELECT deposit.username,deposit_date,deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') HAVING LEFT(deposit_date, 10) LIKE '$depfidate' LIMIT $translimit");
+                            break;
+                        case "3":
+                            $depfi_query = mysqli_query($con,"SELECT deposit.username,deposit_date,deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit.username LIKE '%$transusername%' HAVING LEFT(deposit_date, 10) LIKE '$depfidate' LIMIT $translimit");
+                            break;
+                    }
                 } else if (empty($depfidate) && !empty($depfiamount)) {
                     $depficase = "2";
+                    switch ($verif_deposit_case) { 
+                        case "1":
+                            $depfi_query = mysqli_query($con,"");
+                            break;
+                        case "2":
+                            $depfi_query = mysqli_query($con,"");
+                            break;
+                        case "3":
+                            $depfi_query = mysqli_query($con,"");
+                            break;
+                    }
                 } else if (!empty($depfidate) && !empty($depfiamount)) {
                     $depficase = "3";
+                    switch ($verif_deposit_case) { 
+                        case "1":
+                            $depfi_query = mysqli_query($con,"");
+                            break;
+                        case "2":
+                            $depfi_query = mysqli_query($con,"");
+                            break;
+                        case "3":
+                            $depfi_query = mysqli_query($con,"");
+                            break;
+                    }
                 }
+                $depfi_query_array_all = mysqli_fetch_all($depfi_query, MYSQLI_ASSOC);
             }
             if (isset($_POST['depback'])) {
                 header("Location: welcome_admin.php");
@@ -165,19 +200,33 @@ if ($con->connect_error) {
                     <thead>
                     <tr>
                         <th>Username</th>
-                        <th>Email</th>
                         <th>Deposit Date</th>
                         <th>Deposit Amount</th>
                     </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($deposit_query_array_all as $sub_array): ?>
-                            <tr>
-                                <?php foreach ($sub_array as $value): ?>
-                                    <td><?php echo $value; ?></td>
-                                <?php endforeach; ?>
-                            </tr>
-                        <?php endforeach; ?>
+                        <?php if ($depficase === "initial"): ?>
+                            <?php foreach ($deposit_query_array_all as $sub_array): ?>
+                                <tr>
+                                    <?php foreach ($sub_array as $value): ?>
+                                        <td><?php echo $value; ?></td>
+                                    <?php endforeach; ?>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                        <?php if ($depficase === "1"): ?>
+                            <?php foreach ($depfi_query_array_all as $sub_array): ?>
+                                <tr>
+                                    <?php foreach ($sub_array as $value): ?>
+                                        <td><?php echo $value; ?></td>
+                                    <?php endforeach; ?>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                        <?php if ($depficase === "2"): ?>
+                        <?php endif; ?>
+                        <?php if ($depficase === "3"): ?>
+                        <?php endif; ?>
                     </tbody>
                 </table>
                 <div class="mt-2">P.S. : If you just want to check records omit these inputs</div>
@@ -206,12 +255,12 @@ if ($con->connect_error) {
                         <div class="mt-3 mb-3">P.S. : </div>
                         <ul>
                             <li class="mt-1">At least one of the year , month or day needs to be an exact known value</li>
-                            <li class="mt-1">Date's Format is YYYY-MM-DD : use % operator for more general filterting</li>
-                            <li class="mt-1">It is Mandatory! to keep the format as it is even with the "-"</li>
+                            <li class="mt-1">Date's Format is YYYY-MM-DD hh:mm:ss : use % operator for more general filterting (the space between the date and the time is necessary)</li>
+                            <li class="mt-1">It is Mandatory! to keep the format as it is with the "-" (hyphen) and ":" (colon)</li>
                         </ul>
                         <div class="mt-3">Examples :</div>
                         <ul>
-                            <li class="mt-1">" 2023-%-% " (records during 2023 at any day or month)</li>
+                            <li class="mt-1">" 2023-%-% " (records during 2023 at any day, any month)</li>
                             <li class="mt-1">" 2023-01-% " (records during January 2023 at any day)</li>
                             <li class="mt-1">" %-06-01 " (records during the 1st of June at any year)</li>
                             <li class="mt-1">" %-%-01 " (records during the 1st of any month at any year)</li>
