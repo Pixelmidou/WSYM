@@ -4,6 +4,11 @@ if ($con->connect_error) {
     die("Connection Failed" . $con->connect_error);
 } else {
     session_start();
+    if(empty($_SESSION['username']) || $_SESSION['username'] == ''){
+        session_destroy();
+        header("Location: index.html");
+        die();
+    }
     $now = time();
     if($now > $_SESSION['expire']) { 
         session_destroy(); ?>
@@ -30,10 +35,6 @@ if ($con->connect_error) {
     <?php } else {
         $page_load = true;
         $username = $_SESSION['username'];
-        if(empty($_SESSION['username']) || $_SESSION['username'] == ''){
-            header("Location: index.html");
-            die();
-        }
         if (isset($_POST['logout'])) {
             session_destroy();
             header("Location: index.html");

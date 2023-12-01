@@ -1,5 +1,12 @@
 <?php
 session_start();
+if (!isset($_SESSION['deposit_verif']) && !isset($_SESSION['withdraw_verif']) && !isset($_SESSION['wire_verif']) && !isset($_SESSION['ticket_verif'])) {
+    if (empty($_SESSION['deposit_verif']) || $_SESSION['deposit_verif'] === "" && empty($_SESSION['withdraw_verif']) || $_SESSION['withdraw_verif'] === "" && empty($_SESSION['wire_verif']) || $_SESSION['wire_verif'] === ""  && empty($_SESSION['ticket_verif']) || $_SESSION['ticket_verif'] === "") {
+        session_destroy();
+        header("Location: index.html");
+        exit;
+    } 
+}
 if (isset($_SESSION['deposit_verif'])) {
     $deposit_verif = $_SESSION['deposit_verif'];
     if ($deposit_verif === "success") {
