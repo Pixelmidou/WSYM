@@ -9,6 +9,11 @@ if ($con->connect_error) {
         header("Location: index.html");
         die();
     }
+    if (isset($_POST['logout'])) {
+        session_destroy();
+        header("Location: index.html");
+        exit;
+    }
     $now = time();
     if($now > $_SESSION['expire']) { 
         session_destroy(); ?>
@@ -27,6 +32,7 @@ if ($con->connect_error) {
             <div class="container1">
                 <div class="container2">
                     <h1 style="text-align: center;">Session expired : You need to login again !</h1>
+                    <div style="text-align: center; font-size: medium;">Any action attempted was stopped and interrupted.</div>
                     <div style="text-align: center; font-size: small;">You will be automatically redirected back to the login page in 4 seconds.</div>
                 </div>
             </div>
@@ -35,11 +41,6 @@ if ($con->connect_error) {
     <?php } else {
         $page_load = true;
         $username = $_SESSION['username'];
-        if (isset($_POST['logout'])) {
-            session_destroy();
-            header("Location: index.html");
-            exit;
-        }
         $balance_query = mysqli_query($con,"SELECT balance FROM balance WHERE username = '$username'");
         if (mysqli_num_rows($balance_query) > 0) {
             $balance_array = mysqli_fetch_all($balance_query, MYSQLI_ASSOC);
@@ -246,6 +247,7 @@ if ($con->connect_error) {
         </form>
         <form method="post" class="container4 ticket" id="ticket">
             <h1 class="deptitle">Submit a ticket</h1>
+            <div class="desc">P.S. : Only one ticket at time can be opened</div>
             <label>
                 <textarea id="tick" name="tickettext" cols="40" rows="6"></textarea>
             </label>
