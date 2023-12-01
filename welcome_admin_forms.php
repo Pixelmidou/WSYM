@@ -48,7 +48,40 @@ if ($con->connect_error) {
     if (isset($_SESSION["verif_deposit"])) { 
         $verif_deposit = $_SESSION["verif_deposit"];
         if($verif_deposit === "success") { 
-            
+            $verif_deposit_case = $_SESSION['verif_deposit_case'];
+            switch ($verif_deposit_case) {
+                case "1":
+                    $transusername = $_SESSION["transusername"];
+                    $translimit = $_SESSION['translimit'];
+                    $depositdeposit = mysqli_query($con,"SELECT username,deposit_date,deposit_amount FROM deposit WHERE username LIKE '%$transusername%' LIMIT $translimit");
+                    $deposit_query2 = mysqli_query($con,"SELECT username,deposit_date,deposit_amount FROM deposit WHERE username LIKE '%$transusername%' LIMIT $translimit");
+                    break;
+                case "2":
+                    $transemail = $_SESSION["transemail"];
+                    $translimit = $_SESSION['translimit'];
+                    $deposit_query1 = mysqli_query($con,"SELECT deposit.username,email,deposit_date,deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') LIMIT $translimit");
+                    $deposit_query2 = mysqli_query($con,"SELECT deposit.username,email,deposit_date,deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') LIMIT $translimit");
+                    break;
+                case "3":
+                    $transemail = $_SESSION["transemail"];
+                    $transusername = $_SESSION["transusername"];
+                    $translimit = $_SESSION['translimit'];
+                    $deposit_query1 = mysqli_query($con,"SELECT deposit.username,email,deposit_date,deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit.username LIKE '%$transusername%' LIMIT $translimit");
+                    $deposit_query2 = mysqli_query($con,"SELECT deposit.username,email,deposit_date,deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit.username LIKE '%$transusername%' LIMIT $translimit");
+                    break;
+            }
+            $deposit_query_array_all = mysqli_fetch_all($deposit_query1, MYSQLI_ASSOC);
+            if (isset($_POST["deposit_submit"])) {
+                $depfidate = filter_input(INPUT_POST, 'depfidate', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+                $depfiamount = filter_input(INPUT_POST, 'depfiamount', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+                if (!empty($depfidate) && empty($depfiamount)) {
+                    $depficase = "1";
+                } else if (empty($depfidate) && !empty($depfiamount)) {
+                    $depficase = "2";
+                } else if (!empty($depfidate) && !empty($depfiamount)) {
+                    $depficase = "3";
+                }
+            }
             if (isset($_POST['depback'])) {
                 header("Location: welcome_admin.php");
                 unset($_SESSION['verif_deposit']);
@@ -132,32 +165,36 @@ if ($con->connect_error) {
                     <thead>
                     <tr>
                         <th>Username</th>
+                        <th>Email</th>
                         <th>Deposit Date</th>
                         <th>Deposit Amount</th>
                     </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
+                        <?php foreach ($deposit_query_array_all as $sub_array): ?>
+                            <tr>
+                                <?php foreach ($sub_array as $value): ?>
+                                    <td><?php echo $value; ?></td>
+                                <?php endforeach; ?>
+                            </tr>
+                        <?php endforeach; ?>
                     </tbody>
                 </table>
                 <div class="mt-2">P.S. : If you just want to check records omit these inputs</div>
                 <div class="d-flex gap-4">
                     <label class="labbor lab">
                     <img src="./data/calender.svg" alt="">
-                    <input type="text" placeholder="Filter by date" required>
+                    <input type="text" placeholder="Filter by date" id="fidate" name="depfidate">
                     </label>
                     <label class="labbor lab">
                     <img src="./data/dollar.svg" alt="">
-                    <input type="text" placeholder="Filter by amount" required>
+                    <input type="text" placeholder="Filter by amount" id="fiamount" name="depfiamount">
                     </label>
                 </div>
                 <div class="d-flex gap-4 mt-2 mb-2">
-                    <input type="submit" class="but text-center" id="but" value="Filter">
+                    <input type="submit" class="but text-center" id="but" value="Filter" onclick="return verifsub3()" name="deposit_submit">
                     <input value="Open filtering manual" class="but text-center" type="button" data-bs-toggle="offcanvas" data-bs-target="#manual">
+                    <input type="submit" id="but" name="depback" class="but text-center" value="Back to the admin page" formnovalidate>
                 </div>
                 <div class="offcanvas offcanvas-start" id="manual">
                     <div class="offcanvas-header">
@@ -166,9 +203,12 @@ if ($con->connect_error) {
                     </div>
                     <div class="offcanvas-body">
                         <div class="mb-3 h3">Date Filtering :</div>
-                        <div class="mt-3 mb-3">P.S. : At least one of the year , month or day needs to be an exact known value</div>
-                        <div class="mt-3 mb-3">Date's Format is YYYY-MM-DD : use % operator for more general filterting</div>
-                        <div class="mt-3 mb-3">It is Mandatory! to keep the format as it is even with the "-"</div>
+                        <div class="mt-3 mb-3">P.S. : </div>
+                        <ul>
+                            <li class="mt-1">At least one of the year , month or day needs to be an exact known value</li>
+                            <li class="mt-1">Date's Format is YYYY-MM-DD : use % operator for more general filterting</li>
+                            <li class="mt-1">It is Mandatory! to keep the format as it is even with the "-"</li>
+                        </ul>
                         <div class="mt-3">Examples :</div>
                         <ul>
                             <li class="mt-1">" 2023-%-% " (records during 2023 at any day or month)</li>
@@ -189,13 +229,18 @@ if ($con->connect_error) {
                         <li class="mt-1">l : less than</li>
                         <li class="mt-1">e : equals to</li>
                     </ul>
-                    <div class="mt-3 mb-2">P.S. : Keywords are not case-sensitive</div>
+                    <div class="mt-3 mb-2">P.S.  : </div>
+                    <ul>
+                        <li class="mt-1">Keywords are not case-sensitive</li>
+                        <li class="mt-1">DO NOT use "," (comma) instead use "." (full stop) for float numbers</li>
+                    </ul>
                 </div>
             </div>
+            <div class="mb-2 mt-2" style="font-size: 15px;">Please do not use the browser's back button , use the one provided instead</div>
         </form>
-        <form method="post"><input type="submit" id="but" name="depback" class="but text-center" value="Back to the admin page"></form>
     </div>
     <script src="./bootstrap-5.0.2-dist/js/bootstrap.bundle.min.js"></script>
+    <script src="./js/welcome_admin.js"></script>
 </body>
 </html>
 <?php endif; ?>

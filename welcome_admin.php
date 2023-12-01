@@ -63,7 +63,7 @@ if ($con->connect_error) {
       $today_wires_array = mysqli_fetch_all($today_wires_query, MYSQLI_ASSOC);
       foreach ($today_wires_array as $row) {
           $today_wires = $row["today_wires"];
-          $today_wires_msg = "In the last 24 Hours, there has been $today_wires withdraws";
+          $today_wires_msg = "In the last 24 Hours, there has been $today_wires wires";
       }
   }
   if (isset($_POST['balance_submit'])) {
@@ -115,6 +115,7 @@ if ($con->connect_error) {
     $transemail = filter_input(INPUT_POST, 'transemail', FILTER_SANITIZE_EMAIL);
     $transusername = filter_input(INPUT_POST, 'transusername', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     $translimit = filter_input(INPUT_POST, 'translimit', FILTER_SANITIZE_NUMBER_FLOAT);
+    $_SESSION['translimit'] = $translimit;
     if (!empty($transusername) && empty($transemail)) {
       $_SESSION['transusername'] = $transusername;
       $deposit_query = mysqli_query($con,"SELECT username,deposit_date,deposit_amount FROM deposit WHERE username LIKE '%$transusername%' LIMIT $translimit");
@@ -129,7 +130,7 @@ if ($con->connect_error) {
         exit;
       }
       } else if (!empty($transemail) && empty($transusername)) {
-        $_SESSION['transusername'] = $transemail;
+        $_SESSION['transemail'] = $transemail;
         $deposit_query = mysqli_query($con,"SELECT deposit.username,email,deposit_date,deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') LIMIT $translimit");
         if (mysqli_num_rows($deposit_query)) {
           $_SESSION['verif_deposit'] = "success";
@@ -143,8 +144,8 @@ if ($con->connect_error) {
         }
       } else if (!empty($transemail) && !empty($transusername)) {
         $_SESSION['transusername'] = $transusername;
-        $_SESSION['transusername'] = $transemail;
-        $deposit_query = mysqli_query($con,"SELECT deposit.username,email,deposit_date,deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%yes%') AND deposit.username LIKE '%yes%' LIMIT $translimit");
+        $_SESSION['transemail'] = $transemail;
+        $deposit_query = mysqli_query($con,"SELECT deposit.username,email,deposit_date,deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit.username LIKE '%$transusername%' LIMIT $translimit");
         if (mysqli_num_rows($deposit_query)) {
           $_SESSION['verif_deposit'] = "success";
           $_SESSION['verif_deposit_case'] = "3";

@@ -12,3 +12,10 @@ function verifsub2() {
         return false
     }
 }
+function verifsub3() {
+    fidate = document.getElementById("fidate").value
+    fiamount = document.getElementById("fiamount").value
+    if (fidate === "" && fiamount === "") {
+        return false
+    }
+}
