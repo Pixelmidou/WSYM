@@ -4,119 +4,157 @@ if ($con->connect_error) {
     die("Connection Failed" . $con->connect_error);
 } else {
     session_start();
-    $username = $_SESSION['username'];
-    if(empty($_SESSION['username']) || $_SESSION['username'] == ''){
-        header("Location: index.html");
-        die();
-    }
-    $balance_query = mysqli_query($con,"SELECT balance FROM balance WHERE username = '$username'");
-    if (mysqli_num_rows($balance_query) > 0) {
-        $balance_array = mysqli_fetch_all($balance_query, MYSQLI_ASSOC);
-        foreach ($balance_array as $row) {
-            $balance = $row["balance"];
-        }
-    }
-    $last_deposit_query = mysqli_query($con,"SELECT deposit_date,deposit_amount FROM deposit WHERE username = '$username' AND deposit_date = (SELECT MAX(deposit_date) FROM deposit)");
-    if (mysqli_num_rows($last_deposit_query) > 0) {
-        $last_deposit_array = mysqli_fetch_all($last_deposit_query, MYSQLI_ASSOC);
-        foreach ($last_deposit_array as $row) {
-            $last_deposit_date = $row["deposit_date"];
-            $last_deposit_amount = $row["deposit_amount"];
-            $dep_msg = "Last Known Deposit was at $last_deposit_date with a value of $$last_deposit_amount";
-        }
-    } else {
-        $dep_msg = "There was no previous deposits";
-    }
-    $last_withdraw_query = mysqli_query($con,"SELECT withdraw_date,withdraw_amount FROM withdraw WHERE username = '$username' AND withdraw_date = (SELECT MAX(withdraw_date) FROM withdraw)");
-    if (mysqli_num_rows($last_withdraw_query) > 0) {
-        $last_withdraw_array = mysqli_fetch_all($last_withdraw_query, MYSQLI_ASSOC);
-        foreach ($last_withdraw_array as $row) {
-            $last_withdraw_date = $row["withdraw_date"];
-            $last_withdraw_amount = $row["withdraw_amount"];
-            $with_msg = "Last Known Withdraw was at $last_withdraw_date with a value of $$last_withdraw_amount";
-        }
-    } else {
-        $with_msg = "There was no previous withdraws";
-    }
-    $last_wire_query = mysqli_query($con,"SELECT wire_date,wire_amount,receiver FROM wire WHERE username = '$username' AND wire_date = (SELECT MAX(wire_date) FROM wire)");
-    if (mysqli_num_rows($last_wire_query) > 0) {
-        $last_wire_array = mysqli_fetch_all($last_wire_query, MYSQLI_ASSOC);
-        foreach ($last_wire_array as $row) {
-            $last_wire_date = $row["wire_date"];
-            $last_wire_amount = $row["wire_amount"];
-            $last_wire_rec = $row["receiver"];
-            $wire_msg = "Last Known Wire was at $last_wire_date with a value of $$last_wire_amount to $last_wire_rec";
-        }
-    } else {
-        $wire_msg = "There was no previous wires";
-    }
-    if (isset($_POST['deposit_submit'])) {
-        $depval = filter_input(INPUT_POST,"depval",FILTER_SANITIZE_NUMBER_FLOAT);
-        $_SESSION['depval'] = $depval;
-        if (mysqli_query($con,"INSERT INTO deposit VALUES (id,'$username',now(),$depval)") && mysqli_query($con,"UPDATE balance SET balance = balance + $depval WHERE username = '$username'")) {
-            $_SESSION['deposit_verif'] = "success";
-            header("Location: welcome_verif.php");
-            exit;
-        } else {
-            $_SESSION['deposit_verif'] = "fail";
-            header("Location: welcome_verif.php");
-            exit;
-        }
-    }
-    if (isset($_POST['withdraw_submit'])) {
-        $withval = filter_input(INPUT_POST,"withval",FILTER_SANITIZE_NUMBER_FLOAT);
-        $_SESSION['withval'] = $withval;
-        if (mysqli_query($con,"INSERT INTO withdraw VALUES (id,'$username',now(),$withval)") && mysqli_query($con,"UPDATE balance SET balance = balance - $withval WHERE username = '$username'")) {
-            $_SESSION['withdraw_verif'] = "success";
-            header("Location: welcome_verif.php");
-            exit;
-        } else {
-            $_SESSION['withdraw_verif'] = "fail";
-            header("Location: welcome_verif.php");
-            exit;
-        }
-    }
-    if (isset($_POST['wire_submit'])) {
-        $wireval = filter_input(INPUT_POST,"wireval",FILTER_SANITIZE_NUMBER_FLOAT);
-        $wireemail = filter_input(INPUT_POST,"wireemail",FILTER_SANITIZE_EMAIL);
-        $_SESSION['wireval'] = $wireval;
-        $_SESSION['wireemail'] = $wireemail;
-        if (mysqli_query($con,"INSERT INTO wire VALUES (id,'$username','$wireemail',now(),$wireval)") && mysqli_query($con,"UPDATE balance SET balance = balance + $wireval WHERE email = '$wireemail'") && mysqli_query($con,"UPDATE balance SET balance = balance - $wireval WHERE username = '$username'")) {
-            $_SESSION['wire_verif'] = "success";
-            header("Location: welcome_verif.php");
-            exit;
-        } else {
-            $_SESSION['wire_verif'] = "fail";
-            header("Location: welcome_verif.php");
-            exit;
-        }
-    }
-    if (isset($_POST['ticket_submit'])) {
-        $tickettext = filter_input(INPUT_POST,"tickettext",FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-        if (mysqli_query($con,"INSERT INTO ticket VALUES ('$username','$tickettext')")) {
-            $_SESSION['ticket_verif'] = "success";
-            header("Location: welcome_verif.php");
-            exit;
-        } else {
-            $_SESSION['ticket_verif'] = "fail";
-            header("Location: welcome_verif.php");
-            exit;
-        }
-    }
-    if (isset($_POST['logout'])) {
-        session_destroy();
-        header("Location: index.html");
-        exit;
-    }
     $now = time();
     if($now > $_SESSION['expire']) { 
-        session_destroy();
-        $_SESSION['session_verif'] = "success";
-        header("Location: welcome_verif.php");
-        exit;
-    } 
+        session_destroy(); ?>
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <meta http-equiv="refresh" content="4; url=index.html">
+            <title>WSYM Banking</title>
+            <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
+            <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
+            <link rel="stylesheet" href="./css/redirections_style.css">
+        </head>
+        <body>
+            <div class="container1">
+                <div class="container2">
+                    <h1 style="text-align: center;">Session expired : You need to login again !</h1>
+                    <div style="text-align: center; font-size: small;">You will be automatically redirected back to the login page in 4 seconds.</div>
+                </div>
+            </div>
+        </body>
+        </html>
+    <?php } else {
+        $page_load = true;
+        $username = $_SESSION['username'];
+        if(empty($_SESSION['username']) || $_SESSION['username'] == ''){
+            header("Location: index.html");
+            die();
+        }
+        if (isset($_POST['logout'])) {
+            session_destroy();
+            header("Location: index.html");
+            exit;
+        }
+        $balance_query = mysqli_query($con,"SELECT balance FROM balance WHERE username = '$username'");
+        if (mysqli_num_rows($balance_query) > 0) {
+            $balance_array = mysqli_fetch_all($balance_query, MYSQLI_ASSOC);
+            foreach ($balance_array as $row) {
+                $balance = $row["balance"];
+            }
+        }
+        $last_deposit_query = mysqli_query($con,"SELECT deposit_date,deposit_amount FROM deposit WHERE username = '$username' AND deposit_date = (SELECT MAX(deposit_date) FROM deposit)");
+        if (mysqli_num_rows($last_deposit_query) > 0) {
+            $last_deposit_array = mysqli_fetch_all($last_deposit_query, MYSQLI_ASSOC);
+            foreach ($last_deposit_array as $row) {
+                $last_deposit_date = $row["deposit_date"];
+                $last_deposit_amount = $row["deposit_amount"];
+                $dep_msg = "Last Known Deposit was at $last_deposit_date with a value of $$last_deposit_amount";
+            }
+        } else {
+            $dep_msg = "There was no previous deposits";
+        }
+        $last_withdraw_query = mysqli_query($con,"SELECT withdraw_date,withdraw_amount FROM withdraw WHERE username = '$username' AND withdraw_date = (SELECT MAX(withdraw_date) FROM withdraw)");
+        if (mysqli_num_rows($last_withdraw_query) > 0) {
+            $last_withdraw_array = mysqli_fetch_all($last_withdraw_query, MYSQLI_ASSOC);
+            foreach ($last_withdraw_array as $row) {
+                $last_withdraw_date = $row["withdraw_date"];
+                $last_withdraw_amount = $row["withdraw_amount"];
+                $with_msg = "Last Known Withdraw was at $last_withdraw_date with a value of $$last_withdraw_amount";
+            }
+        } else {
+            $with_msg = "There was no previous withdraws";
+        }
+        $last_wire_query = mysqli_query($con,"SELECT wire_date,wire_amount,receiver FROM wire WHERE username = '$username' AND wire_date = (SELECT MAX(wire_date) FROM wire)");
+        if (mysqli_num_rows($last_wire_query) > 0) {
+            $last_wire_array = mysqli_fetch_all($last_wire_query, MYSQLI_ASSOC);
+            foreach ($last_wire_array as $row) {
+                $last_wire_date = $row["wire_date"];
+                $last_wire_amount = $row["wire_amount"];
+                $last_wire_rec = $row["receiver"];
+                $wire_msg = "Last Known Wire was at $last_wire_date with a value of $$last_wire_amount to $last_wire_rec";
+            }
+        } else {
+            $wire_msg = "There was no previous wires";
+        }
+        if (isset($_POST['deposit_submit'])) {
+            $depval = filter_input(INPUT_POST,"depval",FILTER_SANITIZE_NUMBER_FLOAT);
+            $_SESSION['depval'] = $depval;
+            if (mysqli_query($con,"INSERT INTO deposit VALUES (id,'$username',now(),$depval)") && mysqli_query($con,"UPDATE balance SET balance = balance + $depval WHERE username = '$username'")) {
+                $_SESSION['deposit_verif'] = "success";
+                header("Location: welcome_verif.php");
+                exit;
+            } else {
+                $_SESSION['deposit_verif'] = "fail";
+                header("Location: welcome_verif.php");
+                exit;
+            }
+        }
+        if (isset($_POST['withdraw_submit'])) {
+            $withval = filter_input(INPUT_POST,"withval",FILTER_SANITIZE_NUMBER_FLOAT);
+            $_SESSION['withval'] = $withval;
+            if (mysqli_query($con,"INSERT INTO withdraw VALUES (id,'$username',now(),$withval)") && mysqli_query($con,"UPDATE balance SET balance = balance - $withval WHERE username = '$username'")) {
+                $_SESSION['withdraw_verif'] = "success";
+                header("Location: welcome_verif.php");
+                exit;
+            } else {
+                $_SESSION['withdraw_verif'] = "fail";
+                header("Location: welcome_verif.php");
+                exit;
+            }
+        }
+        if (isset($_POST['wire_submit'])) {
+            $wireval = filter_input(INPUT_POST,"wireval",FILTER_SANITIZE_NUMBER_FLOAT);
+            $wireemail = filter_input(INPUT_POST,"wireemail",FILTER_SANITIZE_EMAIL);
+            $_SESSION['wireval'] = $wireval;
+            $_SESSION['wireemail'] = $wireemail;
+            if (mysqli_query($con,"INSERT INTO wire VALUES (id,'$username','$wireemail',now(),$wireval)") && mysqli_query($con,"UPDATE balance SET balance = balance + $wireval WHERE email = '$wireemail'") && mysqli_query($con,"UPDATE balance SET balance = balance - $wireval WHERE username = '$username'")) {
+                $_SESSION['wire_verif'] = "success";
+                header("Location: welcome_verif.php");
+                exit;
+            } else {
+                $_SESSION['wire_verif'] = "fail";
+                header("Location: welcome_verif.php");
+                exit;
+            }
+        }
+        if (isset($_POST['ticket_submit'])) {
+            $tickettext = filter_input(INPUT_POST,"tickettext",FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+            if (mysqli_query($con,"INSERT INTO ticket VALUES ('$username','$tickettext')")) {
+                $_SESSION['ticket_verif'] = "success";
+                header("Location: welcome_verif.php");
+                exit;
+            } else {
+                $_SESSION['ticket_verif'] = "fail";
+                header("Location: welcome_verif.php");
+                exit;
+            }
+        }
+        switch ($_SESSION) {
+            case isset($_SESSION['dep']):
+                unset($_SESSION['deposit_verif']);
+                unset($_SESSION['dep']);
+                break;
+            case isset($_SESSION['withd']):
+                unset($_SESSION['withdraw_verif']);
+                unset($_SESSION['withd']);
+                break;
+            case isset($_SESSION['wire']):
+                unset($_SESSION['wire_verif']);
+                unset($_SESSION['wire']);
+                break;
+            case isset($_SESSION['tick']):
+                unset($_SESSION['ticket_verif']);
+                unset($_SESSION['tick']);
+                break;
+        }
+    }
 }
 ?>
+<?php if(isset($page_load) && $page_load === true): ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -216,3 +254,4 @@ if ($con->connect_error) {
     <script src="./js/welcome.js"></script>
 </body>
 </html>
+<?php endif; ?>
