@@ -1,5 +1,5 @@
 # WSYM
-Here is the live preview of this project : https://wsym.000webhostapp.com/ <br><br><br>
+Here is the live preview of this project : (Temporarily not available) <br><br><br>
 Next Steps in the project : <br><br>
 Admin Welcome Page : <br>
 people balance : show a person's balance - edit a person's balance <br>
