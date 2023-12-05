@@ -19,7 +19,7 @@ if ($con->connect_error) {
             while ($row_admin = mysqli_fetch_array($admin_query, MYSQLI_ASSOC)) { 
                 if (password_verify($password,$row_admin['pass'])) {
                     $_SESSION['admin_username'] = $username;
-                    header("Location: welcome_admin.php");
+                    header("Location: admin_redirections.php");
                     exit;
                 } else { ?>
                     <!DOCTYPE html>
@@ -48,7 +48,7 @@ if ($con->connect_error) {
         } else if (mysqli_num_rows($user_query) > 0) {
             while ($row_user = mysqli_fetch_array($user_query, MYSQLI_ASSOC)) {
                 if (password_verify($password,$row_user['pass'])) {
-                    $_SESSION['username'] = $username;
+                    $_SESSION['user_username'] = $username;
                     header("Location: welcome.php");
                     exit;
                 } else { ?>

@@ -410,6 +410,7 @@ if ($con->connect_error) {
         <li><label for="file" class="dropdown-item">Upload Your Photo
           <input class="invisible" type="file" accept="image/*" name="image" id="file" onchange="loadFile(event)" value="Upload Your Photo" style="width: 0;">
         </label></li>
+        <li><a href="admin_redirections.php" class="dropdown-item">Go Back to Redirections</a></li>
         <li><form method="post"><input class="dropdown-item" name="logout" type="submit" value="Sign Out"></form></li>
       </ul>
     </div>
