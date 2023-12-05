@@ -16,12 +16,12 @@ if ($con->connect_error) {
   //     header("Location: welcome_verif.php");
   //     exit;
   // } 
-  $username = $_SESSION['username'];
-  if(empty($_SESSION['username']) || $_SESSION['username'] == ''){
+  $admin_username = $_SESSION['admin_username'];
+  if(empty($_SESSION['admin_username']) || $_SESSION['admin_username'] == ''){
     header("Location: index.html");
     exit;
   }
-  $admin_type_query = mysqli_query($con,"SELECT rank FROM adminusers WHERE username = '$username'");
+  $admin_type_query = mysqli_query($con,"SELECT rank FROM login_credentials WHERE username = '$admin_username'");
   if (mysqli_num_rows($admin_type_query) > 0) {
       $admin_type_array = mysqli_fetch_all($admin_type_query, MYSQLI_ASSOC);
       foreach ($admin_type_array as $row) {
@@ -404,7 +404,7 @@ if ($con->connect_error) {
     <div class="dropdown">
       <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded=""fail"">
         <img src="" alt="pfp" width="32" height="32" class="rounded-circle me-2" id="output">
-        <strong><?php echo "$username"; ?></strong>
+        <strong><?php echo "$admin_username"; ?></strong>
       </a>
       <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
         <li><label for="file" class="dropdown-item">Upload Your Photo

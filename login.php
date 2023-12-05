@@ -14,11 +14,11 @@ if ($con->connect_error) {
         $username = filter_input(INPUT_POST, 'username1', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         $password = filter_input(INPUT_POST, 'password1', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         $user_query = mysqli_query($con,"SELECT username,pass FROM login_credentials WHERE username = '$username'");
-        $admin_query = mysqli_query($con,"SELECT username,pass FROM adminusers WHERE username = '$username'");
+        $admin_query = mysqli_query($con,"SELECT username,pass FROM login_credentials WHERE username = '$username' AND rank IN (SELECT rank FROM ranks WHERE rank <> 'none')");
         if (mysqli_num_rows($admin_query) > 0) { 
             while ($row_admin = mysqli_fetch_array($admin_query, MYSQLI_ASSOC)) { 
                 if (password_verify($password,$row_admin['pass'])) {
-                    $_SESSION['username'] = $username;
+                    $_SESSION['admin_username'] = $username;
                     header("Location: welcome_admin.php");
                     exit;
                 } else { ?>
