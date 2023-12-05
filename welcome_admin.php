@@ -206,7 +206,51 @@ if ($con->connect_error) {
       }
   }
   if (isset($_POST['wire_transactions_submit'])) { 
-  
+    $transemail = filter_input(INPUT_POST, 'transemail', FILTER_SANITIZE_EMAIL);
+    $transusername = filter_input(INPUT_POST, 'transusername', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $translimit = filter_input(INPUT_POST, 'translimit', FILTER_SANITIZE_NUMBER_FLOAT);
+    $_SESSION['translimit'] = $translimit;
+    if (!empty($transusername) && empty($transemail)) {
+      $_SESSION['transusername'] = $transusername;
+      $wire_query = mysqli_query($con,"SELECT username,wire_date,wire_amount FROM wire WHERE username LIKE '%$transusername%' LIMIT $translimit");
+      if (mysqli_num_rows($wire_query)) {
+        $_SESSION['verif_wire'] = "success";
+        $_SESSION['verif_wire_case'] = "1";
+        header("Location: welcome_admin_forms.php");
+        exit;
+      } else {
+        $_SESSION['verif_wire'] = "fail";
+        header("Location: welcome_admin_forms.php");
+        exit;
+      }
+      } else if (!empty($transemail) && empty($transusername)) {
+        $_SESSION['transemail'] = $transemail;
+        $wire_query = mysqli_query($con,"SELECT wire.username,email,wire_date,wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') LIMIT $translimit");
+        if (mysqli_num_rows($wire_query)) {
+          $_SESSION['verif_wire'] = "success";
+          $_SESSION['verif_wire_case'] = "2";
+          header("Location: welcome_admin_forms.php");
+          exit;
+        } else {
+          $_SESSION['verif_wire'] = "fail";
+          header("Location: welcome_admin_forms.php");
+          exit;
+        }
+      } else if (!empty($transemail) && !empty($transusername)) {
+        $_SESSION['transusername'] = $transusername;
+        $_SESSION['transemail'] = $transemail;
+        $wire_query = mysqli_query($con,"SELECT wire.username,email,wire_date,wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' LIMIT $translimit");
+        if (mysqli_num_rows($wire_query)) {
+          $_SESSION['verif_wire'] = "success";
+          $_SESSION['verif_wire_case'] = "3";
+          header("Location: welcome_admin_forms.php");
+          exit;
+        } else {
+          $_SESSION['verif_wire'] = "fail";
+          header("Location: welcome_admin_forms.php");
+          exit;
+        }
+      }
   }
   switch ($_SESSION) {
     case isset($_SESSION["balsub"]):
@@ -220,6 +264,10 @@ if ($con->connect_error) {
     case isset($_SESSION["transwith"]):
         unset($_SESSION["verif_withdraw"]);
         unset($_SESSION["transwith"]);
+        break;
+    case isset($_SESSION["transwire"]):
+        unset($_SESSION["verif_wire"]);
+        unset($_SESSION["transwre"]);
         break;
   }
 }

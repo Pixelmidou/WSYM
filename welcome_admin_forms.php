@@ -818,6 +818,393 @@ if ($con->connect_error) {
         }
         $_SESSION["transwith"] = "transwith";
     }
+    if (isset($_SESSION["verif_wire"])) { 
+        $verif_wire = $_SESSION["verif_wire"];
+        if($verif_wire === "success") { 
+            $verif_wire_case = $_SESSION['verif_wire_case'];
+            switch ($verif_wire_case) {
+                case "1":
+                    $transusername = $_SESSION["transusername"];
+                    $translimit = $_SESSION['translimit'];
+                    $wire_query1 = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' LIMIT $translimit");
+                    $wire_query2 = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' LIMIT $translimit");
+                    break;
+                case "2":
+                    $transemail = $_SESSION["transemail"];
+                    $translimit = $_SESSION['translimit'];
+                    $wire_query1 = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') LIMIT $translimit");
+                    $wire_query2 = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') LIMIT $translimit");
+                    break;
+                case "3":
+                    $transemail = $_SESSION["transemail"];
+                    $transusername = $_SESSION["transusername"];
+                    $translimit = $_SESSION['translimit'];
+                    $wire_query1 = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' LIMIT $translimit");
+                    $wire_query2 = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' LIMIT $translimit");
+                    break;
+            }
+            $wire_query_array_all = mysqli_fetch_all($wire_query1, MYSQLI_ASSOC);
+            $wireficase = "initial";
+            if (isset($_POST["wire_submit"])) {
+                $wirefidate = filter_input(INPUT_POST, 'wirefidate', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+                $wirefihour = filter_input(INPUT_POST, 'wirefihour', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+                $wirefiamount = filter_input(INPUT_POST, 'wirefiamount', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+                $wireficase = "filter";
+                if (!empty($wirefidate) && empty($wirefihour) && empty($wirefiamount)) {
+                    switch ($verif_wire_case) { 
+                        case "1":
+                            $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' HAVING LEFT(wire_date, 10) LIKE '$wirefidate' LIMIT $translimit");
+                            break;
+                        case "2":
+                            $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') HAVING LEFT(wire_date, 10) LIKE '$wirefidate' LIMIT $translimit");
+                            break;
+                        case "3":
+                            $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' HAVING LEFT(wire_date, 10) LIKE '$wirefidate' LIMIT $translimit");
+                            break;
+                    }
+                } else if (!empty($wirefidate) && !empty($wirefiamount) && empty($wirefihour)) {
+                    $i = 0;
+                    $values = ["SG","G","SL","SL","E"];
+                    $wirefiamount_action = "";
+                    while (in_array(strtoupper(substr($wirefiamount,0,strpos($wirefiamount," "))),$values) && $i < 2) {
+                        $wirefiamount_action .= trim(strtoupper($wirefiamount[$i]));
+                        $i += 1;
+                    }
+                    $wirefiamount_value = floatval(substr($wirefiamount,strpos($wirefiamount," ") + 1));
+                    switch ($wirefiamount_action) {
+                        case "SG":
+                            switch ($verif_wire_case) { 
+                                case "1":
+                                    $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' AND wire_amount > $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' LIMIT $translimit");
+                                    break;
+                                case "2":
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire_amount > $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate'  LIMIT $translimit");
+                                    break;
+                                case "3":
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' AND wire_amount > $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' LIMIT $translimit");
+                                    break;
+                            }
+                            break;
+                        case "G":
+                            switch ($verif_wire_case) { 
+                                case "1":
+                                    $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' AND wire_amount >= $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' LIMIT $translimit");
+                                    break;
+                                case "2":
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire_amount >= $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' LIMIT $translimit");
+                                    break;
+                                case "3":
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' AND wire_amount >= $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' LIMIT $translimit");
+                                    break;
+                            }
+                            break;
+                        case "SL":
+                            switch ($verif_wire_case) { 
+                                case "1":
+                                    $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' AND wire_amount < $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' LIMIT $translimit");
+                                    break;
+                                case "2":
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire_amount < $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' LIMIT $translimit");
+                                    break;
+                                case "3":
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' AND wire_amount < $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' LIMIT $translimit");
+                                    break;
+                            }
+                            break;
+                        case "L":
+                            switch ($verif_wire_case) { 
+                                case "1":
+                                    $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' AND wire_amount <= $wirefiamount_value  HAVING LEFT(wire_date, 10) LIKE '$wirefidate' LIMIT $translimit");
+                                    break;
+                                case "2":
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire_amount <= $wirefiamount_value  HAVING LEFT(wire_date, 10) LIKE '$wirefidate' LIMIT $translimit");
+                                    break;
+                                case "3":
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' AND wire_amount <= $wirefiamount_value  HAVING LEFT(wire_date, 10) LIKE '$wirefidate' LIMIT $translimit");
+                                    break;
+                            }
+                            break;
+                        case "E":
+                            switch ($verif_wire_case) { 
+                                case "1":
+                                    $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' AND wire_amount = $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' LIMIT $translimit");
+                                    break;
+                                case "2":
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire_amount = $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' LIMIT $translimit");
+                                    break;
+                                case "3":
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' AND wire_amount = $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' LIMIT $translimit");
+                                    break;
+                            }
+                            break;
+                    }
+                } else if (!empty($wirefidate) && empty($wirefiamount) && !empty($wirefihour)) {
+                    switch ($verif_wire_case) { 
+                        case "1":
+                            $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' HAVING LEFT(wire_date, 10) LIKE '$wirefidate' AND RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                            break;
+                        case "2":
+                            $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') HAVING LEFT(wire_date, 10) LIKE '$wirefidate' AND RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                            break;
+                        case "3":
+                            $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' HAVING LEFT(wire_date, 10) LIKE '$wirefidate' AND RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                            break;
+                    }
+                } else if (empty($wirefidate) && !empty($wirefiamount) && empty($wirefihour)) {
+                    $i = 0;
+                    $values = ["SG","G","SL","SL","E"];
+                    $wirefiamount_action = "";
+                    while (in_array(strtoupper(substr($wirefiamount,0,strpos($wirefiamount," "))),$values) && $i < 2) {
+                        $wirefiamount_action .= trim(strtoupper($wirefiamount[$i]));
+                        $i += 1;
+                    }
+                    $wirefiamount_value = floatval(substr($wirefiamount,strpos($wirefiamount," ") + 1));
+                    switch ($wirefiamount_action) {
+                        case "SG":
+                            switch ($verif_wire_case) { 
+                                case "1":
+                                    $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' AND wire_amount > $wirefiamount_value LIMIT $translimit");
+                                    break;
+                                case "2":
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire_amount > $wirefiamount_value LIMIT $translimit");
+                                    break;
+                                case "3":
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' AND wire_amount > $wirefiamount_value LIMIT $translimit");
+                                    break;
+                            }
+                            break;
+                        case "G":
+                            switch ($verif_wire_case) { 
+                                case "1":
+                                    $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' AND wire_amount >= $wirefiamount_value LIMIT $translimit");
+                                    break;
+                                case "2":
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire_amount >= $wirefiamount_value LIMIT $translimit");
+                                    break;
+                                case "3":
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' AND wire_amount >= $wirefiamount_value LIMIT $translimit");
+                                    break;
+                            }
+                            break;
+                        case "SL":
+                            switch ($verif_wire_case) { 
+                                case "1":
+                                    $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' AND wire_amount < $wirefiamount_value LIMIT $translimit");
+                                    break;
+                                case "2":
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire_amount < $wirefiamount_value LIMIT $translimit");
+                                    break;
+                                case "3":
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' AND wire_amount < $wirefiamount_value LIMIT $translimit");
+                                    break;
+                            }
+                            break;
+                        case "L":
+                            switch ($verif_wire_case) { 
+                                case "1":
+                                    $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' AND wire_amount <= $wirefiamount_value LIMIT $translimit");
+                                    break;
+                                case "2":
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire_amount <= $wirefiamount_value LIMIT $translimit");
+                                    break;
+                                case "3":
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' AND wire_amount <= $wirefiamount_value LIMIT $translimit");
+                                    break;
+                            }
+                            break;
+                        case "E":
+                            switch ($verif_wire_case) { 
+                                case "1":
+                                    $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' AND wire_amount = $wirefiamount_value LIMIT $translimit");
+                                    break;
+                                case "2":
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire_amount = $wirefiamount_value LIMIT $translimit");
+                                    break;
+                                case "3":
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' AND wire_amount = $wirefiamount_value LIMIT $translimit");
+                                    break;
+                            }
+                            break;
+                    }
+                } else if (empty($wirefidate) && !empty($wirefiamount) && !empty($wirefihour)) {
+                    $i = 0;
+                    $values = ["SG","G","SL","SL","E"];
+                    $wirefiamount_action = "";
+                    while (in_array(strtoupper(substr($wirefiamount,0,strpos($wirefiamount," "))),$values) && $i < 2) {
+                        $wirefiamount_action .= trim(strtoupper($wirefiamount[$i]));
+                        $i += 1;
+                    }
+                    $wirefiamount_value = floatval(substr($wirefiamount,strpos($wirefiamount," ") + 1));
+                    switch ($wirefiamount_action) {
+                        case "SG":
+                            switch ($verif_wire_case) { 
+                                case "1":
+                                    $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' AND wire_amount > $wirefiamount_value HAVING RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                                    break;
+                                case "2":
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire_amount > $wirefiamount_value HAVING RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                                    break;
+                                case "3":
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' AND wire_amount > $wirefiamount_value HAVING RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                                    break;
+                            }
+                            break;
+                        case "G":
+                            switch ($verif_wire_case) { 
+                                case "1":
+                                    $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' AND wire_amount >= $wirefiamount_value HAVING RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                                    break;
+                                case "2":
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire_amount >= $wirefiamount_value HAVING RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                                    break;
+                                case "3":
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' AND wire_amount >= $wirefiamount_value HAVING RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                                    break;
+                            }
+                            break;
+                        case "SL":
+                            switch ($verif_wire_case) { 
+                                case "1":
+                                    $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' AND wire_amount < $wirefiamount_value HAVING RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                                    break;
+                                case "2":
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire_amount < $wirefiamount_value HAVING RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                                    break;
+                                case "3":
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' AND wire_amount < $wirefiamount_value HAVING RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                                    break;
+                            }
+                            break;
+                        case "L":
+                            switch ($verif_wire_case) { 
+                                case "1":
+                                    $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' AND wire_amount <= $wirefiamount_value HAVING RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                                    break;
+                                case "2":
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire_amount <= $wirefiamount_value HAVING RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                                    break;
+                                case "3":
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' AND wire_amount <= $wirefiamount_value HAVING RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                                    break;
+                            }
+                            break;
+                        case "E":
+                            switch ($verif_wire_case) { 
+                                case "1":
+                                    $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' AND wire_amount = $wirefiamount_value HAVING RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                                    break;
+                                case "2":
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire_amount = $wirefiamount_value HAVING RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                                    break;
+                                case "3":
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' AND wire_amount = $wirefiamount_value HAVING RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                                    break;
+                            }
+                            break;
+                    }
+                } else if (empty($wirefidate) && empty($wirefiamount) && !empty($wirefihour)) {
+                    switch ($verif_wire_case) { 
+                        case "1":
+                            $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WRIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                            break;
+                        case "2":
+                            $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') HAVING RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                            break;
+                        case "3":
+                            $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' HAVING RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                            break;
+                    }
+                } else if (!empty($wirefidate) && !empty($wirefiamount) && !empty($wirefihour)) {
+                    $i = 0;
+                    $values = ["SG","G","SL","SL","E"];
+                    $wirefiamount_action = "";
+                    while (in_array(strtoupper(substr($wirefiamount,0,strpos($wirefiamount," "))),$values) && $i < 2) {
+                        $wirefiamount_action .= trim(strtoupper($wirefiamount[$i]));
+                        $i += 1;
+                    }
+                    $wirefiamount_value = floatval(substr($wirefiamount,strpos($wirefiamount," ") + 1));
+                    switch ($wirefiamount_action) {
+                        case "SG":
+                            switch ($verif_wire_case) { 
+                                case "1":
+                                    $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' AND wire_amount > $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' AND RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                                    break;
+                                case "2":
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire_amount > $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' AND RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                                    break;
+                                case "3":
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' AND wire_amount > $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' AND RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                                    break;
+                            }
+                            break;
+                        case "G":
+                            switch ($verif_wire_case) { 
+                                case "1":
+                                    $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' AND wire_amount >= $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' AND RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                                    break;
+                                case "2":
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire_amount >= $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' AND RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                                    break;
+                                case "3":
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' AND wire_amount >= $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' AND RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                                    break;
+                            }
+                            break;
+                        case "SL":
+                            switch ($verif_wire_case) { 
+                                case "1":
+                                    $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' AND wire_amount < $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' AND RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                                    break;
+                                case "2":
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire_amount < $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' AND RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                                    break;
+                                case "3":
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' AND wire_amount < $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' AND RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                                    break;
+                            }
+                            break;
+                        case "L":
+                            switch ($verif_wire_case) { 
+                                case "1":
+                                    $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' AND wire_amount <= $wirefiamount_value  HAVING LEFT(wire_date, 10) LIKE '$wirefidate' AND RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                                    break;
+                                case "2":
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire_amount <= $wirefiamount_value  HAVING LEFT(wire_date, 10) LIKE '$wirefidate' AND RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                                    break;
+                                case "3":
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' AND wire_amount <= $wirefiamount_value  HAVING LEFT(wire_date, 10) LIKE '$wirefidate' AND RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                                    break;
+                            }
+                            break;
+                        case "E":
+                            switch ($verif_wire_case) { 
+                                case "1":
+                                    $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' AND wire_amount = $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' AND RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                                    break;
+                                case "2":
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire_amount = $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' AND RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                                    break;
+                                case "3":
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' AND wire_amount = $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' AND RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                                    break;
+                            }
+                            break;
+                    }
+                }
+                $wirefi_query_array_all = mysqli_fetch_all($wirefi_query, MYSQLI_ASSOC);
+            }
+        }
+        if (isset($_POST['reset_wire_submit'])) {
+            $wireficase = "initial";
+        }
+        if (isset($_POST['wireback'])) {
+            header("Location: welcome_admin.php");
+            unset($_SESSION['verif_wire']);
+            exit;
+        }
+        $_SESSION["transwire"] = "transwire";
+    }
+
 }
 ?>
 <?php if(isset($verif_balance) && $verif_balance === "success"): ?>
@@ -856,12 +1243,12 @@ if ($con->connect_error) {
                 <div class="mb-2 mt-2">P.S. : If you just want to check balances omit these inputs</div>
                 <div class="d-flex gap-4">
                     <label class="labbor lab">
-                    <img src="./data/user.svg" alt="">
-                    <input type="text" placeholder="Username" name="username" required>
+                        <img src="./data/user.svg" alt="">
+                        <input type="text" placeholder="Username" name="username" required>
                     </label>
                     <label class="labbor lab">
-                    <img src="./data/dollar.svg" alt="">
-                    <input type="text" placeholder="Value in Dollars" name="bval" required>
+                        <img src="./data/dollar.svg" alt="">
+                        <input type="text" placeholder="Value in Dollars" name="bval" required>
                     </label>
                 </div>
                 <div class="d-flex gap-4 mt-2 mb-2">
@@ -1069,6 +1456,141 @@ if ($con->connect_error) {
                     <input type="submit" class="but text-center" id="but" value="Reset filter" name="reset_withdraw_submit">
                     <input value="Open filtering manual" class="but text-center" type="button" data-bs-toggle="offcanvas" data-bs-target="#manual">
                     <input type="submit" id="but" name="withback" class="but text-center" value="Back to the admin page" formnovalidate>
+                </div>
+                <div class="offcanvas offcanvas-start" id="manual">
+                    <div class="offcanvas-header">
+                        <h1 class="offcanvas-title">Filtering Manual</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+                    </div>
+                    <div class="offcanvas-body">
+                        <div class="mb-3 h3">Date Filtering :</div>
+                        <div class="mt-3 mb-3">P.S. : </div>
+                        <ul>
+                            <li class="mt-1">At least one of the year , month or day needs to be an exact known value</li>
+                            <li class="mt-1">Date's Format is YYYY-MM-DD : use % operator for more general filterting</li>
+                            <li class="mt-1">It is Mandatory! to keep the format as it is with the 3 "-" (hyphens)</li>
+                        </ul>
+                        <div class="mt-3">Examples :</div>
+                        <ul>
+                            <li class="mt-1">" 2023-%-% " (records during 2023 at X month and X day)</li>
+                            <li class="mt-1">" 2023-01-% " (records during January 2023 at X day)</li>
+                            <li class="mt-1">" %-06-01 " (records during the 1st of June of X year)</li>
+                            <li class="mt-1">" %-%-01 " (records during the 1st of X month of X year)</li>
+                            <li class="mt-1">etc ...</li>
+                        </ul>
+                        <div class="mb-3 h3">Hour Filtering :</div>
+                        <div class="mt-3 mb-3">P.S. : </div>
+                        <ul>
+                            <li class="mt-1">At least one of the hour , minutes or seconds needs to be an exact known value</li>
+                            <li class="mt-1">Hour's Format is HH:MM:SS : use % operator for more general filterting</li>
+                            <li class="mt-1">It is Mandatory! to keep the format as it is with the 3 ":" (colons)</li>
+                        </ul>
+                        <div class="mt-3">Examples :</div>
+                        <ul>
+                            <li class="mt-1">" 18:%:% " (records at 18 o'clock at X minutes and X seconds)</li>
+                            <li class="mt-1">" 18:30:% " (records at 18:30 o'clock at X seconds)</li>
+                            <li class="mt-1">" %:06:01 " (records at X hour , 6 minutes and 1 second)</li>
+                            <li class="mt-1">" %:%:01 " (records at X hour , X minutes and 1 second)</li>
+                            <li class="mt-1">etc ...</li>
+                        </ul>
+                        <div class="mb-3 mt-5 h3">Amount Filtering :</div>
+                        <div class="mt-3 mb-3">The format is " keyword number "</div>
+                        <div class="mt-3 mb-3">Examples : sg 90.8 / e 120 / etc ...</div>
+                        <div class="mt-3 mb-2">Keywords : sg / g / sl / l / e</div>
+                        <div class="mt-3">Explication :</div>
+                        <ul>
+                            <li class="mt-1">sg : strictly greater than </li>
+                            <li class="mt-1">g : greater than</li>
+                            <li class="mt-1">sl : strictly less than</li>
+                            <li class="mt-1">l : less than</li>
+                            <li class="mt-1">e : equals to</li>
+                        </ul>
+                        <div class="mt-3 mb-2">P.S.  : </div>
+                        <ul>
+                            <li class="mt-1">Keywords are not case-sensitive</li>
+                            <li class="mt-1">The space between the keyword and the number is necessary</li>
+                            <li class="mt-1">DO NOT use "," (comma) instead use "." (full stop) for float numbers</li>
+                        </ul>
+                        <h4 class="mt-4 mb-3">P.S. : You can filter by all the three criterias together or two by two.</h4>
+                    </div>
+                </div>
+        </form>
+    </div>
+    <script src="./bootstrap-5.0.2-dist/js/bootstrap.bundle.min.js"></script>
+    <script src="./js/welcome_admin.js"></script>
+    </body>
+    </html>
+<?php endif; ?>
+<?php if(isset($verif_wire) && $verif_wire === "success"): ?>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>WSYM Banking</title>
+        <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
+        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
+        <link href="./bootstrap-5.0.2-dist/css/bootstrap.min.css" rel="stylesheet">
+        <link href="./css/welcome_admin_forms.css" rel="stylesheet">
+    </head>
+    <body>
+        <div class="container1">
+            <form method="post" class="container2">
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Wire_receiver</th>
+                        <th>Wire Date</th>
+                        <th>Wire Hour</th>
+                        <th>Wire Amount</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        <?php if ($wireficase === "initial"): ?>
+                            <?php foreach ($wire_query_array_all as $sub_array): ?>
+                                <tr>
+                                    <?php foreach ($sub_array as $value): ?>
+                                        <td><?php echo $value; ?></td>
+                                    <?php endforeach; ?>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                        <?php if ($wireficase === "filter"): ?>
+                            <?php foreach ($wirefi_query_array_all as $sub_array): ?>
+                                <tr>
+                                    <?php foreach ($sub_array as $value): ?>
+                                        <td><?php echo $value; ?></td>
+                                    <?php endforeach; ?>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+                <div class="mt-2">P.S. : If you just want to check records omit these inputs</div>
+                <div class="d-flex gap-4">
+                    <label class="labbor lab">
+                        <img src="./data/calender.svg" alt="">
+                        <input type="text" placeholder="Filter by date" id="fidate" name="wirefidate">
+                    </label>
+                    <label class="labbor lab">
+                        <img src="./data/clock.svg" alt="">
+                        <input type="text" placeholder="Filter by hour" id="fihour" name="wirefihour">
+                    </label>
+                    <label class="labbor lab">
+                        <img src="./data/dollar.svg" alt="">
+                        <input type="text" placeholder="Filter by amount" id="fiamount" name="wirefiamount">
+                    </label>
+                    <label class="labbor lab">
+                        <img src="./data/user.svg" alt="">
+                        <input type="text" placeholder="Filter by receiver" name="wirefirec">
+                    </label>
+                </div>
+                <div class="d-flex gap-4 mt-2 mb-2">
+                    <input type="submit" class="but text-center" id="but" value="Filter" onclick="return verifsub3()" name="wire_submit">
+                    <input type="submit" class="but text-center" id="but" value="Reset filter" name="reset_wire_submit">
+                    <input value="Open filtering manual" class="but text-center" type="button" data-bs-toggle="offcanvas" data-bs-target="#manual">
+                    <input type="submit" id="but" name="wireback" class="but text-center" value="Back to the admin page" formnovalidate>
                 </div>
                 <div class="offcanvas offcanvas-start" id="manual">
                     <div class="offcanvas-header">
