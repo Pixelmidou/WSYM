@@ -1,4 +1,7 @@
 <?php
+
+use function PHPSTORM_META\type;
+
 require ("linking.php");
 if ($con->connect_error) {
     die("Connection Failed" . $con->connect_error);
@@ -252,6 +255,62 @@ if ($con->connect_error) {
         }
       }
   }
+  if (isset($_POST['block_dep_submit'])) {
+    $actionemail = filter_input(INPUT_POST, 'blockemail', FILTER_SANITIZE_EMAIL);
+    $actionusername = filter_input(INPUT_POST, 'blockusername', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $actionradio = filter_input(INPUT_POST, 'actions', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    if (!empty($actionusername) && empty($actionemail)) { 
+      $action_query = mysqli_query($con,"SELECT deposit FROM blacklist WHERE username = '$actionusername'");
+      if (mysqli_num_rows($action_query) > 0) {
+        $_SESSION['actionusername'] = $actionusername;
+        $action_query_array = mysqli_fetch_all($action_query, MYSQLI_ASSOC);
+        foreach ($action_query_array as $row) {
+            $actionsql = $row["deposit"];
+        }
+        if ($actionradio === "allow" && $actionsql === "1") {
+          $_SESSION["verif_dep_action"] = "fail1";
+          header("Location: welcome_admin_forms.php");
+          exit;
+        } else if ($actionradio === "block" && $actionsql === "0") {
+          $_SESSION["verif_dep_action"] = "fail2";
+          header("Location: welcome_admin_forms.php");
+          exit;
+        } else if ($actionradio === "allow" && $actionsql === "0") {
+          mysqli_query($con,"UPDATE blacklist SET deposit = 1 WHERE username = '$actionusername'");
+          if (mysqli_affected_rows($con) > 0) {
+            $_SESSION["verif_dep_action"] = "success1";
+            header("Location: welcome_admin_forms.php");
+            exit;
+          } else {
+            $_SESSION["verif_dep_action"] = "fail3";
+            header("Location: welcome_admin_forms.php");
+            exit;
+          }
+        } else if ($actionradio === "block" && $actionsql === "1") {
+          mysqli_query($con,"UPDATE blacklist SET deposit = 0 WHERE username = '$actionusername'");
+          if (mysqli_affected_rows($con) > 0) {
+            $_SESSION["verif_dep_action"] = "success2";
+            header("Location: welcome_admin_forms.php");
+            exit;
+          } else {
+            $_SESSION["verif_dep_action"] = "fail3";
+            header("Location: welcome_admin_forms.php");
+            exit;
+          }
+        }
+      }
+    } else if (empty($actionusername) && !empty($actionemail)) { 
+
+    } else if (!empty($actionusername) && !empty($actionemail)) { 
+
+    }
+  }
+  if (isset($_POST['block_with_submit'])) {
+    
+  }
+  if (isset($_POST['block_wire_submit'])) {
+    
+  }
   switch ($_SESSION) {
     case isset($_SESSION["balsub"]):
         unset($_SESSION["verif_balance"]);
@@ -268,6 +327,10 @@ if ($con->connect_error) {
     case isset($_SESSION["transwire"]):
         unset($_SESSION["verif_wire"]);
         unset($_SESSION["transwre"]);
+        break;
+    case isset($_SESSION["actionv"]):
+        unset($_SESSION["verif_wire"]);
+        unset($_SESSION["actionv"]);
         break;
   }
 }
@@ -519,11 +582,42 @@ if ($con->connect_error) {
         </div>
       </form>
     </div>
-    <div class="tab-pane fade" id="blockactions">
-      <div class="blockactionscont d-flex flex-column justify-content-center align-items-center">4
-
+    <form method="post" class="tab-pane fade" id="blockactions">
+      <div class="blockactionscont d-flex flex-column justify-content-center align-items-center">
+        <h1>Allow / Block Actions</h1>
+        <div class="desc text-center" style="font-size: 15px;">Insert the email or the username of the person you want to block/allow the actions of (Information MUST be percise!) <br> (at least one of the inputs needs to be filled)</div>
+        <div class="mt-auto mb-auto d-flex flex-column justify-content-center align-items-center">
+          <label class="labbor lab">
+              <img src="./data/mail.svg" alt="">
+              <input type="text" placeholder="Exact Email" id="mailb" name="blockemail">
+          </label>
+          <label class="labbor lab">
+            <img src="./data/user.svg" alt="">
+            <input type="text" placeholder="Exact Username" id="userb" name="blockusername">
+          </label>
+        </div>
+        <div class="mt-auto mb-auto d-flex gap-3">
+          <label>
+              <input type="radio" name="actions" id="" value="allow" required>
+              <span style="color: white;">Allow</span>
+          </label>
+          <label>
+              <input type="radio" name="actions" id="" value="block" required>
+              <span style="color: white;">Block</span>
+          </label>
+        </div>
+        <style>
+          .x {
+            width: 180px;
+          }
+        </style>
+        <div class="d-flex gap-3 mb-2">
+          <input type="submit" value="Deposit B/A" class="but x" name="block_dep_submit" onclick="return verifsub4()">
+          <input type="submit" value="Withdraw B/A" class="but x" name="block_with_submit" onclick="return verifsub4()">
+          <input type="submit" value="Wire B/A" class="but x" name="block_wire_submit" onclick="return verifsub4()">
+        </div>
       </div>
-    </div>
+    </form>
     <div class="tab-pane fade" id="infomanagment">
       <div class="infomanagmentcont d-flex flex-column justify-content-center align-items-center">5
 
@@ -535,7 +629,7 @@ if ($con->connect_error) {
       </div>
     </div>
   </div>
-</main>
+  </main>
     <script src="./bootstrap-5.0.2-dist/js/bootstrap.bundle.min.js"></script>
     <script src="./js/welcome_admin.js"></script>
     <script src="./js/sidebars.js"></script>

@@ -19,3 +19,10 @@ function verifsub3() {
         return false
     }
 }
+function verifsub4() {
+    mailb = document.getElementById("mailb").value
+    userb = document.getElementById("userb").value
+    if (mailb === "" && userb === "") {
+        return false
+    }
+}
