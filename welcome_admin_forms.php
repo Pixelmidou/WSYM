@@ -1206,8 +1206,33 @@ if ($con->connect_error) {
     }
     if (isset($_SESSION["verif_dep_action"])) {
         $verif_dep_action = $_SESSION["verif_dep_action"];
-        $actionusername = $_SESSION['actionusername'];
-        $_SESSION["actionv"] = "actionv";
+        if (isset($_SESSION['actionusername'])) {
+            $actionusername = $_SESSION['actionusername'];
+        }
+        if (isset($_SESSION['actionemail'])) {
+            $actionemail = $_SESSION['actionemail'];
+        }
+        $_SESSION["actiondep"] = "actiondep";
+    }
+    if (isset($_SESSION["verif_with_action"])) {
+        $verif_with_action = $_SESSION["verif_with_action"];
+        if (isset($_SESSION['actionusername'])) {
+            $actionusername = $_SESSION['actionusername'];
+        }
+        if (isset($_SESSION['actionemail'])) {
+            $actionemail = $_SESSION['actionemail'];
+        }
+        $_SESSION["actionwith"] = "actionwith";
+    }
+    if (isset($_SESSION["verif_wire_action"])) {
+        $verif_wire_action = $_SESSION["verif_wire_action"];
+        if (isset($_SESSION['actionusername'])) {
+            $actionusername = $_SESSION['actionusername'];
+        }
+        if (isset($_SESSION['actionemail'])) {
+            $actionemail = $_SESSION['actionemail'];
+        }
+        $_SESSION["actionwire"] = "actionwire";
     }
 }
 ?>
@@ -1697,14 +1722,14 @@ if ($con->connect_error) {
     <body>
         <div class="container1">
             <div class="container2">
-                <h1 style="text-align: center;">Action Failed : <?php echo $actionusername; ?> is already allowed to deposit !</h1>
+                <h1 style="text-align: center;">Action Failed : " <?php echo $actionusername; ?> " is already allowed to deposit !</h1>
                 <div style="text-align: center; font-size: small;">You will be automatically redirected back to the admin page in 4 seconds.</div>
             </div>
         </div>
     </body>
     </html>
 <?php endif; ?>
-<?php if(isset($veri_dep_action) && $verif_dep_action === "fail2"): ?>
+<?php if(isset($verif_dep_action) && $verif_dep_action === "fail2"): ?>
     <!DOCTYPE html>
     <html lang="en">
     <head>
@@ -1719,14 +1744,14 @@ if ($con->connect_error) {
     <body>
         <div class="container1">
             <div class="container2">
-                <h1 style="text-align: center;">Action Failed : <?php echo $actionusername; ?> is already blocked from depositing !</h1>
+                <h1 style="text-align: center;">Action Failed : " <?php echo $actionusername; ?> " is already blocked from depositing !</h1>
                 <div style="text-align: center; font-size: small;">You will be automatically redirected back to the admin page in 4 seconds.</div>
             </div>
         </div>
     </body>
     </html>
 <?php endif; ?>
-<?php if(isset($veri_dep_action) && $verif_dep_action === "fail3"): ?>
+<?php if(isset($verif_dep_action) && $verif_dep_action === "fail3"): ?>
     <!DOCTYPE html>
     <html lang="en">
     <head>
@@ -1748,6 +1773,50 @@ if ($con->connect_error) {
     </body>
     </html>
 <?php endif; ?>
+<?php if(isset($verif_dep_action) && $verif_dep_action === "fail4"): ?>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="refresh" content="4; url=welcome_admin.php">
+        <title>WSYM Banking</title>
+        <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
+        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="./css/redirections_style.css">
+    </head>
+    <body>
+        <div class="container1">
+            <div class="container2">
+                <h1 style="text-align: center;">Action Failed : " <?php echo $actionemail; ?> " is already allowed to deposit !</h1>
+                <div style="text-align: center; font-size: small;">You will be automatically redirected back to the admin page in 4 seconds.</div>
+            </div>
+        </div>
+    </body>
+    </html>
+<?php endif; ?>
+<?php if(isset($verif_dep_action) && $verif_dep_action === "fail5"): ?>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="refresh" content="4; url=welcome_admin.php">
+        <title>WSYM Banking</title>
+        <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
+        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="./css/redirections_style.css">
+    </head>
+    <body>
+        <div class="container1">
+            <div class="container2">
+                <h1 style="text-align: center;">Action Failed : " <?php echo $actionemail; ?> " is already blocked from depositing !</h1>
+                <div style="text-align: center; font-size: small;">You will be automatically redirected back to the admin page in 4 seconds.</div>
+            </div>
+        </div>
+    </body>
+    </html>
+<?php endif; ?>
 <?php if(isset($verif_dep_action) && $verif_dep_action === "success1"): ?>
     <!DOCTYPE html>
     <html lang="en">
@@ -1763,7 +1832,7 @@ if ($con->connect_error) {
     <body>
         <div class="container1">
             <div class="container2">
-                <h1 style="text-align: center;">Action Success : <?php echo $actionusername; ?> is allowed to deposit !</h1>
+                <h1 style="text-align: center;">Action Success : " <?php echo $actionusername; ?> " is allowed to deposit !</h1>
                 <div style="text-align: center; font-size: small;">You will be automatically redirected back to the admin page in 4 seconds.</div>
             </div>
         </div>
@@ -1785,7 +1854,447 @@ if ($con->connect_error) {
     <body>
         <div class="container1">
             <div class="container2">
-                <h1 style="text-align: center;">Action Success : <?php echo $actionusername; ?> is blocked from depositing !</h1>
+                <h1 style="text-align: center;">Action Success : " <?php echo $actionusername; ?> " is blocked from depositing !</h1>
+                <div style="text-align: center; font-size: small;">You will be automatically redirected back to the admin page in 4 seconds.</div>
+            </div>
+        </div>
+    </body>
+    </html>
+<?php endif; ?>
+<?php if(isset($verif_dep_action) && $verif_dep_action === "success3"): ?>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="refresh" content="4; url=welcome_admin.php">
+        <title>WSYM Banking</title>
+        <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
+        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="./css/redirections_style.css">
+    </head>
+    <body>
+        <div class="container1">
+            <div class="container2">
+                <h1 style="text-align: center;">Action Success : " <?php echo $actionemail; ?> " is allowed to deposit !</h1>
+                <div style="text-align: center; font-size: small;">You will be automatically redirected back to the admin page in 4 seconds.</div>
+            </div>
+        </div>
+    </body>
+    </html>
+<?php endif; ?>
+<?php if(isset($verif_dep_action) && $verif_dep_action === "success4"): ?>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="refresh" content="4; url=welcome_admin.php">
+        <title>WSYM Banking</title>
+        <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
+        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="./css/redirections_style.css">
+    </head>
+    <body>
+        <div class="container1">
+            <div class="container2">
+                <h1 style="text-align: center;">Action Success : " <?php echo $actionemail; ?> " is blocked from depositing !</h1>
+                <div style="text-align: center; font-size: small;">You will be automatically redirected back to the admin page in 4 seconds.</div>
+            </div>
+        </div>
+    </body>
+    </html>
+<?php endif; ?>
+<?php if(isset($verif_with_action) && $verif_with_action === "fail1"): ?>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="refresh" content="4; url=welcome_admin.php">
+        <title>WSYM Banking</title>
+        <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
+        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="./css/redirections_style.css">
+    </head>
+    <body>
+        <div class="container1">
+            <div class="container2">
+                <h1 style="text-align: center;">Action Failed : " <?php echo $actionusername; ?> " is already allowed to withdraw !</h1>
+                <div style="text-align: center; font-size: small;">You will be automatically redirected back to the admin page in 4 seconds.</div>
+            </div>
+        </div>
+    </body>
+    </html>
+<?php endif; ?>
+<?php if(isset($verif_with_action) && $verif_with_action === "fail2"): ?>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="refresh" content="4; url=welcome_admin.php">
+        <title>WSYM Banking</title>
+        <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
+        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="./css/redirections_style.css">
+    </head>
+    <body>
+        <div class="container1">
+            <div class="container2">
+                <h1 style="text-align: center;">Action Failed : " <?php echo $actionusername; ?> " is already blocked from withdrawing !</h1>
+                <div style="text-align: center; font-size: small;">You will be automatically redirected back to the admin page in 4 seconds.</div>
+            </div>
+        </div>
+    </body>
+    </html>
+<?php endif; ?>
+<?php if(isset($verif_with_action) && $verif_with_action === "fail3"): ?>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="refresh" content="4; url=welcome_admin.php">
+        <title>WSYM Banking</title>
+        <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
+        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="./css/redirections_style.css">
+    </head>
+    <body>
+        <div class="container1">
+            <div class="container2">
+                <h1 style="text-align: center;">Error 500 : Internal Server Error</h1>
+                <div style="text-align: center; font-size: small;">You will be automatically redirected back to the welcome page in 4 seconds.</div>
+            </div>
+        </div>
+    </body>
+    </html>
+<?php endif; ?>
+<?php if(isset($verif_with_action) && $verif_with_action === "fail4"): ?>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="refresh" content="4; url=welcome_admin.php">
+        <title>WSYM Banking</title>
+        <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
+        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="./css/redirections_style.css">
+    </head>
+    <body>
+        <div class="container1">
+            <div class="container2">
+                <h1 style="text-align: center;">Action Failed : " <?php echo $actionemail; ?> " is already allowed to withdraw !</h1>
+                <div style="text-align: center; font-size: small;">You will be automatically redirected back to the admin page in 4 seconds.</div>
+            </div>
+        </div>
+    </body>
+    </html>
+<?php endif; ?>
+<?php if(isset($verif_with_action) && $verif_with_action === "fail5"): ?>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="refresh" content="4; url=welcome_admin.php">
+        <title>WSYM Banking</title>
+        <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
+        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="./css/redirections_style.css">
+    </head>
+    <body>
+        <div class="container1">
+            <div class="container2">
+                <h1 style="text-align: center;">Action Failed : " <?php echo $actionemail; ?> " is already blocked from withdrawing !</h1>
+                <div style="text-align: center; font-size: small;">You will be automatically redirected back to the admin page in 4 seconds.</div>
+            </div>
+        </div>
+    </body>
+    </html>
+<?php endif; ?>
+<?php if(isset($verif_with_action) && $verif_with_action === "success1"): ?>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="refresh" content="4; url=welcome_admin.php">
+        <title>WSYM Banking</title>
+        <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
+        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="./css/redirections_style.css">
+    </head>
+    <body>
+        <div class="container1">
+            <div class="container2">
+                <h1 style="text-align: center;">Action Success : " <?php echo $actionusername; ?> " is allowed to withdraw !</h1>
+                <div style="text-align: center; font-size: small;">You will be automatically redirected back to the admin page in 4 seconds.</div>
+            </div>
+        </div>
+    </body>
+    </html>
+<?php endif; ?>
+<?php if(isset($verif_with_action) && $verif_with_action === "success2"): ?>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="refresh" content="4; url=welcome_admin.php">
+        <title>WSYM Banking</title>
+        <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
+        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="./css/redirections_style.css">
+    </head>
+    <body>
+        <div class="container1">
+            <div class="container2">
+                <h1 style="text-align: center;">Action Success : " <?php echo $actionusername; ?> " is blocked from withdrawing !</h1>
+                <div style="text-align: center; font-size: small;">You will be automatically redirected back to the admin page in 4 seconds.</div>
+            </div>
+        </div>
+    </body>
+    </html>
+<?php endif; ?>
+<?php if(isset($verif_with_action) && $verif_with_action === "success3"): ?>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="refresh" content="4; url=welcome_admin.php">
+        <title>WSYM Banking</title>
+        <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
+        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="./css/redirections_style.css">
+    </head>
+    <body>
+        <div class="container1">
+            <div class="container2">
+                <h1 style="text-align: center;">Action Success : " <?php echo $actionemail; ?> " is allowed to withdraw !</h1>
+                <div style="text-align: center; font-size: small;">You will be automatically redirected back to the admin page in 4 seconds.</div>
+            </div>
+        </div>
+    </body>
+    </html>
+<?php endif; ?>
+<?php if(isset($verif_with_action) && $verif_with_action === "success4"): ?>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="refresh" content="4; url=welcome_admin.php">
+        <title>WSYM Banking</title>
+        <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
+        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="./css/redirections_style.css">
+    </head>
+    <body>
+        <div class="container1">
+            <div class="container2">
+                <h1 style="text-align: center;">Action Success : " <?php echo $actionemail; ?> " is blocked from withdrawing !</h1>
+                <div style="text-align: center; font-size: small;">You will be automatically redirected back to the admin page in 4 seconds.</div>
+            </div>
+        </div>
+    </body>
+    </html>
+<?php endif; ?>
+<?php if(isset($verif_wire_action) && $verif_wire_action === "fail1"): ?>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="refresh" content="4; url=welcome_admin.php">
+        <title>WSYM Banking</title>
+        <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
+        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="./css/redirections_style.css">
+    </head>
+    <body>
+        <div class="container1">
+            <div class="container2">
+                <h1 style="text-align: center;">Action Failed : " <?php echo $actionusername; ?> " is already allowed to wire money !</h1>
+                <div style="text-align: center; font-size: small;">You will be automatically redirected back to the admin page in 4 seconds.</div>
+            </div>
+        </div>
+    </body>
+    </html>
+<?php endif; ?>
+<?php if(isset($verif_wire_action) && $verif_wire_action === "fail2"): ?>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="refresh" content="4; url=welcome_admin.php">
+        <title>WSYM Banking</title>
+        <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
+        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="./css/redirections_style.css">
+    </head>
+    <body>
+        <div class="container1">
+            <div class="container2">
+                <h1 style="text-align: center;">Action Failed : " <?php echo $actionusername; ?> " is already blocked from wiring money !</h1>
+                <div style="text-align: center; font-size: small;">You will be automatically redirected back to the admin page in 4 seconds.</div>
+            </div>
+        </div>
+    </body>
+    </html>
+<?php endif; ?>
+<?php if(isset($verif_wire_action) && $verif_wire_action === "fail3"): ?>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="refresh" content="4; url=welcome_admin.php">
+        <title>WSYM Banking</title>
+        <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
+        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="./css/redirections_style.css">
+    </head>
+    <body>
+        <div class="container1">
+            <div class="container2">
+                <h1 style="text-align: center;">Error 500 : Internal Server Error</h1>
+                <div style="text-align: center; font-size: small;">You will be automatically redirected back to the welcome page in 4 seconds.</div>
+            </div>
+        </div>
+    </body>
+    </html>
+<?php endif; ?>
+<?php if(isset($verif_wire_action) && $verif_wire_action === "fail4"): ?>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="refresh" content="4; url=welcome_admin.php">
+        <title>WSYM Banking</title>
+        <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
+        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="./css/redirections_style.css">
+    </head>
+    <body>
+        <div class="container1">
+            <div class="container2">
+                <h1 style="text-align: center;">Action Failed : " <?php echo $actionemail; ?> " is already allowed to wire money !</h1>
+                <div style="text-align: center; font-size: small;">You will be automatically redirected back to the admin page in 4 seconds.</div>
+            </div>
+        </div>
+    </body>
+    </html>
+<?php endif; ?>
+<?php if(isset($verif_wire_action) && $verif_wire_action === "fail5"): ?>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="refresh" content="4; url=welcome_admin.php">
+        <title>WSYM Banking</title>
+        <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
+        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="./css/redirections_style.css">
+    </head>
+    <body>
+        <div class="container1">
+            <div class="container2">
+                <h1 style="text-align: center;">Action Failed : " <?php echo $actionemail; ?> " is already blocked from wiring money !</h1>
+                <div style="text-align: center; font-size: small;">You will be automatically redirected back to the admin page in 4 seconds.</div>
+            </div>
+        </div>
+    </body>
+    </html>
+<?php endif; ?>
+<?php if(isset($verif_wire_action) && $verif_wire_action === "success1"): ?>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="refresh" content="4; url=welcome_admin.php">
+        <title>WSYM Banking</title>
+        <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
+        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="./css/redirections_style.css">
+    </head>
+    <body>
+        <div class="container1">
+            <div class="container2">
+                <h1 style="text-align: center;">Action Success : " <?php echo $actionusername; ?> " is allowed to wire money !</h1>
+                <div style="text-align: center; font-size: small;">You will be automatically redirected back to the admin page in 4 seconds.</div>
+            </div>
+        </div>
+    </body>
+    </html>
+<?php endif; ?>
+<?php if(isset($verif_wire_action) && $verif_wire_action === "success2"): ?>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="refresh" content="4; url=welcome_admin.php">
+        <title>WSYM Banking</title>
+        <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
+        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="./css/redirections_style.css">
+    </head>
+    <body>
+        <div class="container1">
+            <div class="container2">
+                <h1 style="text-align: center;">Action Success : " <?php echo $actionusername; ?> " is blocked from wiring money !</h1>
+                <div style="text-align: center; font-size: small;">You will be automatically redirected back to the admin page in 4 seconds.</div>
+            </div>
+        </div>
+    </body>
+    </html>
+<?php endif; ?>
+<?php if(isset($verif_wire_action) && $verif_wire_action === "success3"): ?>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="refresh" content="4; url=welcome_admin.php">
+        <title>WSYM Banking</title>
+        <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
+        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="./css/redirections_style.css">
+    </head>
+    <body>
+        <div class="container1">
+            <div class="container2">
+                <h1 style="text-align: center;">Action Success : " <?php echo $actionemail; ?> " is allowed to wire money !</h1>
+                <div style="text-align: center; font-size: small;">You will be automatically redirected back to the admin page in 4 seconds.</div>
+            </div>
+        </div>
+    </body>
+    </html>
+<?php endif; ?>
+<?php if(isset($verif_wire_action) && $verif_wire_action === "success4"): ?>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="refresh" content="4; url=welcome_admin.php">
+        <title>WSYM Banking</title>
+        <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
+        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="./css/redirections_style.css">
+    </head>
+    <body>
+        <div class="container1">
+            <div class="container2">
+                <h1 style="text-align: center;">Action Success : " <?php echo $actionemail; ?> " is blocked from wiring money !</h1>
                 <div style="text-align: center; font-size: small;">You will be automatically redirected back to the admin page in 4 seconds.</div>
             </div>
         </div>

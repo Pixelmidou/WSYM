@@ -26,3 +26,10 @@ function verifsub4() {
         return false
     }
 }
+function verifsub5() {
+    mailbacc = document.getElementById("mailbacc").value
+    userbacc = document.getElementById("userbacc").value
+    if (mailbacc === "" && userbacc === "") {
+        return false
+    }
+}
