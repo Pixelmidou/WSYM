@@ -1,6 +1,11 @@
 <?php
 session_start();
 $admin_username = $_SESSION['admin_username'];
+if(empty($_SESSION['admin_username']) || $_SESSION['admin_username'] == ''){
+    session_destroy();
+    header("Location: index.html");
+    exit;
+}
 $_SESSION['user_username'] = $admin_username;
 ?>
 <!DOCTYPE html>

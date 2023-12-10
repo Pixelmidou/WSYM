@@ -4,137 +4,148 @@ if ($con->connect_error) {
     die("Connection Failed" . $con->connect_error);
 } else { 
   session_start();
+  if(empty($_SESSION['admin_username']) || $_SESSION['admin_username'] == ''){
+      session_destroy();
+      header("Location: index.html");
+      exit;
+  }
   if (isset($_POST['logout'])) {
       session_destroy();
       header("Location: index.html");
       exit;
   }
-  // $now = time();
-  // if($now > $_SESSION['expire']) { 
-  //     session_destroy();
-  //     $_SESSION['session_verif'] = "success";
-  //     header("Location: welcome_verif.php");
-  //     exit;
-  // } 
-  $admin_username = $_SESSION['admin_username'];
-  if(empty($_SESSION['admin_username']) || $_SESSION['admin_username'] == ''){
-    header("Location: index.html");
-    exit;
-  }
-  $admin_type_query = mysqli_query($con,"SELECT rank FROM login_credentials WHERE username = '$admin_username'");
-  if (mysqli_num_rows($admin_type_query) > 0) {
-      $admin_type_array = mysqli_fetch_all($admin_type_query, MYSQLI_ASSOC);
-      foreach ($admin_type_array as $row) {
-          $admin_type = $row["rank"];
-      }
-  }
-  $clients_number_query = mysqli_query($con,"SELECT count(*) AS clients_number FROM login_credentials");
-  if (mysqli_num_rows($clients_number_query) > 0) {
-      $clients_number_array = mysqli_fetch_all($clients_number_query, MYSQLI_ASSOC);
-      foreach ($clients_number_array as $row) {
-          $clients_number = $row["clients_number"];
-      }
-  }
-  $stored_money_query = mysqli_query($con,"SELECT SUM(balance) AS stored_money from balance");
-  if (mysqli_num_rows($stored_money_query) > 0) {
-      $stored_money_array = mysqli_fetch_all($stored_money_query, MYSQLI_ASSOC);
-      foreach ($stored_money_array as $row) {
-          $stored_money = $row["stored_money"];
-      }
-  }
-  $today_deposits_query = mysqli_query($con,"SELECT count(deposit_date) AS today_deposits FROM deposit WHERE year(deposit_date) = year(now()) AND month(deposit_date) = month(now()) AND day(deposit_date) = day(now())");
-  if (mysqli_num_rows($today_deposits_query) > 0) {
-      $today_deposits_array = mysqli_fetch_all($today_deposits_query, MYSQLI_ASSOC);
-      foreach ($today_deposits_array as $row) {
-          $today_deposits = $row["today_deposits"];
-          $today_deposits_msg = "In the last 24 Hours, there has been $today_deposits deposits";
-      }
-  }
-  $today_withdraws_query = mysqli_query($con,"SELECT count(withdraw_date) AS today_withdraws FROM withdraw WHERE year(withdraw_date) = year(now()) AND month(withdraw_date) = month(now()) AND day(withdraw_date) = day(now())");
-  if (mysqli_num_rows($today_withdraws_query) > 0) {
-      $today_withdraws_array = mysqli_fetch_all($today_withdraws_query, MYSQLI_ASSOC);
-      foreach ($today_withdraws_array as $row) {
-          $today_withdraws = $row["today_withdraws"];
-          $today_withdraws_msg = "In the last 24 Hours, there has been $today_withdraws withdraws";
-      }
-  }
-  $today_wires_query = mysqli_query($con,"SELECT count(wire_date) AS today_wires FROM wire WHERE year(wire_date) = year(now()) AND month(wire_date) = month(now()) AND day(wire_date) = day(now())");
-  if (mysqli_num_rows($today_wires_query) > 0) {
-      $today_wires_array = mysqli_fetch_all($today_wires_query, MYSQLI_ASSOC);
-      foreach ($today_wires_array as $row) {
-          $today_wires = $row["today_wires"];
-          $today_wires_msg = "In the last 24 Hours, there has been $today_wires wires";
-      }
-  }
-  if (isset($_POST['balance_submit'])) {
-    $balanceemail = filter_input(INPUT_POST, 'balanceemail', FILTER_SANITIZE_EMAIL);
-    $balanceusername = filter_input(INPUT_POST, 'balanceusername', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-    if (!empty($balanceemail) && empty($balanceusername)) {
-      $_SESSION['balanceemail'] = $balanceemail;
-      $balance_query = mysqli_query($con,"SELECT * FROM balance WHERE email LIKE '%$balanceemail%'");
-      if (mysqli_num_rows($balance_query)) {
-        $_SESSION['verif_balance'] = "success";
-        $_SESSION['verif_balance_case'] = "1";
-        header("Location: welcome_admin_forms.php");
-        exit;
-      } else {
-        $_SESSION['verif_balance'] = "fail";
-        header("Location: welcome_admin_forms.php");
-        exit;
-      }
-    } else if (!empty($balanceusername) && empty($balanceemail)) {
-      $_SESSION['balanceusername'] = $balanceusername;
-      $balance_query = mysqli_query($con,"SELECT * FROM balance WHERE username LIKE '%$balanceusername%'");
-      if (mysqli_num_rows($balance_query)) {
-        $_SESSION['verif_balance'] = "success";
-        $_SESSION['verif_balance_case'] = "2";
-        header("Location: welcome_admin_forms.php");
-        exit;
-      } else {
-        $_SESSION['verif_balance'] = "fail";
-        header("Location: welcome_admin_forms.php");
-        exit;
-      }
-    } else if (!empty($balanceemail) && !empty($balanceusername)) {
-      $_SESSION['balanceemail'] = $balanceemail;
-      $_SESSION['balanceusername'] = $balanceusername;
-      $balance_query = mysqli_query($con,"SELECT * FROM balance WHERE username LIKE '%$balanceusername%' AND email LIKE '%$balanceemail%'");
-      if (mysqli_num_rows($balance_query)) {
-        $_SESSION['verif_balance'] = "success";
-        $_SESSION['verif_balance_case'] = "3";
-        header("Location: welcome_admin_forms.php");
-        exit;
-      } else {
-        $_SESSION['verif_balance'] = "fail";
-        header("Location: welcome_admin_forms.php");
-        exit;
+  $now = time();
+  if($now > $_SESSION['expire']) { 
+      session_destroy(); ?>
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <meta http-equiv="refresh" content="4; url=index.html">
+          <title>WSYM Banking</title>
+          <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
+          <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
+          <link rel="stylesheet" href="./css/redirections_style.css">
+      </head>
+      <body>
+          <div class="container1">
+              <div class="container2">
+                  <h1 style="text-align: center;">Session expired : You need to login again !</h1>
+                  <div style="text-align: center; font-size: medium;">Any action attempted was stopped and interrupted.</div>
+                  <div style="text-align: center; font-size: small;">You will be automatically redirected back to the login page in 4 seconds.</div>
+              </div>
+          </div>
+      </body>
+      </html>
+  <?php } else {
+    $page_load = true;
+    $admin_username = $_SESSION['admin_username'];
+    if(empty($_SESSION['admin_username']) || $_SESSION['admin_username'] == ''){
+      header("Location: index.html");
+      exit;
+    }
+    $admin_type_query = mysqli_query($con,"SELECT rank FROM login_credentials WHERE username = '$admin_username'");
+    if (mysqli_num_rows($admin_type_query) > 0) {
+        $admin_type_array = mysqli_fetch_all($admin_type_query, MYSQLI_ASSOC);
+        foreach ($admin_type_array as $row) {
+            $admin_type = $row["rank"];
+        }
+    }
+    $clients_number_query = mysqli_query($con,"SELECT count(*) AS clients_number FROM login_credentials");
+    if (mysqli_num_rows($clients_number_query) > 0) {
+        $clients_number_array = mysqli_fetch_all($clients_number_query, MYSQLI_ASSOC);
+        foreach ($clients_number_array as $row) {
+            $clients_number = $row["clients_number"];
+        }
+    }
+    $stored_money_query = mysqli_query($con,"SELECT SUM(balance) AS stored_money from balance");
+    if (mysqli_num_rows($stored_money_query) > 0) {
+        $stored_money_array = mysqli_fetch_all($stored_money_query, MYSQLI_ASSOC);
+        foreach ($stored_money_array as $row) {
+            $stored_money = $row["stored_money"];
+        }
+    }
+    $today_deposits_query = mysqli_query($con,"SELECT count(deposit_date) AS today_deposits FROM deposit WHERE year(deposit_date) = year(now()) AND month(deposit_date) = month(now()) AND day(deposit_date) = day(now())");
+    if (mysqli_num_rows($today_deposits_query) > 0) {
+        $today_deposits_array = mysqli_fetch_all($today_deposits_query, MYSQLI_ASSOC);
+        foreach ($today_deposits_array as $row) {
+            $today_deposits = $row["today_deposits"];
+            $today_deposits_msg = "In the last 24 Hours, there has been $today_deposits deposits";
+        }
+    }
+    $today_withdraws_query = mysqli_query($con,"SELECT count(withdraw_date) AS today_withdraws FROM withdraw WHERE year(withdraw_date) = year(now()) AND month(withdraw_date) = month(now()) AND day(withdraw_date) = day(now())");
+    if (mysqli_num_rows($today_withdraws_query) > 0) {
+        $today_withdraws_array = mysqli_fetch_all($today_withdraws_query, MYSQLI_ASSOC);
+        foreach ($today_withdraws_array as $row) {
+            $today_withdraws = $row["today_withdraws"];
+            $today_withdraws_msg = "In the last 24 Hours, there has been $today_withdraws withdraws";
+        }
+    }
+    $today_wires_query = mysqli_query($con,"SELECT count(wire_date) AS today_wires FROM wire WHERE year(wire_date) = year(now()) AND month(wire_date) = month(now()) AND day(wire_date) = day(now())");
+    if (mysqli_num_rows($today_wires_query) > 0) {
+        $today_wires_array = mysqli_fetch_all($today_wires_query, MYSQLI_ASSOC);
+        foreach ($today_wires_array as $row) {
+            $today_wires = $row["today_wires"];
+            $today_wires_msg = "In the last 24 Hours, there has been $today_wires wires";
+        }
+    }
+    if (isset($_POST['balance_submit'])) {
+      $balanceemail = filter_input(INPUT_POST, 'balanceemail', FILTER_SANITIZE_EMAIL);
+      $balanceusername = filter_input(INPUT_POST, 'balanceusername', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+      if (!empty($balanceemail) && empty($balanceusername)) {
+        $_SESSION['balanceemail'] = $balanceemail;
+        $balance_query = mysqli_query($con,"SELECT * FROM balance WHERE email LIKE '%$balanceemail%'");
+        if (mysqli_num_rows($balance_query)) {
+          $_SESSION['verif_balance'] = "success";
+          $_SESSION['verif_balance_case'] = "1";
+          header("Location: welcome_admin_forms.php");
+          exit;
+        } else {
+          $_SESSION['verif_balance'] = "fail";
+          header("Location: welcome_admin_forms.php");
+          exit;
+        }
+      } else if (!empty($balanceusername) && empty($balanceemail)) {
+        $_SESSION['balanceusername'] = $balanceusername;
+        $balance_query = mysqli_query($con,"SELECT * FROM balance WHERE username LIKE '%$balanceusername%'");
+        if (mysqli_num_rows($balance_query)) {
+          $_SESSION['verif_balance'] = "success";
+          $_SESSION['verif_balance_case'] = "2";
+          header("Location: welcome_admin_forms.php");
+          exit;
+        } else {
+          $_SESSION['verif_balance'] = "fail";
+          header("Location: welcome_admin_forms.php");
+          exit;
+        }
+      } else if (!empty($balanceemail) && !empty($balanceusername)) {
+        $_SESSION['balanceemail'] = $balanceemail;
+        $_SESSION['balanceusername'] = $balanceusername;
+        $balance_query = mysqli_query($con,"SELECT * FROM balance WHERE username LIKE '%$balanceusername%' AND email LIKE '%$balanceemail%'");
+        if (mysqli_num_rows($balance_query)) {
+          $_SESSION['verif_balance'] = "success";
+          $_SESSION['verif_balance_case'] = "3";
+          header("Location: welcome_admin_forms.php");
+          exit;
+        } else {
+          $_SESSION['verif_balance'] = "fail";
+          header("Location: welcome_admin_forms.php");
+          exit;
+        }
       }
     }
-  }
-  if (isset($_POST['deposit_transactions_submit'])) { 
-    $transemail = filter_input(INPUT_POST, 'transemail', FILTER_SANITIZE_EMAIL);
-    $transusername = filter_input(INPUT_POST, 'transusername', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-    $translimit = filter_input(INPUT_POST, 'translimit', FILTER_SANITIZE_NUMBER_FLOAT);
-    $_SESSION['translimit'] = $translimit;
-    if (!empty($transusername) && empty($transemail)) {
-      $_SESSION['transusername'] = $transusername;
-      $deposit_query = mysqli_query($con,"SELECT username,deposit_date,deposit_amount FROM deposit WHERE username LIKE '%$transusername%' LIMIT $translimit");
-      if (mysqli_num_rows($deposit_query)) {
-        $_SESSION['verif_deposit'] = "success";
-        $_SESSION['verif_deposit_case'] = "1";
-        header("Location: welcome_admin_forms.php");
-        exit;
-      } else {
-        $_SESSION['verif_deposit'] = "fail";
-        header("Location: welcome_admin_forms.php");
-        exit;
-      }
-      } else if (!empty($transemail) && empty($transusername)) {
-        $_SESSION['transemail'] = $transemail;
-        $deposit_query = mysqli_query($con,"SELECT deposit.username,email,deposit_date,deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') LIMIT $translimit");
+    if (isset($_POST['deposit_transactions_submit'])) { 
+      $transemail = filter_input(INPUT_POST, 'transemail', FILTER_SANITIZE_EMAIL);
+      $transusername = filter_input(INPUT_POST, 'transusername', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+      $translimit = filter_input(INPUT_POST, 'translimit', FILTER_SANITIZE_NUMBER_FLOAT);
+      $_SESSION['translimit'] = $translimit;
+      if (!empty($transusername) && empty($transemail)) {
+        $_SESSION['transusername'] = $transusername;
+        $deposit_query = mysqli_query($con,"SELECT username,deposit_date,deposit_amount FROM deposit WHERE username LIKE '%$transusername%' LIMIT $translimit");
         if (mysqli_num_rows($deposit_query)) {
           $_SESSION['verif_deposit'] = "success";
-          $_SESSION['verif_deposit_case'] = "2";
+          $_SESSION['verif_deposit_case'] = "1";
           header("Location: welcome_admin_forms.php");
           exit;
         } else {
@@ -142,46 +153,46 @@ if ($con->connect_error) {
           header("Location: welcome_admin_forms.php");
           exit;
         }
-      } else if (!empty($transemail) && !empty($transusername)) {
-        $_SESSION['transusername'] = $transusername;
-        $_SESSION['transemail'] = $transemail;
-        $deposit_query = mysqli_query($con,"SELECT deposit.username,email,deposit_date,deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit.username LIKE '%$transusername%' LIMIT $translimit");
-        if (mysqli_num_rows($deposit_query)) {
-          $_SESSION['verif_deposit'] = "success";
-          $_SESSION['verif_deposit_case'] = "3";
-          header("Location: welcome_admin_forms.php");
-          exit;
-        } else {
-          $_SESSION['verif_deposit'] = "fail";
-          header("Location: welcome_admin_forms.php");
-          exit;
+        } else if (!empty($transemail) && empty($transusername)) {
+          $_SESSION['transemail'] = $transemail;
+          $deposit_query = mysqli_query($con,"SELECT deposit.username,email,deposit_date,deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') LIMIT $translimit");
+          if (mysqli_num_rows($deposit_query)) {
+            $_SESSION['verif_deposit'] = "success";
+            $_SESSION['verif_deposit_case'] = "2";
+            header("Location: welcome_admin_forms.php");
+            exit;
+          } else {
+            $_SESSION['verif_deposit'] = "fail";
+            header("Location: welcome_admin_forms.php");
+            exit;
+          }
+        } else if (!empty($transemail) && !empty($transusername)) {
+          $_SESSION['transusername'] = $transusername;
+          $_SESSION['transemail'] = $transemail;
+          $deposit_query = mysqli_query($con,"SELECT deposit.username,email,deposit_date,deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit.username LIKE '%$transusername%' LIMIT $translimit");
+          if (mysqli_num_rows($deposit_query)) {
+            $_SESSION['verif_deposit'] = "success";
+            $_SESSION['verif_deposit_case'] = "3";
+            header("Location: welcome_admin_forms.php");
+            exit;
+          } else {
+            $_SESSION['verif_deposit'] = "fail";
+            header("Location: welcome_admin_forms.php");
+            exit;
+          }
         }
-      }
-  }
-  if (isset($_POST['withdraw_transactions_submit'])) { 
-    $transemail = filter_input(INPUT_POST, 'transemail', FILTER_SANITIZE_EMAIL);
-    $transusername = filter_input(INPUT_POST, 'transusername', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-    $translimit = filter_input(INPUT_POST, 'translimit', FILTER_SANITIZE_NUMBER_FLOAT);
-    $_SESSION['translimit'] = $translimit;
-    if (!empty($transusername) && empty($transemail)) {
-      $_SESSION['transusername'] = $transusername;
-      $withdraw_query = mysqli_query($con,"SELECT username,withdraw_date,withdraw_amount FROM withdraw WHERE username LIKE '%$transusername%' LIMIT $translimit");
-      if (mysqli_num_rows($withdraw_query)) {
-        $_SESSION['verif_withdraw'] = "success";
-        $_SESSION['verif_withdraw_case'] = "1";
-        header("Location: welcome_admin_forms.php");
-        exit;
-      } else {
-        $_SESSION['verif_withdraw'] = "fail";
-        header("Location: welcome_admin_forms.php");
-        exit;
-      }
-      } else if (!empty($transemail) && empty($transusername)) {
-        $_SESSION['transemail'] = $transemail;
-        $withdraw_query = mysqli_query($con,"SELECT withdraw.username,email,withdraw_date,withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') LIMIT $translimit");
+    }
+    if (isset($_POST['withdraw_transactions_submit'])) { 
+      $transemail = filter_input(INPUT_POST, 'transemail', FILTER_SANITIZE_EMAIL);
+      $transusername = filter_input(INPUT_POST, 'transusername', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+      $translimit = filter_input(INPUT_POST, 'translimit', FILTER_SANITIZE_NUMBER_FLOAT);
+      $_SESSION['translimit'] = $translimit;
+      if (!empty($transusername) && empty($transemail)) {
+        $_SESSION['transusername'] = $transusername;
+        $withdraw_query = mysqli_query($con,"SELECT username,withdraw_date,withdraw_amount FROM withdraw WHERE username LIKE '%$transusername%' LIMIT $translimit");
         if (mysqli_num_rows($withdraw_query)) {
           $_SESSION['verif_withdraw'] = "success";
-          $_SESSION['verif_withdraw_case'] = "2";
+          $_SESSION['verif_withdraw_case'] = "1";
           header("Location: welcome_admin_forms.php");
           exit;
         } else {
@@ -189,46 +200,46 @@ if ($con->connect_error) {
           header("Location: welcome_admin_forms.php");
           exit;
         }
-      } else if (!empty($transemail) && !empty($transusername)) {
-        $_SESSION['transusername'] = $transusername;
-        $_SESSION['transemail'] = $transemail;
-        $withdraw_query = mysqli_query($con,"SELECT withdraw.username,email,withdraw_date,withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw.username LIKE '%$transusername%' LIMIT $translimit");
-        if (mysqli_num_rows($withdraw_query)) {
-          $_SESSION['verif_withdraw'] = "success";
-          $_SESSION['verif_withdraw_case'] = "3";
-          header("Location: welcome_admin_forms.php");
-          exit;
-        } else {
-          $_SESSION['verif_withdraw'] = "fail";
-          header("Location: welcome_admin_forms.php");
-          exit;
+        } else if (!empty($transemail) && empty($transusername)) {
+          $_SESSION['transemail'] = $transemail;
+          $withdraw_query = mysqli_query($con,"SELECT withdraw.username,email,withdraw_date,withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') LIMIT $translimit");
+          if (mysqli_num_rows($withdraw_query)) {
+            $_SESSION['verif_withdraw'] = "success";
+            $_SESSION['verif_withdraw_case'] = "2";
+            header("Location: welcome_admin_forms.php");
+            exit;
+          } else {
+            $_SESSION['verif_withdraw'] = "fail";
+            header("Location: welcome_admin_forms.php");
+            exit;
+          }
+        } else if (!empty($transemail) && !empty($transusername)) {
+          $_SESSION['transusername'] = $transusername;
+          $_SESSION['transemail'] = $transemail;
+          $withdraw_query = mysqli_query($con,"SELECT withdraw.username,email,withdraw_date,withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw.username LIKE '%$transusername%' LIMIT $translimit");
+          if (mysqli_num_rows($withdraw_query)) {
+            $_SESSION['verif_withdraw'] = "success";
+            $_SESSION['verif_withdraw_case'] = "3";
+            header("Location: welcome_admin_forms.php");
+            exit;
+          } else {
+            $_SESSION['verif_withdraw'] = "fail";
+            header("Location: welcome_admin_forms.php");
+            exit;
+          }
         }
-      }
-  }
-  if (isset($_POST['wire_transactions_submit'])) { 
-    $transemail = filter_input(INPUT_POST, 'transemail', FILTER_SANITIZE_EMAIL);
-    $transusername = filter_input(INPUT_POST, 'transusername', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-    $translimit = filter_input(INPUT_POST, 'translimit', FILTER_SANITIZE_NUMBER_FLOAT);
-    $_SESSION['translimit'] = $translimit;
-    if (!empty($transusername) && empty($transemail)) {
-      $_SESSION['transusername'] = $transusername;
-      $wire_query = mysqli_query($con,"SELECT username,wire_date,wire_amount FROM wire WHERE username LIKE '%$transusername%' LIMIT $translimit");
-      if (mysqli_num_rows($wire_query)) {
-        $_SESSION['verif_wire'] = "success";
-        $_SESSION['verif_wire_case'] = "1";
-        header("Location: welcome_admin_forms.php");
-        exit;
-      } else {
-        $_SESSION['verif_wire'] = "fail";
-        header("Location: welcome_admin_forms.php");
-        exit;
-      }
-      } else if (!empty($transemail) && empty($transusername)) {
-        $_SESSION['transemail'] = $transemail;
-        $wire_query = mysqli_query($con,"SELECT wire.username,email,wire_date,wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') LIMIT $translimit");
+    }
+    if (isset($_POST['wire_transactions_submit'])) { 
+      $transemail = filter_input(INPUT_POST, 'transemail', FILTER_SANITIZE_EMAIL);
+      $transusername = filter_input(INPUT_POST, 'transusername', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+      $translimit = filter_input(INPUT_POST, 'translimit', FILTER_SANITIZE_NUMBER_FLOAT);
+      $_SESSION['translimit'] = $translimit;
+      if (!empty($transusername) && empty($transemail)) {
+        $_SESSION['transusername'] = $transusername;
+        $wire_query = mysqli_query($con,"SELECT username,wire_date,wire_amount FROM wire WHERE username LIKE '%$transusername%' LIMIT $translimit");
         if (mysqli_num_rows($wire_query)) {
           $_SESSION['verif_wire'] = "success";
-          $_SESSION['verif_wire_case'] = "2";
+          $_SESSION['verif_wire_case'] = "1";
           header("Location: welcome_admin_forms.php");
           exit;
         } else {
@@ -236,615 +247,774 @@ if ($con->connect_error) {
           header("Location: welcome_admin_forms.php");
           exit;
         }
-      } else if (!empty($transemail) && !empty($transusername)) {
-        $_SESSION['transusername'] = $transusername;
-        $_SESSION['transemail'] = $transemail;
-        $wire_query = mysqli_query($con,"SELECT wire.username,email,wire_date,wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' LIMIT $translimit");
-        if (mysqli_num_rows($wire_query)) {
-          $_SESSION['verif_wire'] = "success";
-          $_SESSION['verif_wire_case'] = "3";
-          header("Location: welcome_admin_forms.php");
-          exit;
+        } else if (!empty($transemail) && empty($transusername)) {
+          $_SESSION['transemail'] = $transemail;
+          $wire_query = mysqli_query($con,"SELECT wire.username,email,wire_date,wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') LIMIT $translimit");
+          if (mysqli_num_rows($wire_query)) {
+            $_SESSION['verif_wire'] = "success";
+            $_SESSION['verif_wire_case'] = "2";
+            header("Location: welcome_admin_forms.php");
+            exit;
+          } else {
+            $_SESSION['verif_wire'] = "fail";
+            header("Location: welcome_admin_forms.php");
+            exit;
+          }
+        } else if (!empty($transemail) && !empty($transusername)) {
+          $_SESSION['transusername'] = $transusername;
+          $_SESSION['transemail'] = $transemail;
+          $wire_query = mysqli_query($con,"SELECT wire.username,email,wire_date,wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' LIMIT $translimit");
+          if (mysqli_num_rows($wire_query)) {
+            $_SESSION['verif_wire'] = "success";
+            $_SESSION['verif_wire_case'] = "3";
+            header("Location: welcome_admin_forms.php");
+            exit;
+          } else {
+            $_SESSION['verif_wire'] = "fail";
+            header("Location: welcome_admin_forms.php");
+            exit;
+          }
+        }
+    }
+    if (isset($_POST['block_dep_submit'])) {
+      $actionemail = filter_input(INPUT_POST, 'blockemail', FILTER_SANITIZE_EMAIL);
+      $actionusername = filter_input(INPUT_POST, 'blockusername', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+      $actionradio = filter_input(INPUT_POST, 'actions', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+      if (!empty($actionusername) && empty($actionemail)) { 
+        $action_query = mysqli_query($con,"SELECT deposit FROM blacklist WHERE username = '$actionusername'");
+        if (mysqli_num_rows($action_query) > 0) {
+          $_SESSION['actionusername'] = $actionusername;
+          $action_query_array = mysqli_fetch_all($action_query, MYSQLI_ASSOC);
+          foreach ($action_query_array as $row) {
+              $actionsql = $row["deposit"];
+          }
+          if ($actionradio === "allow" && $actionsql === "1") {
+            $_SESSION["verif_dep_action"] = "fail1";
+            header("Location: welcome_admin_forms.php");
+            exit;
+          } else if ($actionradio === "block" && $actionsql === "0") {
+            $_SESSION["verif_dep_action"] = "fail2";
+            header("Location: welcome_admin_forms.php");
+            exit;
+          } else if ($actionradio === "allow" && $actionsql === "0") {
+            mysqli_query($con,"UPDATE blacklist SET deposit = 1 WHERE username = '$actionusername'");
+            if (mysqli_affected_rows($con) > 0) {
+              $_SESSION["verif_dep_action"] = "success1";
+              header("Location: welcome_admin_forms.php");
+              exit;
+            } else {
+              $_SESSION["verif_dep_action"] = "fail3";
+              header("Location: welcome_admin_forms.php");
+              exit;
+            }
+          } else if ($actionradio === "block" && $actionsql === "1") {
+            mysqli_query($con,"UPDATE blacklist SET deposit = 0 WHERE username = '$actionusername'");
+            if (mysqli_affected_rows($con) > 0) {
+              $_SESSION["verif_dep_action"] = "success2";
+              header("Location: welcome_admin_forms.php");
+              exit;
+            } else {
+              $_SESSION["verif_dep_action"] = "fail3";
+              header("Location: welcome_admin_forms.php");
+              exit;
+            }
+          }
         } else {
-          $_SESSION['verif_wire'] = "fail";
+          $_SESSION["verif_dep_action"] = "fail3";
           header("Location: welcome_admin_forms.php");
           exit;
         }
-      }
-  }
-  if (isset($_POST['block_dep_submit'])) {
-    $actionemail = filter_input(INPUT_POST, 'blockemail', FILTER_SANITIZE_EMAIL);
-    $actionusername = filter_input(INPUT_POST, 'blockusername', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-    $actionradio = filter_input(INPUT_POST, 'actions', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-    if (!empty($actionusername) && empty($actionemail)) { 
-      $action_query = mysqli_query($con,"SELECT deposit FROM blacklist WHERE username = '$actionusername'");
-      if (mysqli_num_rows($action_query) > 0) {
-        $_SESSION['actionusername'] = $actionusername;
-        $action_query_array = mysqli_fetch_all($action_query, MYSQLI_ASSOC);
-        foreach ($action_query_array as $row) {
-            $actionsql = $row["deposit"];
-        }
-        if ($actionradio === "allow" && $actionsql === "1") {
-          $_SESSION["verif_dep_action"] = "fail1";
-          header("Location: welcome_admin_forms.php");
-          exit;
-        } else if ($actionradio === "block" && $actionsql === "0") {
-          $_SESSION["verif_dep_action"] = "fail2";
-          header("Location: welcome_admin_forms.php");
-          exit;
-        } else if ($actionradio === "allow" && $actionsql === "0") {
-          mysqli_query($con,"UPDATE blacklist SET deposit = 1 WHERE username = '$actionusername'");
-          if (mysqli_affected_rows($con) > 0) {
-            $_SESSION["verif_dep_action"] = "success1";
-            header("Location: welcome_admin_forms.php");
-            exit;
-          } else {
-            $_SESSION["verif_dep_action"] = "fail3";
-            header("Location: welcome_admin_forms.php");
-            exit;
+      } else if (empty($actionusername) && !empty($actionemail)) { 
+        $action_query = mysqli_query($con,"SELECT deposit FROM blacklist b,login_credentials l WHERE l.username = b.username AND email IN (SELECT email FROM login_credentials WHERE email = '$actionemail')");
+        if (mysqli_num_rows($action_query) > 0) {
+          $_SESSION['actionemail'] = $actionemail;
+          $action_query_array = mysqli_fetch_all($action_query, MYSQLI_ASSOC);
+          foreach ($action_query_array as $row) {
+              $actionsql = $row["deposit"];
           }
-        } else if ($actionradio === "block" && $actionsql === "1") {
-          mysqli_query($con,"UPDATE blacklist SET deposit = 0 WHERE username = '$actionusername'");
-          if (mysqli_affected_rows($con) > 0) {
-            $_SESSION["verif_dep_action"] = "success2";
+          if ($actionradio === "allow" && $actionsql === "1") {
+            $_SESSION["verif_dep_action"] = "fail4";
             header("Location: welcome_admin_forms.php");
             exit;
-          } else {
-            $_SESSION["verif_dep_action"] = "fail3";
+          } else if ($actionradio === "block" && $actionsql === "0") {
+            $_SESSION["verif_dep_action"] = "fail5";
             header("Location: welcome_admin_forms.php");
             exit;
+          } else if ($actionradio === "allow" && $actionsql === "0") {
+            mysqli_query($con,"UPDATE blacklist,login_credentials SET deposit = 1 WHERE login_credentials.username = blacklist.username AND login_credentials.email IN (SELECT email FROM login_credentials WHERE email = '$actionemail')");
+            if (mysqli_affected_rows($con) > 0) {
+              $_SESSION["verif_dep_action"] = "success3";
+              header("Location: welcome_admin_forms.php");
+              exit;
+            } else {
+              $_SESSION["verif_dep_action"] = "fail3";
+              header("Location: welcome_admin_forms.php");
+              exit;
+            }
+          } else if ($actionradio === "block" && $actionsql === "1") {
+            mysqli_query($con,"UPDATE blacklist,login_credentials SET deposit = 0 WHERE login_credentials.username = blacklist.username AND login_credentials.email IN (SELECT email FROM login_credentials WHERE email = '$actionemail')");
+            if (mysqli_affected_rows($con) > 0) {
+              $_SESSION["verif_dep_action"] = "success4";
+              header("Location: welcome_admin_forms.php");
+              exit;
+            } else {
+              $_SESSION["verif_dep_action"] = "fail3";
+              header("Location: welcome_admin_forms.php");
+              exit;
+            }
           }
-        }
-      } else {
-        $_SESSION["verif_dep_action"] = "fail3";
-        header("Location: welcome_admin_forms.php");
-        exit;
-      }
-    } else if (empty($actionusername) && !empty($actionemail)) { 
-      $action_query = mysqli_query($con,"SELECT deposit FROM blacklist b,login_credentials l WHERE l.username = b.username AND email IN (SELECT email FROM login_credentials WHERE email = '$actionemail')");
-      if (mysqli_num_rows($action_query) > 0) {
-        $_SESSION['actionemail'] = $actionemail;
-        $action_query_array = mysqli_fetch_all($action_query, MYSQLI_ASSOC);
-        foreach ($action_query_array as $row) {
-            $actionsql = $row["deposit"];
-        }
-        if ($actionradio === "allow" && $actionsql === "1") {
-          $_SESSION["verif_dep_action"] = "fail4";
+        } else {
+          $_SESSION["verif_dep_action"] = "fail3";
           header("Location: welcome_admin_forms.php");
           exit;
-        } else if ($actionradio === "block" && $actionsql === "0") {
-          $_SESSION["verif_dep_action"] = "fail5";
+        }
+      } else if (!empty($actionusername) && !empty($actionemail)) { 
+        $action_query = mysqli_query($con,"SELECT deposit FROM blacklist b,login_credentials l WHERE l.username = b.username AND email IN (SELECT email FROM login_credentials WHERE email = '$actionemail') AND b.username = '$actionusername'");
+        if (mysqli_num_rows($action_query) > 0) {
+          $_SESSION['actionusername'] = $actionusername;
+          $_SESSION['actionemail'] = $actionemail;
+          $action_query_array = mysqli_fetch_all($action_query, MYSQLI_ASSOC);
+          foreach ($action_query_array as $row) {
+              $actionsql = $row["deposit"];
+          }
+          if ($actionradio === "allow" && $actionsql === "1") {
+            $_SESSION["verif_dep_action"] = "fail6";
+            header("Location: welcome_admin_forms.php");
+            exit;
+          } else if ($actionradio === "block" && $actionsql === "0") {
+            $_SESSION["verif_dep_action"] = "fail7";
+            header("Location: welcome_admin_forms.php");
+            exit;
+          } else if ($actionradio === "allow" && $actionsql === "0") {
+            mysqli_query($con,"UPDATE blacklist,login_credentials SET deposit = 1 WHERE login_credentials.username = blacklist.username AND login_credentials.email IN (SELECT email FROM login_credentials WHERE email = '$actionemail') AND blacklist.username = '$actionusername'");
+            if (mysqli_affected_rows($con) > 0) {
+              $_SESSION["verif_dep_action"] = "success5";
+              header("Location: welcome_admin_forms.php");
+              exit;
+            } else {
+              $_SESSION["verif_dep_action"] = "fail3";
+              header("Location: welcome_admin_forms.php");
+              exit;
+            }
+          } else if ($actionradio === "block" && $actionsql === "1") {
+            mysqli_query($con,"UPDATE blacklist,login_credentials SET deposit = 0 WHERE login_credentials.username = blacklist.username AND login_credentials.email IN (SELECT email FROM login_credentials WHERE email = '$actionemail') AND blacklist.username = '$actionusername'");
+            if (mysqli_affected_rows($con) > 0) {
+              $_SESSION["verif_dep_action"] = "success6";
+              header("Location: welcome_admin_forms.php");
+              exit;
+            } else {
+              $_SESSION["verif_dep_action"] = "fail3";
+              header("Location: welcome_admin_forms.php");
+              exit;
+            }
+          }
+        } else {
+          $_SESSION["verif_dep_action"] = "fail3";
           header("Location: welcome_admin_forms.php");
           exit;
-        } else if ($actionradio === "allow" && $actionsql === "0") {
-          mysqli_query($con,"UPDATE blacklist,login_credentials SET deposit = 1 WHERE login_credentials.username = blacklist.username AND login_credentials.email IN (SELECT email FROM login_credentials WHERE email = '$actionemail')");
-          if (mysqli_affected_rows($con) > 0) {
-            $_SESSION["verif_dep_action"] = "success3";
-            header("Location: welcome_admin_forms.php");
-            exit;
-          } else {
-            $_SESSION["verif_dep_action"] = "fail3";
-            header("Location: welcome_admin_forms.php");
-            exit;
-          }
-        } else if ($actionradio === "block" && $actionsql === "1") {
-          mysqli_query($con,"UPDATE blacklist,login_credentials SET deposit = 0 WHERE login_credentials.username = blacklist.username AND login_credentials.email IN (SELECT email FROM login_credentials WHERE email = '$actionemail')");
-          if (mysqli_affected_rows($con) > 0) {
-            $_SESSION["verif_dep_action"] = "success4";
-            header("Location: welcome_admin_forms.php");
-            exit;
-          } else {
-            $_SESSION["verif_dep_action"] = "fail3";
-            header("Location: welcome_admin_forms.php");
-            exit;
-          }
         }
-      } else {
-        $_SESSION["verif_dep_action"] = "fail3";
-        header("Location: welcome_admin_forms.php");
-        exit;
-      }
-    } else if (!empty($actionusername) && !empty($actionemail)) { 
-      $action_query = mysqli_query($con,"SELECT deposit FROM blacklist b,login_credentials l WHERE l.username = b.username AND email IN (SELECT email FROM login_credentials WHERE email = '$actionemail') AND b.username = '$actionusername'");
-      if (mysqli_num_rows($action_query) > 0) {
-        $_SESSION['actionusername'] = $actionusername;
-        $_SESSION['actionemail'] = $actionemail;
-        $action_query_array = mysqli_fetch_all($action_query, MYSQLI_ASSOC);
-        foreach ($action_query_array as $row) {
-            $actionsql = $row["deposit"];
-        }
-        if ($actionradio === "allow" && $actionsql === "1") {
-          $_SESSION["verif_dep_action"] = "fail6";
-          header("Location: welcome_admin_forms.php");
-          exit;
-        } else if ($actionradio === "block" && $actionsql === "0") {
-          $_SESSION["verif_dep_action"] = "fail7";
-          header("Location: welcome_admin_forms.php");
-          exit;
-        } else if ($actionradio === "allow" && $actionsql === "0") {
-          mysqli_query($con,"UPDATE blacklist,login_credentials SET deposit = 1 WHERE login_credentials.username = blacklist.username AND login_credentials.email IN (SELECT email FROM login_credentials WHERE email = '$actionemail') AND blacklist.username = '$actionusername'");
-          if (mysqli_affected_rows($con) > 0) {
-            $_SESSION["verif_dep_action"] = "success5";
-            header("Location: welcome_admin_forms.php");
-            exit;
-          } else {
-            $_SESSION["verif_dep_action"] = "fail3";
-            header("Location: welcome_admin_forms.php");
-            exit;
-          }
-        } else if ($actionradio === "block" && $actionsql === "1") {
-          mysqli_query($con,"UPDATE blacklist,login_credentials SET deposit = 0 WHERE login_credentials.username = blacklist.username AND login_credentials.email IN (SELECT email FROM login_credentials WHERE email = '$actionemail') AND blacklist.username = '$actionusername'");
-          if (mysqli_affected_rows($con) > 0) {
-            $_SESSION["verif_dep_action"] = "success6";
-            header("Location: welcome_admin_forms.php");
-            exit;
-          } else {
-            $_SESSION["verif_dep_action"] = "fail3";
-            header("Location: welcome_admin_forms.php");
-            exit;
-          }
-        }
-      } else {
-        $_SESSION["verif_dep_action"] = "fail3";
-        header("Location: welcome_admin_forms.php");
-        exit;
       }
     }
-  }
-  if (isset($_POST['block_with_submit'])) {
-    $actionemail = filter_input(INPUT_POST, 'blockemail', FILTER_SANITIZE_EMAIL);
-    $actionusername = filter_input(INPUT_POST, 'blockusername', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-    $actionradio = filter_input(INPUT_POST, 'actions', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-    if (!empty($actionusername) && empty($actionemail)) { 
-      $action_query = mysqli_query($con,"SELECT withdraw FROM blacklist WHERE username = '$actionusername'");
-      if (mysqli_num_rows($action_query) > 0) {
-        $_SESSION['actionusername'] = $actionusername;
-        $action_query_array = mysqli_fetch_all($action_query, MYSQLI_ASSOC);
-        foreach ($action_query_array as $row) {
-            $actionsql = $row["withdraw"];
-        }
-        if ($actionradio === "allow" && $actionsql === "1") {
-          $_SESSION["verif_with_action"] = "fail1";
+    if (isset($_POST['block_with_submit'])) {
+      $actionemail = filter_input(INPUT_POST, 'blockemail', FILTER_SANITIZE_EMAIL);
+      $actionusername = filter_input(INPUT_POST, 'blockusername', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+      $actionradio = filter_input(INPUT_POST, 'actions', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+      if (!empty($actionusername) && empty($actionemail)) { 
+        $action_query = mysqli_query($con,"SELECT withdraw FROM blacklist WHERE username = '$actionusername'");
+        if (mysqli_num_rows($action_query) > 0) {
+          $_SESSION['actionusername'] = $actionusername;
+          $action_query_array = mysqli_fetch_all($action_query, MYSQLI_ASSOC);
+          foreach ($action_query_array as $row) {
+              $actionsql = $row["withdraw"];
+          }
+          if ($actionradio === "allow" && $actionsql === "1") {
+            $_SESSION["verif_with_action"] = "fail1";
+            header("Location: welcome_admin_forms.php");
+            exit;
+          } else if ($actionradio === "block" && $actionsql === "0") {
+            $_SESSION["verif_with_action"] = "fail2";
+            header("Location: welcome_admin_forms.php");
+            exit;
+          } else if ($actionradio === "allow" && $actionsql === "0") {
+            mysqli_query($con,"UPDATE blacklist SET withdraw = 1 WHERE username = '$actionusername'");
+            if (mysqli_affected_rows($con) > 0) {
+              $_SESSION["verif_with_action"] = "success1";
+              header("Location: welcome_admin_forms.php");
+              exit;
+            } else {
+              $_SESSION["verif_with_action"] = "fail3";
+              header("Location: welcome_admin_forms.php");
+              exit;
+            }
+          } else if ($actionradio === "block" && $actionsql === "1") {
+            mysqli_query($con,"UPDATE blacklist SET withdraw = 0 WHERE username = '$actionusername'");
+            if (mysqli_affected_rows($con) > 0) {
+              $_SESSION["verif_with_action"] = "success2";
+              header("Location: welcome_admin_forms.php");
+              exit;
+            } else {
+              $_SESSION["verif_with_action"] = "fail3";
+              header("Location: welcome_admin_forms.php");
+              exit;
+            }
+          }
+        } else {
+          $_SESSION["verif_with_action"] = "fail3";
           header("Location: welcome_admin_forms.php");
           exit;
-        } else if ($actionradio === "block" && $actionsql === "0") {
-          $_SESSION["verif_with_action"] = "fail2";
+        }
+      } else if (empty($actionusername) && !empty($actionemail)) { 
+        $action_query = mysqli_query($con,"SELECT withdraw FROM blacklist b,login_credentials l WHERE l.username = b.username AND email IN (SELECT email FROM login_credentials WHERE email = '$actionemail')");
+        if (mysqli_num_rows($action_query) > 0) {
+          $_SESSION['actionemail'] = $actionemail;
+          $action_query_array = mysqli_fetch_all($action_query, MYSQLI_ASSOC);
+          foreach ($action_query_array as $row) {
+              $actionsql = $row["withdraw"];
+          }
+          if ($actionradio === "allow" && $actionsql === "1") {
+            $_SESSION["verif_with_action"] = "fail4";
+            header("Location: welcome_admin_forms.php");
+            exit;
+          } else if ($actionradio === "block" && $actionsql === "0") {
+            $_SESSION["verif_with_action"] = "fail5";
+            header("Location: welcome_admin_forms.php");
+            exit;
+          } else if ($actionradio === "allow" && $actionsql === "0") {
+            mysqli_query($con,"UPDATE blacklist,login_credentials SET withdraw = 1 WHERE login_credentials.username = blacklist.username AND login_credentials.email IN (SELECT email FROM login_credentials WHERE email = '$actionemail')");
+            if (mysqli_affected_rows($con) > 0) {
+              $_SESSION["verif_with_action"] = "success3";
+              header("Location: welcome_admin_forms.php");
+              exit;
+            } else {
+              $_SESSION["verif_with_action"] = "fail3";
+              header("Location: welcome_admin_forms.php");
+              exit;
+            }
+          } else if ($actionradio === "block" && $actionsql === "1") {
+            mysqli_query($con,"UPDATE blacklist,login_credentials SET withdraw = 0 WHERE login_credentials.username = blacklist.username AND login_credentials.email IN (SELECT email FROM login_credentials WHERE email = '$actionemail')");
+            if (mysqli_affected_rows($con) > 0) {
+              $_SESSION["verif_with_action"] = "success4";
+              header("Location: welcome_admin_forms.php");
+              exit;
+            } else {
+              $_SESSION["verif_with_action"] = "fail3";
+              header("Location: welcome_admin_forms.php");
+              exit;
+            }
+          }
+        } else {
+          $_SESSION["verif_with_action"] = "fail3";
           header("Location: welcome_admin_forms.php");
           exit;
-        } else if ($actionradio === "allow" && $actionsql === "0") {
-          mysqli_query($con,"UPDATE blacklist SET withdraw = 1 WHERE username = '$actionusername'");
-          if (mysqli_affected_rows($con) > 0) {
-            $_SESSION["verif_with_action"] = "success1";
-            header("Location: welcome_admin_forms.php");
-            exit;
-          } else {
-            $_SESSION["verif_with_action"] = "fail3";
-            header("Location: welcome_admin_forms.php");
-            exit;
-          }
-        } else if ($actionradio === "block" && $actionsql === "1") {
-          mysqli_query($con,"UPDATE blacklist SET withdraw = 0 WHERE username = '$actionusername'");
-          if (mysqli_affected_rows($con) > 0) {
-            $_SESSION["verif_with_action"] = "success2";
-            header("Location: welcome_admin_forms.php");
-            exit;
-          } else {
-            $_SESSION["verif_with_action"] = "fail3";
-            header("Location: welcome_admin_forms.php");
-            exit;
-          }
         }
-      } else {
-        $_SESSION["verif_with_action"] = "fail3";
-        header("Location: welcome_admin_forms.php");
-        exit;
-      }
-    } else if (empty($actionusername) && !empty($actionemail)) { 
-      $action_query = mysqli_query($con,"SELECT withdraw FROM blacklist b,login_credentials l WHERE l.username = b.username AND email IN (SELECT email FROM login_credentials WHERE email = '$actionemail')");
-      if (mysqli_num_rows($action_query) > 0) {
-        $_SESSION['actionemail'] = $actionemail;
-        $action_query_array = mysqli_fetch_all($action_query, MYSQLI_ASSOC);
-        foreach ($action_query_array as $row) {
-            $actionsql = $row["withdraw"];
-        }
-        if ($actionradio === "allow" && $actionsql === "1") {
-          $_SESSION["verif_with_action"] = "fail4";
+      } else if (!empty($actionusername) && !empty($actionemail)) { 
+        $action_query = mysqli_query($con,"SELECT withdraw FROM blacklist b,login_credentials l WHERE l.username = b.username AND email IN (SELECT email FROM login_credentials WHERE email = '$actionemail') AND b.username = '$actionusername'");
+        if (mysqli_num_rows($action_query) > 0) {
+          $_SESSION['actionusername'] = $actionusername;
+          $_SESSION['actionemail'] = $actionemail;
+          $action_query_array = mysqli_fetch_all($action_query, MYSQLI_ASSOC);
+          foreach ($action_query_array as $row) {
+              $actionsql = $row["withdraw"];
+          }
+          if ($actionradio === "allow" && $actionsql === "1") {
+            $_SESSION["verif_with_action"] = "fail6";
+            header("Location: welcome_admin_forms.php");
+            exit;
+          } else if ($actionradio === "block" && $actionsql === "0") {
+            $_SESSION["verif_with_action"] = "fail7";
+            header("Location: welcome_admin_forms.php");
+            exit;
+          } else if ($actionradio === "allow" && $actionsql === "0") {
+            mysqli_query($con,"UPDATE blacklist,login_credentials SET withdraw = 1 WHERE login_credentials.username = blacklist.username AND login_credentials.email IN (SELECT email FROM login_credentials WHERE email = '$actionemail') AND blacklist.username = '$actionusername'");
+            if (mysqli_affected_rows($con) > 0) {
+              $_SESSION["verif_with_action"] = "success5";
+              header("Location: welcome_admin_forms.php");
+              exit;
+            } else {
+              $_SESSION["verif_with_action"] = "fail3";
+              header("Location: welcome_admin_forms.php");
+              exit;
+            }
+          } else if ($actionradio === "block" && $actionsql === "1") {
+            mysqli_query($con,"UPDATE blacklist,login_credentials SET withdraw = 0 WHERE login_credentials.username = blacklist.username AND login_credentials.email IN (SELECT email FROM login_credentials WHERE email = '$actionemail') AND blacklist.username = '$actionusername'");
+            if (mysqli_affected_rows($con) > 0) {
+              $_SESSION["verif_with_action"] = "success6";
+              header("Location: welcome_admin_forms.php");
+              exit;
+            } else {
+              $_SESSION["verif_with_action"] = "fail3";
+              header("Location: welcome_admin_forms.php");
+              exit;
+            }
+          }
+        } else {
+          $_SESSION["verif_with_action"] = "fail3";
           header("Location: welcome_admin_forms.php");
           exit;
-        } else if ($actionradio === "block" && $actionsql === "0") {
-          $_SESSION["verif_with_action"] = "fail5";
-          header("Location: welcome_admin_forms.php");
-          exit;
-        } else if ($actionradio === "allow" && $actionsql === "0") {
-          mysqli_query($con,"UPDATE blacklist,login_credentials SET withdraw = 1 WHERE login_credentials.username = blacklist.username AND login_credentials.email IN (SELECT email FROM login_credentials WHERE email = '$actionemail')");
-          if (mysqli_affected_rows($con) > 0) {
-            $_SESSION["verif_with_action"] = "success3";
-            header("Location: welcome_admin_forms.php");
-            exit;
-          } else {
-            $_SESSION["verif_with_action"] = "fail3";
-            header("Location: welcome_admin_forms.php");
-            exit;
-          }
-        } else if ($actionradio === "block" && $actionsql === "1") {
-          mysqli_query($con,"UPDATE blacklist,login_credentials SET withdraw = 0 WHERE login_credentials.username = blacklist.username AND login_credentials.email IN (SELECT email FROM login_credentials WHERE email = '$actionemail')");
-          if (mysqli_affected_rows($con) > 0) {
-            $_SESSION["verif_with_action"] = "success4";
-            header("Location: welcome_admin_forms.php");
-            exit;
-          } else {
-            $_SESSION["verif_with_action"] = "fail3";
-            header("Location: welcome_admin_forms.php");
-            exit;
-          }
         }
-      } else {
-        $_SESSION["verif_with_action"] = "fail3";
-        header("Location: welcome_admin_forms.php");
-        exit;
-      }
-    } else if (!empty($actionusername) && !empty($actionemail)) { 
-      $action_query = mysqli_query($con,"SELECT withdraw FROM blacklist b,login_credentials l WHERE l.username = b.username AND email IN (SELECT email FROM login_credentials WHERE email = '$actionemail') AND b.username = '$actionusername'");
-      if (mysqli_num_rows($action_query) > 0) {
-        $_SESSION['actionusername'] = $actionusername;
-        $_SESSION['actionemail'] = $actionemail;
-        $action_query_array = mysqli_fetch_all($action_query, MYSQLI_ASSOC);
-        foreach ($action_query_array as $row) {
-            $actionsql = $row["withdraw"];
-        }
-        if ($actionradio === "allow" && $actionsql === "1") {
-          $_SESSION["verif_with_action"] = "fail6";
-          header("Location: welcome_admin_forms.php");
-          exit;
-        } else if ($actionradio === "block" && $actionsql === "0") {
-          $_SESSION["verif_with_action"] = "fail7";
-          header("Location: welcome_admin_forms.php");
-          exit;
-        } else if ($actionradio === "allow" && $actionsql === "0") {
-          mysqli_query($con,"UPDATE blacklist,login_credentials SET withdraw = 1 WHERE login_credentials.username = blacklist.username AND login_credentials.email IN (SELECT email FROM login_credentials WHERE email = '$actionemail') AND blacklist.username = '$actionusername'");
-          if (mysqli_affected_rows($con) > 0) {
-            $_SESSION["verif_with_action"] = "success5";
-            header("Location: welcome_admin_forms.php");
-            exit;
-          } else {
-            $_SESSION["verif_with_action"] = "fail3";
-            header("Location: welcome_admin_forms.php");
-            exit;
-          }
-        } else if ($actionradio === "block" && $actionsql === "1") {
-          mysqli_query($con,"UPDATE blacklist,login_credentials SET withdraw = 0 WHERE login_credentials.username = blacklist.username AND login_credentials.email IN (SELECT email FROM login_credentials WHERE email = '$actionemail') AND blacklist.username = '$actionusername'");
-          if (mysqli_affected_rows($con) > 0) {
-            $_SESSION["verif_with_action"] = "success6";
-            header("Location: welcome_admin_forms.php");
-            exit;
-          } else {
-            $_SESSION["verif_with_action"] = "fail3";
-            header("Location: welcome_admin_forms.php");
-            exit;
-          }
-        }
-      } else {
-        $_SESSION["verif_with_action"] = "fail3";
-        header("Location: welcome_admin_forms.php");
-        exit;
-      }
-    }
-  }
-  if (isset($_POST['block_wire_submit'])) {
-    $actionemail = filter_input(INPUT_POST, 'blockemail', FILTER_SANITIZE_EMAIL);
-    $actionusername = filter_input(INPUT_POST, 'blockusername', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-    $actionradio = filter_input(INPUT_POST, 'actions', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-    if (!empty($actionusername) && empty($actionemail)) { 
-      $action_query = mysqli_query($con,"SELECT wire FROM blacklist WHERE username = '$actionusername'");
-      if (mysqli_num_rows($action_query) > 0) {
-        $_SESSION['actionusername'] = $actionusername;
-        $action_query_array = mysqli_fetch_all($action_query, MYSQLI_ASSOC);
-        foreach ($action_query_array as $row) {
-            $actionsql = $row["wire"];
-        }
-        if ($actionradio === "allow" && $actionsql === "1") {
-          $_SESSION["verif_wire_action"] = "fail1";
-          header("Location: welcome_admin_forms.php");
-          exit;
-        } else if ($actionradio === "block" && $actionsql === "0") {
-          $_SESSION["verif_wire_action"] = "fail2";
-          header("Location: welcome_admin_forms.php");
-          exit;
-        } else if ($actionradio === "allow" && $actionsql === "0") {
-          mysqli_query($con,"UPDATE blacklist SET wire = 1 WHERE username = '$actionusername'");
-          if (mysqli_affected_rows($con) > 0) {
-            $_SESSION["verif_wire_action"] = "success1";
-            header("Location: welcome_admin_forms.php");
-            exit;
-          } else {
-            $_SESSION["verif_wire_action"] = "fail3";
-            header("Location: welcome_admin_forms.php");
-            exit;
-          }
-        } else if ($actionradio === "block" && $actionsql === "1") {
-          mysqli_query($con,"UPDATE blacklist SET wire = 0 WHERE username = '$actionusername'");
-          if (mysqli_affected_rows($con) > 0) {
-            $_SESSION["verif_wire_action"] = "success2";
-            header("Location: welcome_admin_forms.php");
-            exit;
-          } else {
-            $_SESSION["verif_wire_action"] = "fail3";
-            header("Location: welcome_admin_forms.php");
-            exit;
-          }
-        }
-      } else {
-        $_SESSION["verif_wire_action"] = "fail3";
-        header("Location: welcome_admin_forms.php");
-        exit;
-      }
-    } else if (empty($actionusername) && !empty($actionemail)) { 
-      $action_query = mysqli_query($con,"SELECT wire FROM blacklist b,login_credentials l WHERE l.username = b.username AND email IN (SELECT email FROM login_credentials WHERE email = '$actionemail')");
-      if (mysqli_num_rows($action_query) > 0) {
-        $_SESSION['actionemail'] = $actionemail;
-        $action_query_array = mysqli_fetch_all($action_query, MYSQLI_ASSOC);
-        foreach ($action_query_array as $row) {
-            $actionsql = $row["wire"];
-        }
-        if ($actionradio === "allow" && $actionsql === "1") {
-          $_SESSION["verif_wire_action"] = "fail4";
-          header("Location: welcome_admin_forms.php");
-          exit;
-        } else if ($actionradio === "block" && $actionsql === "0") {
-          $_SESSION["verif_wire_action"] = "fail5";
-          header("Location: welcome_admin_forms.php");
-          exit;
-        } else if ($actionradio === "allow" && $actionsql === "0") {
-          mysqli_query($con,"UPDATE blacklist b,login_credentials l SET wire = 1 WHERE l.username = b.username AND l.email IN (SELECT email FROM login_credentials WHERE email = '$actionemail')");
-          if (mysqli_affected_rows($con) > 0) {
-            $_SESSION["verif_wire_action"] = "success3";
-            header("Location: welcome_admin_forms.php");
-            exit;
-          } else {
-            $_SESSION["verif_wire_action"] = "fail3";
-            header("Location: welcome_admin_forms.php");
-            exit;
-          }
-        } else if ($actionradio === "block" && $actionsql === "1") {
-          mysqli_query($con,"UPDATE blacklist,login_credentials SET wire = 0 WHERE login_credentials.username = blacklist.username AND login_credentials.email IN (SELECT email FROM login_credentials WHERE email = '$actionemail')");
-          if (mysqli_affected_rows($con) > 0) {
-            $_SESSION["verif_wire_action"] = "success4";
-            header("Location: welcome_admin_forms.php");
-            exit;
-          } else {
-            $_SESSION["verif_wire_action"] = "fail3";
-            header("Location: welcome_admin_forms.php");
-            exit;
-          }
-        }
-      } else {
-        $_SESSION["verif_wire_action"] = "fail3";
-        header("Location: welcome_admin_forms.php");
-        exit;
-      }
-    } else if (!empty($actionusername) && !empty($actionemail)) { 
-      $action_query = mysqli_query($con,"SELECT wire FROM blacklist b,login_credentials l WHERE l.username = b.username AND email IN (SELECT email FROM login_credentials WHERE email = '$actionemail') AND b.username = '$actionusername'");
-      if (mysqli_num_rows($action_query) > 0) {
-        $_SESSION['actionusername'] = $actionusername;
-        $_SESSION['actionusername'] = $actionusername;
-        $_SESSION['actionemail'] = $actionemail;
-        $action_query_array = mysqli_fetch_all($action_query, MYSQLI_ASSOC);
-        foreach ($action_query_array as $row) {
-            $actionsql = $row["wire"];
-        }
-        if ($actionradio === "allow" && $actionsql === "1") {
-          $_SESSION["verif_wire_action"] = "fail6";
-          header("Location: welcome_admin_forms.php");
-          exit;
-        } else if ($actionradio === "block" && $actionsql === "0") {
-          $_SESSION["verif_wire_action"] = "fail7";
-          header("Location: welcome_admin_forms.php");
-          exit;
-        } else if ($actionradio === "allow" && $actionsql === "0") {
-          mysqli_query($con,"UPDATE blacklist,login_credentials SET wire = 1 WHERE login_credentials.username = blacklist.username AND login_credentials.email IN (SELECT email FROM login_credentials WHERE email = '$actionemail') AND blacklist.username = '$actionusername'");
-          if (mysqli_affected_rows($con) > 0) {
-            $_SESSION["verif_wire_action"] = "success5";
-            header("Location: welcome_admin_forms.php");
-            exit;
-          } else {
-            $_SESSION["verif_wire_action"] = "fail3";
-            header("Location: welcome_admin_forms.php");
-            exit;
-          }
-        } else if ($actionradio === "block" && $actionsql === "1") {
-          mysqli_query($con,"UPDATE blacklist,login_credentials SET wire = 0 WHERE login_credentials.username = blacklist.username AND login_credentials.email IN (SELECT email FROM login_credentials WHERE email = '$actionemail') AND blacklist.username = '$actionusername'");
-          if (mysqli_affected_rows($con) > 0) {
-            $_SESSION["verif_wire_action"] = "success6";
-            header("Location: welcome_admin_forms.php");
-            exit;
-          } else {
-            $_SESSION["verif_wire_action"] = "fail3";
-            header("Location: welcome_admin_forms.php");
-            exit;
-          }
-        }
-      } else {
-        $_SESSION["verif_wire_action"] = "fail3";
-        header("Location: welcome_admin_forms.php");
-        exit;
       }
     }
-  }
-  if (isset($_POST['accsub'])) { 
-    $accmail = filter_input(INPUT_POST, 'accmail', FILTER_SANITIZE_EMAIL);
-    $accuser = filter_input(INPUT_POST, 'accuser', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-    $accactions = filter_input(INPUT_POST, 'accactions', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-    if (!empty($accuser) && empty($accmail)) { 
-      $accaction_query = mysqli_query($con,"SELECT account FROM blacklist WHERE username = '$accuser'");
-      if (mysqli_num_rows($accaction_query) > 0) {
-        $_SESSION['accuser'] = $accuser;
-        $accaction_query_array = mysqli_fetch_all($accaction_query, MYSQLI_ASSOC);
-        foreach ($accaction_query_array as $row) {
-            $accactionsql = $row["account"];
-        }
-        if ($accactions === "enable" && $accactionsql === "1") {
-          $_SESSION["verif_acc_action"] = "fail1";
+    if (isset($_POST['block_wire_submit'])) {
+      $actionemail = filter_input(INPUT_POST, 'blockemail', FILTER_SANITIZE_EMAIL);
+      $actionusername = filter_input(INPUT_POST, 'blockusername', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+      $actionradio = filter_input(INPUT_POST, 'actions', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+      if (!empty($actionusername) && empty($actionemail)) { 
+        $action_query = mysqli_query($con,"SELECT wire FROM blacklist WHERE username = '$actionusername'");
+        if (mysqli_num_rows($action_query) > 0) {
+          $_SESSION['actionusername'] = $actionusername;
+          $action_query_array = mysqli_fetch_all($action_query, MYSQLI_ASSOC);
+          foreach ($action_query_array as $row) {
+              $actionsql = $row["wire"];
+          }
+          if ($actionradio === "allow" && $actionsql === "1") {
+            $_SESSION["verif_wire_action"] = "fail1";
+            header("Location: welcome_admin_forms.php");
+            exit;
+          } else if ($actionradio === "block" && $actionsql === "0") {
+            $_SESSION["verif_wire_action"] = "fail2";
+            header("Location: welcome_admin_forms.php");
+            exit;
+          } else if ($actionradio === "allow" && $actionsql === "0") {
+            mysqli_query($con,"UPDATE blacklist SET wire = 1 WHERE username = '$actionusername'");
+            if (mysqli_affected_rows($con) > 0) {
+              $_SESSION["verif_wire_action"] = "success1";
+              header("Location: welcome_admin_forms.php");
+              exit;
+            } else {
+              $_SESSION["verif_wire_action"] = "fail3";
+              header("Location: welcome_admin_forms.php");
+              exit;
+            }
+          } else if ($actionradio === "block" && $actionsql === "1") {
+            mysqli_query($con,"UPDATE blacklist SET wire = 0 WHERE username = '$actionusername'");
+            if (mysqli_affected_rows($con) > 0) {
+              $_SESSION["verif_wire_action"] = "success2";
+              header("Location: welcome_admin_forms.php");
+              exit;
+            } else {
+              $_SESSION["verif_wire_action"] = "fail3";
+              header("Location: welcome_admin_forms.php");
+              exit;
+            }
+          }
+        } else {
+          $_SESSION["verif_wire_action"] = "fail3";
           header("Location: welcome_admin_forms.php");
           exit;
-        } else if ($accactions === "disable" && $accactionsql === "0") {
-          $_SESSION["verif_acc_action"] = "fail2";
+        }
+      } else if (empty($actionusername) && !empty($actionemail)) { 
+        $action_query = mysqli_query($con,"SELECT wire FROM blacklist b,login_credentials l WHERE l.username = b.username AND email IN (SELECT email FROM login_credentials WHERE email = '$actionemail')");
+        if (mysqli_num_rows($action_query) > 0) {
+          $_SESSION['actionemail'] = $actionemail;
+          $action_query_array = mysqli_fetch_all($action_query, MYSQLI_ASSOC);
+          foreach ($action_query_array as $row) {
+              $actionsql = $row["wire"];
+          }
+          if ($actionradio === "allow" && $actionsql === "1") {
+            $_SESSION["verif_wire_action"] = "fail4";
+            header("Location: welcome_admin_forms.php");
+            exit;
+          } else if ($actionradio === "block" && $actionsql === "0") {
+            $_SESSION["verif_wire_action"] = "fail5";
+            header("Location: welcome_admin_forms.php");
+            exit;
+          } else if ($actionradio === "allow" && $actionsql === "0") {
+            mysqli_query($con,"UPDATE blacklist b,login_credentials l SET wire = 1 WHERE l.username = b.username AND l.email IN (SELECT email FROM login_credentials WHERE email = '$actionemail')");
+            if (mysqli_affected_rows($con) > 0) {
+              $_SESSION["verif_wire_action"] = "success3";
+              header("Location: welcome_admin_forms.php");
+              exit;
+            } else {
+              $_SESSION["verif_wire_action"] = "fail3";
+              header("Location: welcome_admin_forms.php");
+              exit;
+            }
+          } else if ($actionradio === "block" && $actionsql === "1") {
+            mysqli_query($con,"UPDATE blacklist,login_credentials SET wire = 0 WHERE login_credentials.username = blacklist.username AND login_credentials.email IN (SELECT email FROM login_credentials WHERE email = '$actionemail')");
+            if (mysqli_affected_rows($con) > 0) {
+              $_SESSION["verif_wire_action"] = "success4";
+              header("Location: welcome_admin_forms.php");
+              exit;
+            } else {
+              $_SESSION["verif_wire_action"] = "fail3";
+              header("Location: welcome_admin_forms.php");
+              exit;
+            }
+          }
+        } else {
+          $_SESSION["verif_wire_action"] = "fail3";
           header("Location: welcome_admin_forms.php");
           exit;
-        } else if ($accactions === "enable" && $accactionsql === "0") {
-          mysqli_query($con,"UPDATE blacklist SET account = 1 , deposit = 1 , withdraw = 1 , wire = 1 WHERE username = '$accuser'");
-          if (mysqli_affected_rows($con) > 0) {
-            $_SESSION["verif_acc_action"] = "success1";
-            header("Location: welcome_admin_forms.php");
-            exit;
-          } else {
-            $_SESSION["verif_acc_action"] = "fail7";
-            header("Location: welcome_admin_forms.php");
-            exit;
-          }
-        } else if ($accactions === "disable" && $accactionsql === "1") {
-          mysqli_query($con,"UPDATE blacklist SET account = 0 , deposit = 0 , withdraw = 0 , wire = 0 WHERE username = '$accuser'");
-          if (mysqli_affected_rows($con) > 0) {
-            $_SESSION["verif_acc_action"] = "success2";
-            header("Location: welcome_admin_forms.php");
-            exit;
-          } else {
-            $_SESSION["verif_acc_action"] = "fail7";
-            header("Location: welcome_admin_forms.php");
-            exit;
-          }
         }
-      } else {
-        $_SESSION["verif_acc_action"] = "fail7";
-        header("Location: welcome_admin_forms.php");
-        exit;
-      }
-    } else if (empty($accuser) && !empty($accmail)) {
-      $accaction_query = mysqli_query($con,"SELECT account FROM blacklist b,login_credentials l WHERE l.username = b.username AND email IN (SELECT email FROM login_credentials WHERE email = '$accmail')");
-      if (mysqli_num_rows($accaction_query) > 0) {
-        $_SESSION['accmail'] = $accmail;
-        $accaction_query_array = mysqli_fetch_all($accaction_query, MYSQLI_ASSOC);
-        foreach ($accaction_query_array as $row) {
-            $accactionsql = $row["account"];
-        }
-        if ($accactions === "enable" && $accactionsql === "1") {
-          $_SESSION["verif_acc_action"] = "fail3";
+      } else if (!empty($actionusername) && !empty($actionemail)) { 
+        $action_query = mysqli_query($con,"SELECT wire FROM blacklist b,login_credentials l WHERE l.username = b.username AND email IN (SELECT email FROM login_credentials WHERE email = '$actionemail') AND b.username = '$actionusername'");
+        if (mysqli_num_rows($action_query) > 0) {
+          $_SESSION['actionusername'] = $actionusername;
+          $_SESSION['actionusername'] = $actionusername;
+          $_SESSION['actionemail'] = $actionemail;
+          $action_query_array = mysqli_fetch_all($action_query, MYSQLI_ASSOC);
+          foreach ($action_query_array as $row) {
+              $actionsql = $row["wire"];
+          }
+          if ($actionradio === "allow" && $actionsql === "1") {
+            $_SESSION["verif_wire_action"] = "fail6";
+            header("Location: welcome_admin_forms.php");
+            exit;
+          } else if ($actionradio === "block" && $actionsql === "0") {
+            $_SESSION["verif_wire_action"] = "fail7";
+            header("Location: welcome_admin_forms.php");
+            exit;
+          } else if ($actionradio === "allow" && $actionsql === "0") {
+            mysqli_query($con,"UPDATE blacklist,login_credentials SET wire = 1 WHERE login_credentials.username = blacklist.username AND login_credentials.email IN (SELECT email FROM login_credentials WHERE email = '$actionemail') AND blacklist.username = '$actionusername'");
+            if (mysqli_affected_rows($con) > 0) {
+              $_SESSION["verif_wire_action"] = "success5";
+              header("Location: welcome_admin_forms.php");
+              exit;
+            } else {
+              $_SESSION["verif_wire_action"] = "fail3";
+              header("Location: welcome_admin_forms.php");
+              exit;
+            }
+          } else if ($actionradio === "block" && $actionsql === "1") {
+            mysqli_query($con,"UPDATE blacklist,login_credentials SET wire = 0 WHERE login_credentials.username = blacklist.username AND login_credentials.email IN (SELECT email FROM login_credentials WHERE email = '$actionemail') AND blacklist.username = '$actionusername'");
+            if (mysqli_affected_rows($con) > 0) {
+              $_SESSION["verif_wire_action"] = "success6";
+              header("Location: welcome_admin_forms.php");
+              exit;
+            } else {
+              $_SESSION["verif_wire_action"] = "fail3";
+              header("Location: welcome_admin_forms.php");
+              exit;
+            }
+          }
+        } else {
+          $_SESSION["verif_wire_action"] = "fail3";
           header("Location: welcome_admin_forms.php");
           exit;
-        } else if ($accactions === "disable" && $accactionsql === "0") {
-          $_SESSION["verif_acc_action"] = "fail4";
-          header("Location: welcome_admin_forms.php");
-          exit;
-        } else if ($accactions === "enable" && $accactionsql === "0") {
-          mysqli_query($con,"UPDATE blacklist b,login_credentials l SET account = 1 , deposit = 1 , withdraw = 1 , wire = 1 WHERE l.username = b.username AND email IN (SELECT email FROM login_credentials WHERE email = '$accmail')");
-          if (mysqli_affected_rows($con) > 0) {
-            $_SESSION["verif_acc_action"] = "success3";
-            header("Location: welcome_admin_forms.php");
-            exit;
-          } else {
-            $_SESSION["verif_acc_action"] = "fail7";
-            header("Location: welcome_admin_forms.php");
-            exit;
-          }
-        } else if ($accactions === "disable" && $accactionsql === "1") {
-          mysqli_query($con,"UPDATE blacklist b,login_credentials l SET account = 0 , deposit = 0 , withdraw = 0 , wire = 0 WHERE l.username = b.username AND email IN (SELECT email FROM login_credentials WHERE email = '$accmail')");
-          if (mysqli_affected_rows($con) > 0) {
-            $_SESSION["verif_acc_action"] = "success4";
-            header("Location: welcome_admin_forms.php");
-            exit;
-          } else {
-            $_SESSION["verif_acc_action"] = "fail7";
-            header("Location: welcome_admin_forms.php");
-            exit;
-          }
         }
-      } else {
-        $_SESSION["verif_acc_action"] = "fail7";
-        header("Location: welcome_admin_forms.php");
-        exit;
-      }
-    } else if (!empty($accuser) && !empty($accmail)) {
-      $accaction_query = mysqli_query($con,"SELECT account FROM blacklist b,login_credentials l WHERE l.username = b.username AND email IN (SELECT email FROM login_credentials WHERE email = '$accmail') AND b.username = '$accuser'");
-      if (mysqli_num_rows($accaction_query) > 0) {
-        $_SESSION['accuser'] = $accuser;
-        $_SESSION['accmail'] = $accmail;
-        $accaction_query_array = mysqli_fetch_all($accaction_query, MYSQLI_ASSOC);
-        foreach ($accaction_query_array as $row) {
-            $accactionsql = $row["account"];
-        }
-        if ($accactions === "enable" && $accactionsql === "1") {
-          $_SESSION["verif_acc_action"] = "fail5";
-          header("Location: welcome_admin_forms.php");
-          exit;
-        } else if ($accactions === "disable" && $accactionsql === "0") {
-          $_SESSION["verif_acc_action"] = "fail6";
-          header("Location: welcome_admin_forms.php");
-          exit;
-        } else if ($accactions === "enable" && $accactionsql === "0") {
-          mysqli_query($con,"UPDATE blacklist b,login_credentials l SET account = 1 , deposit = 1 , withdraw = 1 , wire = 1 WHERE l.username = b.username AND email IN (SELECT email FROM login_credentials WHERE email = '$accmail') AND b.username = '$accuser'");
-          if (mysqli_affected_rows($con) > 0) {
-            $_SESSION["verif_acc_action"] = "success5";
-            header("Location: welcome_admin_forms.php");
-            exit;
-          } else {
-            $_SESSION["verif_acc_action"] = "fail7";
-            header("Location: welcome_admin_forms.php");
-            exit;
-          }
-        } else if ($accactions === "disable" && $accactionsql === "1") {
-          mysqli_query($con,"UPDATE blacklist b,login_credentials l SET account = 0 , deposit = 0 , withdraw = 0 , wire = 0 WHERE l.username = b.username AND email IN (SELECT email FROM login_credentials WHERE email = '$accmail') AND b.username = '$accuser'");
-          if (mysqli_affected_rows($con) > 0) {
-            $_SESSION["verif_acc_action"] = "success6";
-            header("Location: welcome_admin_forms.php");
-            exit;
-          } else {
-            $_SESSION["verif_acc_action"] = "fail7";
-            header("Location: welcome_admin_forms.php");
-            exit;
-          }
-        }
-      } else {
-        $_SESSION["verif_acc_action"] = "fail7";
-        header("Location: welcome_admin_forms.php");
-        exit;
       }
     }
-  }
-  switch ($_SESSION) {
-    case isset($_SESSION["balsub"]):
-        unset($_SESSION["verif_balance"]);
-        unset($_SESSION["balsub"]);
-        break;
-    case isset($_SESSION["transdep"]):
-        unset($_SESSION["verif_deposit"]);
-        unset($_SESSION["transdep"]);
-        break;
-    case isset($_SESSION["transwith"]):
-        unset($_SESSION["verif_withdraw"]);
-        unset($_SESSION["transwith"]);
-        break;
-    case isset($_SESSION["transwire"]):
-        unset($_SESSION["verif_wire"]);
-        unset($_SESSION["transwire"]);
-        break;
-    case isset($_SESSION["actiondep"]):
-        unset($_SESSION["verif_dep_action"]);
-        unset($_SESSION["actiondep"]);
-        break;
-    case isset($_SESSION["actionwith"]):
-        unset($_SESSION["verif_with_action"]);
-        unset($_SESSION["actionwith"]);
-        break;
-    case isset($_SESSION["actionwire"]):
-        unset($_SESSION["verif_wire_action"]);
-        unset($_SESSION["actionwire"]);
-        break;
-    case isset($_SESSION["accaccount"]):
-        unset($_SESSION["verif_acc_action"]);
-        unset($_SESSION["accaccount"]);
-        break;
+    if (isset($_POST['block_ticket_submit'])) { 
+      $actionemail = filter_input(INPUT_POST, 'blockemail', FILTER_SANITIZE_EMAIL);
+      $actionusername = filter_input(INPUT_POST, 'blockusername', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+      $actionradio = filter_input(INPUT_POST, 'actions', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+      if (!empty($actionusername) && empty($actionemail)) { 
+        $action_query = mysqli_query($con,"SELECT ticket FROM blacklist WHERE username = '$actionusername'");
+        if (mysqli_num_rows($action_query) > 0) {
+          $_SESSION['actionusername'] = $actionusername;
+          $action_query_array = mysqli_fetch_all($action_query, MYSQLI_ASSOC);
+          foreach ($action_query_array as $row) {
+              $actionsql = $row["ticket"];
+          }
+          if ($actionradio === "allow" && $actionsql === "1") {
+            $_SESSION["verif_ticket_action"] = "fail1";
+            header("Location: welcome_admin_forms.php");
+            exit;
+          } else if ($actionradio === "block" && $actionsql === "0") {
+            $_SESSION["verif_ticket_action"] = "fail2";
+            header("Location: welcome_admin_forms.php");
+            exit;
+          } else if ($actionradio === "allow" && $actionsql === "0") {
+            mysqli_query($con,"UPDATE blacklist SET ticket = 1 WHERE username = '$actionusername'");
+            if (mysqli_affected_rows($con) > 0) {
+              $_SESSION["verif_ticket_action"] = "success1";
+              header("Location: welcome_admin_forms.php");
+              exit;
+            } else {
+              $_SESSION["verif_ticket_action"] = "fail3";
+              header("Location: welcome_admin_forms.php");
+              exit;
+            }
+          } else if ($actionradio === "block" && $actionsql === "1") {
+            mysqli_query($con,"UPDATE blacklist SET ticket = 0 WHERE username = '$actionusername'");
+            if (mysqli_affected_rows($con) > 0) {
+              $_SESSION["verif_ticket_action"] = "success2";
+              header("Location: welcome_admin_forms.php");
+              exit;
+            } else {
+              $_SESSION["verif_ticket_action"] = "fail3";
+              header("Location: welcome_admin_forms.php");
+              exit;
+            }
+          }
+        } else {
+          $_SESSION["verif_ticket_action"] = "fail3";
+          header("Location: welcome_admin_forms.php");
+          exit;
+        }
+      } else if (empty($actionusername) && !empty($actionemail)) { 
+        $action_query = mysqli_query($con,"SELECT ticket FROM blacklist b,login_credentials l WHERE l.username = b.username AND email IN (SELECT email FROM login_credentials WHERE email = '$actionemail')");
+        if (mysqli_num_rows($action_query) > 0) {
+          $_SESSION['actionemail'] = $actionemail;
+          $action_query_array = mysqli_fetch_all($action_query, MYSQLI_ASSOC);
+          foreach ($action_query_array as $row) {
+              $actionsql = $row["ticket"];
+          }
+          if ($actionradio === "allow" && $actionsql === "1") {
+            $_SESSION["verif_ticket_action"] = "fail4";
+            header("Location: welcome_admin_forms.php");
+            exit;
+          } else if ($actionradio === "block" && $actionsql === "0") {
+            $_SESSION["verif_ticket_action"] = "fail5";
+            header("Location: welcome_admin_forms.php");
+            exit;
+          } else if ($actionradio === "allow" && $actionsql === "0") {
+            mysqli_query($con,"UPDATE blacklist b,login_credentials l SET ticket = 1 WHERE l.username = b.username AND l.email IN (SELECT email FROM login_credentials WHERE email = '$actionemail')");
+            if (mysqli_affected_rows($con) > 0) {
+              $_SESSION["verif_ticket_action"] = "success3";
+              header("Location: welcome_admin_forms.php");
+              exit;
+            } else {
+              $_SESSION["verif_ticket_action"] = "fail3";
+              header("Location: welcome_admin_forms.php");
+              exit;
+            }
+          } else if ($actionradio === "block" && $actionsql === "1") {
+            mysqli_query($con,"UPDATE blacklist,login_credentials SET ticket = 0 WHERE login_credentials.username = blacklist.username AND login_credentials.email IN (SELECT email FROM login_credentials WHERE email = '$actionemail')");
+            if (mysqli_affected_rows($con) > 0) {
+              $_SESSION["verif_ticket_action"] = "success4";
+              header("Location: welcome_admin_forms.php");
+              exit;
+            } else {
+              $_SESSION["verif_ticket_action"] = "fail3";
+              header("Location: welcome_admin_forms.php");
+              exit;
+            }
+          }
+        } else {
+          $_SESSION["verif_ticket_action"] = "fail3";
+          header("Location: welcome_admin_forms.php");
+          exit;
+        }
+      } else if (!empty($actionusername) && !empty($actionemail)) { 
+        $action_query = mysqli_query($con,"SELECT ticket FROM blacklist b,login_credentials l WHERE l.username = b.username AND email IN (SELECT email FROM login_credentials WHERE email = '$actionemail') AND b.username = '$actionusername'");
+        if (mysqli_num_rows($action_query) > 0) {
+          $_SESSION['actionusername'] = $actionusername;
+          $_SESSION['actionusername'] = $actionusername;
+          $_SESSION['actionemail'] = $actionemail;
+          $action_query_array = mysqli_fetch_all($action_query, MYSQLI_ASSOC);
+          foreach ($action_query_array as $row) {
+              $actionsql = $row["ticket"];
+          }
+          if ($actionradio === "allow" && $actionsql === "1") {
+            $_SESSION["verif_ticket_action"] = "fail6";
+            header("Location: welcome_admin_forms.php");
+            exit;
+          } else if ($actionradio === "block" && $actionsql === "0") {
+            $_SESSION["verif_ticket_action"] = "fail7";
+            header("Location: welcome_admin_forms.php");
+            exit;
+          } else if ($actionradio === "allow" && $actionsql === "0") {
+            mysqli_query($con,"UPDATE blacklist,login_credentials SET ticket = 1 WHERE login_credentials.username = blacklist.username AND login_credentials.email IN (SELECT email FROM login_credentials WHERE email = '$actionemail') AND blacklist.username = '$actionusername'");
+            if (mysqli_affected_rows($con) > 0) {
+              $_SESSION["verif_ticket_action"] = "success5";
+              header("Location: welcome_admin_forms.php");
+              exit;
+            } else {
+              $_SESSION["verif_ticket_action"] = "fail3";
+              header("Location: welcome_admin_forms.php");
+              exit;
+            }
+          } else if ($actionradio === "block" && $actionsql === "1") {
+            mysqli_query($con,"UPDATE blacklist,login_credentials SET ticket = 0 WHERE login_credentials.username = blacklist.username AND login_credentials.email IN (SELECT email FROM login_credentials WHERE email = '$actionemail') AND blacklist.username = '$actionusername'");
+            if (mysqli_affected_rows($con) > 0) {
+              $_SESSION["verif_ticket_action"] = "success6";
+              header("Location: welcome_admin_forms.php");
+              exit;
+            } else {
+              $_SESSION["verif_ticket_action"] = "fail3";
+              header("Location: welcome_admin_forms.php");
+              exit;
+            }
+          }
+        } else {
+          $_SESSION["verif_ticket_action"] = "fail3";
+          header("Location: welcome_admin_forms.php");
+          exit;
+        }
+      }
+    }
+    if (isset($_POST['accsub'])) { 
+      $accmail = filter_input(INPUT_POST, 'accmail', FILTER_SANITIZE_EMAIL);
+      $accuser = filter_input(INPUT_POST, 'accuser', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+      $accactions = filter_input(INPUT_POST, 'accactions', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+      if (!empty($accuser) && empty($accmail)) { 
+        $accaction_query = mysqli_query($con,"SELECT account FROM blacklist WHERE username = '$accuser'");
+        if (mysqli_num_rows($accaction_query) > 0) {
+          $_SESSION['accuser'] = $accuser;
+          $accaction_query_array = mysqli_fetch_all($accaction_query, MYSQLI_ASSOC);
+          foreach ($accaction_query_array as $row) {
+              $accactionsql = $row["account"];
+          }
+          if ($accactions === "enable" && $accactionsql === "1") {
+            $_SESSION["verif_acc_action"] = "fail1";
+            header("Location: welcome_admin_forms.php");
+            exit;
+          } else if ($accactions === "disable" && $accactionsql === "0") {
+            $_SESSION["verif_acc_action"] = "fail2";
+            header("Location: welcome_admin_forms.php");
+            exit;
+          } else if ($accactions === "enable" && $accactionsql === "0") {
+            mysqli_query($con,"UPDATE blacklist SET account = 1 , deposit = 1 , withdraw = 1 , wire = 1, ticket = 1 WHERE username = '$accuser'");
+            if (mysqli_affected_rows($con) > 0) {
+              $_SESSION["verif_acc_action"] = "success1";
+              header("Location: welcome_admin_forms.php");
+              exit;
+            } else {
+              $_SESSION["verif_acc_action"] = "fail7";
+              header("Location: welcome_admin_forms.php");
+              exit;
+            }
+          } else if ($accactions === "disable" && $accactionsql === "1") {
+            mysqli_query($con,"UPDATE blacklist SET account = 0 , deposit = 0 , withdraw = 0 , wire = 0, ticket = 0 WHERE username = '$accuser'");
+            if (mysqli_affected_rows($con) > 0) {
+              $_SESSION["verif_acc_action"] = "success2";
+              header("Location: welcome_admin_forms.php");
+              exit;
+            } else {
+              $_SESSION["verif_acc_action"] = "fail7";
+              header("Location: welcome_admin_forms.php");
+              exit;
+            }
+          }
+        } else {
+          $_SESSION["verif_acc_action"] = "fail7";
+          header("Location: welcome_admin_forms.php");
+          exit;
+        }
+      } else if (empty($accuser) && !empty($accmail)) {
+        $accaction_query = mysqli_query($con,"SELECT account FROM blacklist b,login_credentials l WHERE l.username = b.username AND email IN (SELECT email FROM login_credentials WHERE email = '$accmail')");
+        if (mysqli_num_rows($accaction_query) > 0) {
+          $_SESSION['accmail'] = $accmail;
+          $accaction_query_array = mysqli_fetch_all($accaction_query, MYSQLI_ASSOC);
+          foreach ($accaction_query_array as $row) {
+              $accactionsql = $row["account"];
+          }
+          if ($accactions === "enable" && $accactionsql === "1") {
+            $_SESSION["verif_acc_action"] = "fail3";
+            header("Location: welcome_admin_forms.php");
+            exit;
+          } else if ($accactions === "disable" && $accactionsql === "0") {
+            $_SESSION["verif_acc_action"] = "fail4";
+            header("Location: welcome_admin_forms.php");
+            exit;
+          } else if ($accactions === "enable" && $accactionsql === "0") {
+            mysqli_query($con,"UPDATE blacklist b,login_credentials l SET account = 1 , deposit = 1 , withdraw = 1 , wire = 1, ticket = 1 WHERE l.username = b.username AND email IN (SELECT email FROM login_credentials WHERE email = '$accmail')");
+            if (mysqli_affected_rows($con) > 0) {
+              $_SESSION["verif_acc_action"] = "success3";
+              header("Location: welcome_admin_forms.php");
+              exit;
+            } else {
+              $_SESSION["verif_acc_action"] = "fail7";
+              header("Location: welcome_admin_forms.php");
+              exit;
+            }
+          } else if ($accactions === "disable" && $accactionsql === "1") {
+            mysqli_query($con,"UPDATE blacklist b,login_credentials l SET account = 0 , deposit = 0 , withdraw = 0 , wire = 0, ticket = 0 WHERE l.username = b.username AND email IN (SELECT email FROM login_credentials WHERE email = '$accmail')");
+            if (mysqli_affected_rows($con) > 0) {
+              $_SESSION["verif_acc_action"] = "success4";
+              header("Location: welcome_admin_forms.php");
+              exit;
+            } else {
+              $_SESSION["verif_acc_action"] = "fail7";
+              header("Location: welcome_admin_forms.php");
+              exit;
+            }
+          }
+        } else {
+          $_SESSION["verif_acc_action"] = "fail7";
+          header("Location: welcome_admin_forms.php");
+          exit;
+        }
+      } else if (!empty($accuser) && !empty($accmail)) {
+        $accaction_query = mysqli_query($con,"SELECT account FROM blacklist b,login_credentials l WHERE l.username = b.username AND email IN (SELECT email FROM login_credentials WHERE email = '$accmail') AND b.username = '$accuser'");
+        if (mysqli_num_rows($accaction_query) > 0) {
+          $_SESSION['accuser'] = $accuser;
+          $_SESSION['accmail'] = $accmail;
+          $accaction_query_array = mysqli_fetch_all($accaction_query, MYSQLI_ASSOC);
+          foreach ($accaction_query_array as $row) {
+              $accactionsql = $row["account"];
+          }
+          if ($accactions === "enable" && $accactionsql === "1") {
+            $_SESSION["verif_acc_action"] = "fail5";
+            header("Location: welcome_admin_forms.php");
+            exit;
+          } else if ($accactions === "disable" && $accactionsql === "0") {
+            $_SESSION["verif_acc_action"] = "fail6";
+            header("Location: welcome_admin_forms.php");
+            exit;
+          } else if ($accactions === "enable" && $accactionsql === "0") {
+            mysqli_query($con,"UPDATE blacklist b,login_credentials l SET account = 1 , deposit = 1 , withdraw = 1 , wire = 1, ticket = 1 WHERE l.username = b.username AND email IN (SELECT email FROM login_credentials WHERE email = '$accmail') AND b.username = '$accuser'");
+            if (mysqli_affected_rows($con) > 0) {
+              $_SESSION["verif_acc_action"] = "success5";
+              header("Location: welcome_admin_forms.php");
+              exit;
+            } else {
+              $_SESSION["verif_acc_action"] = "fail7";
+              header("Location: welcome_admin_forms.php");
+              exit;
+            }
+          } else if ($accactions === "disable" && $accactionsql === "1") {
+            mysqli_query($con,"UPDATE blacklist b,login_credentials l SET account = 0 , deposit = 0 , withdraw = 0 , wire = 0, ticket = 0 WHERE l.username = b.username AND email IN (SELECT email FROM login_credentials WHERE email = '$accmail') AND b.username = '$accuser'");
+            if (mysqli_affected_rows($con) > 0) {
+              $_SESSION["verif_acc_action"] = "success6";
+              header("Location: welcome_admin_forms.php");
+              exit;
+            } else {
+              $_SESSION["verif_acc_action"] = "fail7";
+              header("Location: welcome_admin_forms.php");
+              exit;
+            }
+          }
+        } else {
+          $_SESSION["verif_acc_action"] = "fail7";
+          header("Location: welcome_admin_forms.php");
+          exit;
+        }
+      }
+    }
+    switch ($_SESSION) {
+      case isset($_SESSION["balsub"]):
+          unset($_SESSION["verif_balance"]);
+          unset($_SESSION["balsub"]);
+          break;
+      case isset($_SESSION["transdep"]):
+          unset($_SESSION["verif_deposit"]);
+          unset($_SESSION["transdep"]);
+          break;
+      case isset($_SESSION["transwith"]):
+          unset($_SESSION["verif_withdraw"]);
+          unset($_SESSION["transwith"]);
+          break;
+      case isset($_SESSION["transwire"]):
+          unset($_SESSION["verif_wire"]);
+          unset($_SESSION["transwire"]);
+          break;
+      case isset($_SESSION["actiondep"]):
+          unset($_SESSION["verif_dep_action"]);
+          unset($_SESSION["actiondep"]);
+          break;
+      case isset($_SESSION["actionwith"]):
+          unset($_SESSION["verif_with_action"]);
+          unset($_SESSION["actionwith"]);
+          break;
+      case isset($_SESSION["actionwire"]):
+          unset($_SESSION["verif_wire_action"]);
+          unset($_SESSION["actionwire"]);
+          break;
+      case isset($_SESSION["actionticket"]):
+          unset($_SESSION["verif_ticket_action"]);
+          unset($_SESSION["actionticket"]);
+          break;
+      case isset($_SESSION["accaccount"]):
+          unset($_SESSION["verif_acc_action"]);
+          unset($_SESSION["accaccount"]);
+          break;
+    }
   }
 }
 ?>
+<?php if(isset($page_load) && $page_load === true): ?>
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="auto">
   <head>
@@ -1132,11 +1302,17 @@ if ($con->connect_error) {
           .x {
             width: 180px;
           }
+          .xx {
+            width: 200px;
+          }
         </style>
-        <div class="d-flex gap-3 mb-2">
+        <div class="d-flex gap-2 mb-2 mt-2">
           <input type="submit" value="Deposit B/A" class="but x" name="block_dep_submit" onclick="return verifsub4()">
           <input type="submit" value="Withdraw B/A" class="but x" name="block_with_submit" onclick="return verifsub4()">
-          <input type="submit" value="Wire B/A" class="but x" name="block_wire_submit" onclick="return verifsub4()">
+        </div>
+        <div class="d-flex gap-2 mb-2">
+          <input type="submit" value="Wire B/A" class="but xx" name="block_wire_submit" onclick="return verifsub4()">
+          <input type="submit" value="Ticket B/A" class="but xx" name="block_ticket_submit" onclick="return verifsub4()">
         </div>
       </form>
     </div>
@@ -1175,14 +1351,14 @@ if ($con->connect_error) {
       </form>
     </div>
     <div class="tab-pane fade" id="infomanagment">
-      <div class="infomanagmentcont d-flex flex-column justify-content-center align-items-center">5
+      <form class="infomanagmentcont d-flex flex-column justify-content-center align-items-center">5
 
-      </div>
+      </form>
     </div>
     <div class="tab-pane fade" id="tickets">
-      <div class="ticketscont d-flex flex-column justify-content-center align-items-center">6
+      <form class="ticketscont d-flex flex-column justify-content-center align-items-center">6
 
-      </div>
+      </form>
     </div>
   </div>
   </main>
@@ -1197,3 +1373,4 @@ if ($con->connect_error) {
     </script>
   </body>
 </html>
+<?php endif; ?>

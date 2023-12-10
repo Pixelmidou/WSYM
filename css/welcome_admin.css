@@ -19,6 +19,10 @@ body {
   border-bottom: 10px solid #87cefa;
 }
 
+.blockactionscont {
+  height: 436px;
+}
+
 .push {
   margin-top: auto;
   margin-bottom: auto;

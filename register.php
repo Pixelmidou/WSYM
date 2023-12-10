@@ -33,7 +33,7 @@ if ($con->connect_error) {
         <?php } else {
             $password = password_hash(filter_input(INPUT_POST, 'password2', FILTER_SANITIZE_FULL_SPECIAL_CHARS), PASSWORD_DEFAULT);
             $email = filter_input(INPUT_POST, 'email2', FILTER_SANITIZE_EMAIL);
-            if (mysqli_query($con,"INSERT INTO login_credentials VALUES ('$username','$password','$email','none')") && mysqli_query($con,"INSERT INTO balance VALUES ('$username','$email','0')") && mysqli_query($con,"INSERT INTO blacklist VALUES ('$username', '1', '1', '1')")) { ?>
+            if (mysqli_query($con,"INSERT INTO login_credentials VALUES ('$username','$password','$email',now(),'none')") && mysqli_query($con,"INSERT INTO balance VALUES ('$username','$email','0')") && mysqli_query($con,"INSERT INTO blacklist VALUES ('$username', '1', '1', '1','1','1')")) { ?>
                 <!DOCTYPE html>
                 <html lang="en">
                 <head>

@@ -4,6 +4,13 @@ if ($con->connect_error) {
     die("Connection Failed" . $con->connect_error);
 } else { 
     session_start();
+    if (!isset($_SESSION['verif_balance']) && !isset($_SESSION['verif_deposit']) && !isset($_SESSION['verif_withdraw']) && !isset($_SESSION['verif_wire']) && !isset($_SESSION['verif_dep_action']) && !isset($_SESSION['verif_with_action']) && !isset($_SESSION['verif_wire_action']) && !isset($_SESSION['verif_ticket_action']) && !isset($_SESSION['verif_acc_action'])) {
+        if (empty($_SESSION['verif_balance']) || $_SESSION['verif_balance'] === "" && empty($_SESSION['verif_deposit']) || $_SESSION['verif_deposit'] === "" && empty($_SESSION['verif_withdraw']) || $_SESSION['verif_withdraw'] === ""  && empty($_SESSION['verif_wire']) || $_SESSION['verif_wire'] === "" && empty($_SESSION['verif_dep_action']) || $_SESSION['verif_dep_action'] === "" && empty($_SESSION['verif_with_action']) || $_SESSION['verif_with_action'] === "" && empty($_SESSION['verif_wire_action']) || $_SESSION['verif_wire_action'] === "" && empty($_SESSION['verif_ticket_action']) || $_SESSION['verif_ticket_action'] === "" && empty($_SESSION['verif_acc_action']) || $_SESSION['verif_acc_action'] === "") {
+            session_destroy();
+            header("Location: index.html");
+            exit;
+        } 
+    }
     if (isset($_SESSION["verif_balance"])) {
         $verif_balance = $_SESSION["verif_balance"];
         if($verif_balance === "success") {
@@ -1233,6 +1240,16 @@ if ($con->connect_error) {
             $actionemail = $_SESSION['actionemail'];
         }
         $_SESSION["actionwire"] = "actionwire";
+    }
+    if (isset($_SESSION["verif_ticket_action"])) {
+        $verif_ticket_action = $_SESSION["verif_ticket_action"];
+        if (isset($_SESSION['actionusername'])) {
+            $actionusername = $_SESSION['actionusername'];
+        }
+        if (isset($_SESSION['actionemail'])) {
+            $actionemail = $_SESSION['actionemail'];
+        }
+        $_SESSION["actionticket"] = "actionticket";
     }
     if (isset($_SESSION["verif_acc_action"])) {
         $verif_acc_action = $_SESSION["verif_acc_action"];
@@ -2569,6 +2586,292 @@ if ($con->connect_error) {
         <div class="container1">
             <div class="container2">
                 <h1 style="text-align: center;">Action Success : You blocked <?php echo $actionusername; ?> ( <?php echo $actionemail; ?> ) from wiring money !</h1>
+                <div style="text-align: center; font-size: small;">You will be automatically redirected back to the admin page in 4 seconds.</div>
+            </div>
+        </div>
+    </body>
+    </html>
+<?php endif; ?>
+<?php if(isset($verif_ticket_action) && $verif_ticket_action === "fail1"): ?>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="refresh" content="4; url=welcome_admin.php">
+        <title>WSYM Banking</title>
+        <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
+        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="./css/redirections_style.css">
+    </head>
+    <body>
+        <div class="container1">
+            <div class="container2">
+                <h1 style="text-align: center;">Action Failed : " <?php echo $actionusername; ?> " is already allowed to submit tickets !</h1>
+                <div style="text-align: center; font-size: small;">You will be automatically redirected back to the admin page in 4 seconds.</div>
+            </div>
+        </div>
+    </body>
+    </html>
+<?php endif; ?>
+<?php if(isset($verif_ticket_action) && $verif_ticket_action === "fail2"): ?>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="refresh" content="4; url=welcome_admin.php">
+        <title>WSYM Banking</title>
+        <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
+        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="./css/redirections_style.css">
+    </head>
+    <body>
+        <div class="container1">
+            <div class="container2">
+                <h1 style="text-align: center;">Action Failed : " <?php echo $actionusername; ?> " is already blocked from submitting tickets !</h1>
+                <div style="text-align: center; font-size: small;">You will be automatically redirected back to the admin page in 4 seconds.</div>
+            </div>
+        </div>
+    </body>
+    </html>
+<?php endif; ?>
+<?php if(isset($verif_ticket_action) && $verif_ticket_action === "fail3"): ?>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="refresh" content="4; url=welcome_admin.php">
+        <title>WSYM Banking</title>
+        <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
+        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="./css/redirections_style.css">
+    </head>
+    <body>
+        <div class="container1">
+            <div class="container2">
+                <h1 style="text-align: center;">Error 500 : Internal Server Error</h1>
+                <div style="text-align: center; font-size: small;">You will be automatically redirected back to the welcome page in 4 seconds.</div>
+            </div>
+        </div>
+    </body>
+    </html>
+<?php endif; ?>
+<?php if(isset($verif_ticket_action) && $verif_ticket_action === "fail4"): ?>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="refresh" content="4; url=welcome_admin.php">
+        <title>WSYM Banking</title>
+        <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
+        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="./css/redirections_style.css">
+    </head>
+    <body>
+        <div class="container1">
+            <div class="container2">
+                <h1 style="text-align: center;">Action Failed : " <?php echo $actionemail; ?> " is already allowed to submit tickets !</h1>
+                <div style="text-align: center; font-size: small;">You will be automatically redirected back to the admin page in 4 seconds.</div>
+            </div>
+        </div>
+    </body>
+    </html>
+<?php endif; ?>
+<?php if(isset($verif_ticket_action) && $verif_ticket_action === "fail5"): ?>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="refresh" content="4; url=welcome_admin.php">
+        <title>WSYM Banking</title>
+        <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
+        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="./css/redirections_style.css">
+    </head>
+    <body>
+        <div class="container1">
+            <div class="container2">
+                <h1 style="text-align: center;">Action Failed : " <?php echo $actionemail; ?> " is already blocked from submitting tickets !</h1>
+                <div style="text-align: center; font-size: small;">You will be automatically redirected back to the admin page in 4 seconds.</div>
+            </div>
+        </div>
+    </body>
+    </html>
+<?php endif; ?>
+<?php if(isset($verif_ticket_action) && $verif_ticket_action === "fail6"): ?>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="refresh" content="4; url=welcome_admin.php">
+        <title>WSYM Banking</title>
+        <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
+        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="./css/redirections_style.css">
+    </head>
+    <body>
+        <div class="container1">
+            <div class="container2">
+                <h1 style="text-align: center;">Action Failed : <?php echo $actionusername; ?> ( <?php echo $actionemail; ?> ) is already allowed to submit tickets !</h1>
+                <div style="text-align: center; font-size: small;">You will be automatically redirected back to the admin page in 4 seconds.</div>
+            </div>
+        </div>
+    </body>
+    </html>
+<?php endif; ?>
+<?php if(isset($verif_ticket_action) && $verif_ticket_action === "fail7"): ?>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="refresh" content="4; url=welcome_admin.php">
+        <title>WSYM Banking</title>
+        <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
+        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="./css/redirections_style.css">
+    </head>
+    <body>
+        <div class="container1">
+            <div class="container2">
+                <h1 style="text-align: center;">Action Failed : <?php echo $actionusername; ?> ( <?php echo $actionemail; ?> ) is already blocked from submitting tickets !</h1>
+                <div style="text-align: center; font-size: small;">You will be automatically redirected back to the admin page in 4 seconds.</div>
+            </div>
+        </div>
+    </body>
+    </html>
+<?php endif; ?>
+<?php if(isset($verif_ticket_action) && $verif_ticket_action === "success1"): ?>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="refresh" content="4; url=welcome_admin.php">
+        <title>WSYM Banking</title>
+        <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
+        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="./css/redirections_style.css">
+    </head>
+    <body>
+        <div class="container1">
+            <div class="container2">
+                <h1 style="text-align: center;">Action Success : You allowed <?php echo $actionusername; ?> to submit tickets !</h1>
+                <div style="text-align: center; font-size: small;">You will be automatically redirected back to the admin page in 4 seconds.</div>
+            </div>
+        </div>
+    </body>
+    </html>
+<?php endif; ?>
+<?php if(isset($verif_ticket_action) && $verif_ticket_action === "success2"): ?>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="refresh" content="4; url=welcome_admin.php">
+        <title>WSYM Banking</title>
+        <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
+        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="./css/redirections_style.css">
+    </head>
+    <body>
+        <div class="container1">
+            <div class="container2">
+                <h1 style="text-align: center;">Action Success : You blocked <?php echo $actionusername; ?> from submitting tickets !</h1>
+                <div style="text-align: center; font-size: small;">You will be automatically redirected back to the admin page in 4 seconds.</div>
+            </div>
+        </div>
+    </body>
+    </html>
+<?php endif; ?>
+<?php if(isset($verif_ticket_action) && $verif_ticket_action === "success3"): ?>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="refresh" content="4; url=welcome_admin.php">
+        <title>WSYM Banking</title>
+        <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
+        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="./css/redirections_style.css">
+    </head>
+    <body>
+        <div class="container1">
+            <div class="container2">
+                <h1 style="text-align: center;">Action Success : " You allowed <?php echo $actionemail; ?> to submit tickets !</h1>
+                <div style="text-align: center; font-size: small;">You will be automatically redirected back to the admin page in 4 seconds.</div>
+            </div>
+        </div>
+    </body>
+    </html>
+<?php endif; ?>
+<?php if(isset($verif_ticket_action) && $verif_ticket_action === "success4"): ?>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="refresh" content="4; url=welcome_admin.php">
+        <title>WSYM Banking</title>
+        <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
+        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="./css/redirections_style.css">
+    </head>
+    <body>
+        <div class="container1">
+            <div class="container2">
+                <h1 style="text-align: center;">Action Success : You blocked <?php echo $actionemail; ?> from submitting tickets !</h1>
+                <div style="text-align: center; font-size: small;">You will be automatically redirected back to the admin page in 4 seconds.</div>
+            </div>
+        </div>
+    </body>
+    </html>
+<?php endif; ?>
+<?php if(isset($verif_ticket_action) && $verif_ticket_action === "success5"): ?>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="refresh" content="4; url=welcome_admin.php">
+        <title>WSYM Banking</title>
+        <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
+        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="./css/redirections_style.css">
+    </head>
+    <body>
+        <div class="container1">
+            <div class="container2">
+                <h1 style="text-align: center;">Action Success : You allowed <?php echo $actionusername; ?> ( <?php echo $actionemail; ?> ) to ticket !</h1>
+                <div style="text-align: center; font-size: small;">You will be automatically redirected back to the admin page in 4 seconds.</div>
+            </div>
+        </div>
+    </body>
+    </html>
+<?php endif; ?>
+<?php if(isset($verif_ticket_action) && $verif_ticket_action === "success6"): ?>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="refresh" content="4; url=welcome_admin.php">
+        <title>WSYM Banking</title>
+        <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
+        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="./css/redirections_style.css">
+    </head>
+    <body>
+        <div class="container1">
+            <div class="container2">
+                <h1 style="text-align: center;">Action Success : You blocked <?php echo $actionusername; ?> ( <?php echo $actionemail; ?> ) from submitting tickets !</h1>
                 <div style="text-align: center; font-size: small;">You will be automatically redirected back to the admin page in 4 seconds.</div>
             </div>
         </div>

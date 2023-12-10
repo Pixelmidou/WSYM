@@ -85,7 +85,7 @@ if ($con->connect_error) {
         if (isset($_POST['deposit_submit'])) {
             $depval = filter_input(INPUT_POST,"depval",FILTER_SANITIZE_NUMBER_FLOAT);
             $_SESSION['depval'] = $depval;
-            $dep_query = mysqli_query($con,"SELECT deposit FROM blacklist WHERE username = '$username'");
+            $dep_query = mysqli_query($con,"SELECT deposit FROM blacklist WHERE username = '$user_username'");
             if (mysqli_num_rows($dep_query) > 0) {
                 $dep_query_array = mysqli_fetch_all($dep_query, MYSQLI_ASSOC);
                 foreach ($dep_query_array as $row) {
@@ -109,7 +109,7 @@ if ($con->connect_error) {
         if (isset($_POST['withdraw_submit'])) {
             $withval = filter_input(INPUT_POST,"withval",FILTER_SANITIZE_NUMBER_FLOAT);
             $_SESSION['withval'] = $withval;
-            $with_query = mysqli_query($con,"SELECT withdraw FROM blacklist WHERE username = '$username'");
+            $with_query = mysqli_query($con,"SELECT withdraw FROM blacklist WHERE username = '$user_username'");
             if (mysqli_num_rows($with_query) > 0) {
                 $with_query_array = mysqli_fetch_all($with_query, MYSQLI_ASSOC);
                 foreach ($with_query_array as $row) {
@@ -135,7 +135,7 @@ if ($con->connect_error) {
             $wireemail = filter_input(INPUT_POST,"wireemail",FILTER_SANITIZE_EMAIL);
             $_SESSION['wireval'] = $wireval;
             $_SESSION['wireemail'] = $wireemail;
-            $wire_query = mysqli_query($con,"SELECT wire FROM blacklist WHERE username = '$username'");
+            $wire_query = mysqli_query($con,"SELECT wire FROM blacklist WHERE username = '$user_username'");
             if (mysqli_num_rows($wire_query) > 0) {
                 $wire_query_array = mysqli_fetch_all($wire_query, MYSQLI_ASSOC);
                 foreach ($wire_query_array as $row) {
@@ -158,7 +158,7 @@ if ($con->connect_error) {
         }
         if (isset($_POST['ticket_submit'])) {
             $tickettext = filter_input(INPUT_POST,"tickettext",FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-            $ticket_query = mysqli_query($con,"SELECT ticket FROM blacklist WHERE username = '$username'");
+            $ticket_query = mysqli_query($con,"SELECT ticket FROM blacklist WHERE username = '$user_username'");
             if (mysqli_num_rows($ticket_query) > 0) {
                 $ticket_query_array = mysqli_fetch_all($ticket_query, MYSQLI_ASSOC);
                 foreach ($ticket_query_array as $row) {
