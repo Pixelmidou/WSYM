@@ -77,6 +77,27 @@ if (isset($_SESSION['ticket_verif'])) {
     </div>
 </body>
 </html>
+<?php } else if (isset($_SESSION['deposit_verif']) && $deposit_verif === "failb") { ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="refresh" content="4; url=welcome.php">
+    <title>WSYM Banking</title>
+    <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./css/redirections_style.css">
+</head>
+<body>
+    <div class="container1">
+        <div class="container2">
+            <h1 style="text-align: center;">Action Failed : You are blocked from depositing money</h1>
+            <div style="text-align: center; font-size: small;">You will be automatically redirected back to the welcome page in 4 seconds.</div>
+        </div>
+    </div>
+</body>
+</html>
 <?php } ?>
 <?php if (isset($_SESSION['withdraw_verif']) && $withdraw_verif === "success") {  ?>
 <!DOCTYPE html>
@@ -116,6 +137,27 @@ if (isset($_SESSION['ticket_verif'])) {
     <div class="container1">
         <div class="container2">
             <h1 style="text-align: center;">Error 500 : Internal Server Error</h1>
+            <div style="text-align: center; font-size: small;">You will be automatically redirected back to the welcome page in 4 seconds.</div>
+        </div>
+    </div>
+</body>
+</html>
+<?php } else if (isset($_SESSION['withdraw_verif']) && $withdraw_verif === "failb") { ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="refresh" content="4; url=welcome.php">
+    <title>WSYM Banking</title>
+    <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./css/redirections_style.css">
+</head>
+<body>
+    <div class="container1">
+        <div class="container2">
+            <h1 style="text-align: center;">Action Failed : You are blocked from withdrawing money</h1>
             <div style="text-align: center; font-size: small;">You will be automatically redirected back to the welcome page in 4 seconds.</div>
         </div>
     </div>
@@ -165,6 +207,27 @@ if (isset($_SESSION['ticket_verif'])) {
     </div>
 </body>
 </html>
+<?php } else if (isset($_SESSION['wire_verif']) && $wire_verif === "failb") { ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="refresh" content="4; url=welcome.php">
+    <title>WSYM Banking</title>
+    <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./css/redirections_style.css">
+</head>
+<body>
+    <div class="container1">
+        <div class="container2">
+            <h1 style="text-align: center;">Action Failed : You are blocked from wiring money</h1>
+            <div style="text-align: center; font-size: small;">You will be automatically redirected back to the welcome page in 4 seconds.</div>
+        </div>
+    </div>
+</body>
+</html>
 <?php } ?>
 <?php if (isset($_SESSION['ticket_verif']) && $ticket_verif === "success") {  ?>
 <!DOCTYPE html>
@@ -203,6 +266,27 @@ if (isset($_SESSION['ticket_verif'])) {
     <div class="container1">
         <div class="container2">
             <h1 style="text-align: center;">Error 500 : Internal Server Error</h1>
+            <div style="text-align: center; font-size: small;">You will be automatically redirected back to the welcome page in 4 seconds.</div>
+        </div>
+    </div>
+</body>
+</html>
+<?php } else if (isset($_SESSION['ticket_verif']) && $ticket_verif === "failb") { ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="refresh" content="4; url=welcome.php">
+    <title>WSYM Banking</title>
+    <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./css/redirections_style.css">
+</head>
+<body>
+    <div class="container1">
+        <div class="container2">
+            <h1 style="text-align: center;">Action Failed : You are blocked from submitting tickets</h1>
             <div style="text-align: center; font-size: small;">You will be automatically redirected back to the welcome page in 4 seconds.</div>
         </div>
     </div>

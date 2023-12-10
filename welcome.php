@@ -85,8 +85,19 @@ if ($con->connect_error) {
         if (isset($_POST['deposit_submit'])) {
             $depval = filter_input(INPUT_POST,"depval",FILTER_SANITIZE_NUMBER_FLOAT);
             $_SESSION['depval'] = $depval;
-            if (mysqli_query($con,"INSERT INTO deposit VALUES (id,'$user_username',now(),$depval)") && mysqli_query($con,"UPDATE balance SET balance = balance + $depval WHERE username = '$user_username'")) {
+            $dep_query = mysqli_query($con,"SELECT deposit FROM blacklist WHERE username = '$username'");
+            if (mysqli_num_rows($dep_query) > 0) {
+                $dep_query_array = mysqli_fetch_all($dep_query, MYSQLI_ASSOC);
+                foreach ($dep_query_array as $row) {
+                    $dep = $row["deposit"];
+                }
+            }
+            if ($dep === "1" && mysqli_query($con,"INSERT INTO deposit VALUES (id,'$user_username',now(),$depval)") && mysqli_query($con,"UPDATE balance SET balance = balance + $depval WHERE username = '$user_username'")) {
                 $_SESSION['deposit_verif'] = "success";
+                header("Location: welcome_verif.php");
+                exit;
+            } else if ($dep === "0") {
+                $_SESSION['deposit_verif'] = "failb";
                 header("Location: welcome_verif.php");
                 exit;
             } else {
@@ -98,8 +109,19 @@ if ($con->connect_error) {
         if (isset($_POST['withdraw_submit'])) {
             $withval = filter_input(INPUT_POST,"withval",FILTER_SANITIZE_NUMBER_FLOAT);
             $_SESSION['withval'] = $withval;
-            if (mysqli_query($con,"INSERT INTO withdraw VALUES (id,'$user_username',now(),$withval)") && mysqli_query($con,"UPDATE balance SET balance = balance - $withval WHERE username = '$user_username'")) {
+            $with_query = mysqli_query($con,"SELECT withdraw FROM blacklist WHERE username = '$username'");
+            if (mysqli_num_rows($with_query) > 0) {
+                $with_query_array = mysqli_fetch_all($with_query, MYSQLI_ASSOC);
+                foreach ($with_query_array as $row) {
+                    $with = $row["withdraw"];
+                }
+            }
+            if ($with === "1" && mysqli_query($con,"INSERT INTO withdraw VALUES (id,'$user_username',now(),$withval)") && mysqli_query($con,"UPDATE balance SET balance = balance - $withval WHERE username = '$user_username'")) {
                 $_SESSION['withdraw_verif'] = "success";
+                header("Location: welcome_verif.php");
+                exit;
+            } else if ($with === "0") {
+                $_SESSION['withdraw_verif'] = "failb";
                 header("Location: welcome_verif.php");
                 exit;
             } else {
@@ -113,8 +135,19 @@ if ($con->connect_error) {
             $wireemail = filter_input(INPUT_POST,"wireemail",FILTER_SANITIZE_EMAIL);
             $_SESSION['wireval'] = $wireval;
             $_SESSION['wireemail'] = $wireemail;
-            if (mysqli_query($con,"INSERT INTO wire VALUES (id,'$user_username','$wireemail',now(),$wireval)") && mysqli_query($con,"UPDATE balance SET balance = balance + $wireval WHERE email = '$wireemail'") && mysqli_query($con,"UPDATE balance SET balance = balance - $wireval WHERE username = '$user_username'")) {
+            $wire_query = mysqli_query($con,"SELECT wire FROM blacklist WHERE username = '$username'");
+            if (mysqli_num_rows($wire_query) > 0) {
+                $wire_query_array = mysqli_fetch_all($wire_query, MYSQLI_ASSOC);
+                foreach ($wire_query_array as $row) {
+                    $wire = $row["wire"];
+                }
+            }
+            if ($wire === "1" && mysqli_query($con,"INSERT INTO wire VALUES (id,'$user_username','$wireemail',now(),$wireval)") && mysqli_query($con,"UPDATE balance SET balance = balance + $wireval WHERE email = '$wireemail'") && mysqli_query($con,"UPDATE balance SET balance = balance - $wireval WHERE username = '$user_username'")) {
                 $_SESSION['wire_verif'] = "success";
+                header("Location: welcome_verif.php");
+                exit;
+            } else if ($wire === "0") {
+                $_SESSION['wire_verif'] = "failb";
                 header("Location: welcome_verif.php");
                 exit;
             } else {
@@ -125,8 +158,19 @@ if ($con->connect_error) {
         }
         if (isset($_POST['ticket_submit'])) {
             $tickettext = filter_input(INPUT_POST,"tickettext",FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-            if (mysqli_query($con,"INSERT INTO ticket VALUES ('$user_username','$tickettext')")) {
+            $ticket_query = mysqli_query($con,"SELECT ticket FROM blacklist WHERE username = '$username'");
+            if (mysqli_num_rows($ticket_query) > 0) {
+                $ticket_query_array = mysqli_fetch_all($ticket_query, MYSQLI_ASSOC);
+                foreach ($ticket_query_array as $row) {
+                    $ticket = $row["ticket"];
+                }
+            }
+            if ($ticket === "1" && mysqli_query($con,"INSERT INTO ticket VALUES ('$user_username','$tickettext')")) {
                 $_SESSION['ticket_verif'] = "success";
+                header("Location: welcome_verif.php");
+                exit;
+            } else if ($ticket === "0") {
+                $_SESSION['ticket_verif'] = "failb";
                 header("Location: welcome_verif.php");
                 exit;
             } else {

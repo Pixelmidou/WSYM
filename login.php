@@ -15,9 +15,16 @@ if ($con->connect_error) {
         $password = filter_input(INPUT_POST, 'password1', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         $user_query = mysqli_query($con,"SELECT username,pass FROM login_credentials WHERE username = '$username'");
         $admin_query = mysqli_query($con,"SELECT username,pass FROM login_credentials WHERE username = '$username' AND rank IN (SELECT rank FROM ranks WHERE rank <> 'none')");
+        $acc_query = mysqli_query($con,"SELECT account FROM blacklist WHERE username = '$username'");
+        if (mysqli_num_rows($acc_query) > 0) {
+            $acc_query_array = mysqli_fetch_all($acc_query, MYSQLI_ASSOC);
+            foreach ($acc_query_array as $row) {
+                $acc = $row["account"];
+            }
+        }
         if (mysqli_num_rows($admin_query) > 0) { 
             while ($row_admin = mysqli_fetch_array($admin_query, MYSQLI_ASSOC)) { 
-                if (password_verify($password,$row_admin['pass'])) {
+                if (password_verify($password,$row_admin['pass']) && $acc === "1") {
                     $_SESSION['admin_username'] = $username;
                     header("Location: admin_redirections.php");
                     exit;
@@ -37,7 +44,7 @@ if ($con->connect_error) {
                         <div class="container1">
                             <div class="container2">
                                 <h1 style="text-align: center;">Access Denied : Check the provided info !</h1>
-                                <h4 style="text-align: center;">Possible Problems : Wrong Password or Username / Account does not exist</h4>
+                                <h4 style="text-align: center;">Possible Problems : Wrong Password or Username / Account does not exist / Account Disabled</h4>
                                 <div style="text-align: center; font-size: small;">You will be automatically redirected back to the login page in 4 seconds.</div>
                             </div>
                         </div>
@@ -47,7 +54,7 @@ if ($con->connect_error) {
             }
         } else if (mysqli_num_rows($user_query) > 0) {
             while ($row_user = mysqli_fetch_array($user_query, MYSQLI_ASSOC)) {
-                if (password_verify($password,$row_user['pass'])) {
+                if (password_verify($password,$row_user['pass']) && $acc === "1") {
                     $_SESSION['user_username'] = $username;
                     header("Location: welcome.php");
                     exit;
@@ -67,7 +74,7 @@ if ($con->connect_error) {
                         <div class="container1">
                             <div class="container2">
                                 <h1 style="text-align: center;">Access Denied : Check the provided info !</h1>
-                                <h4 style="text-align: center;">Possible Problems : Wrong Password or Username / Account does not exist</h4>
+                                <h4 style="text-align: center;">Possible Problems : Wrong Password or Username / Account does not exist / Account Disabled</h4>
                                 <div style="text-align: center; font-size: small;">You will be automatically redirected back to the login page in 4 seconds.</div>
                             </div>
                         </div>
@@ -91,7 +98,7 @@ if ($con->connect_error) {
                 <div class="container1">
                     <div class="container2">
                         <h1 style="text-align: center;">Access Denied : Check the provided info !</h1>
-                        <h4 style="text-align: center;">Possible Problems : Wrong Password or Username / Account does not exist</h4>
+                        <h4 style="text-align: center;">Possible Problems : Wrong Password or Username / Account does not exist / Account Disabled</h4>
                         <div style="text-align: center; font-size: small;">You will be automatically redirected back to the login page in 4 seconds.</div>
                     </div>
                 </div>

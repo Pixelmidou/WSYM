@@ -2707,6 +2707,28 @@ if ($con->connect_error) {
     </body>
     </html>
 <?php endif; ?>
+<?php if(isset($verif_acc_action) && $verif_acc_action === "fail7"): ?>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="refresh" content="4; url=welcome_admin.php">
+        <title>WSYM Banking</title>
+        <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
+        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="./css/redirections_style.css">
+    </head>
+    <body>
+        <div class="container1">
+            <div class="container2">
+                <h1 style="text-align: center;">Error 500 : Internal Server Error</h1>
+                <div style="text-align: center; font-size: small;">You will be automatically redirected back to the welcome page in 4 seconds.</div>
+            </div>
+        </div>
+    </body>
+    </html>
+<?php endif; ?>
 <?php if(isset($verif_acc_action) && $verif_acc_action === "success1"): ?>
     <!DOCTYPE html>
     <html lang="en">
@@ -2722,7 +2744,7 @@ if ($con->connect_error) {
     <body>
         <div class="container1">
             <div class="container2">
-                <h1 style="text-align: center;">Action Success : <?php echo $accuser; ?>'s account is enabled !</h1>
+                <h1 style="text-align: center;">Action Success : You enabled <?php echo $accuser; ?>'s account !</h1>
                 <div style="text-align: center; font-size: small;">You will be automatically redirected back to the admin page in 4 seconds.</div>
             </div>
         </div>
@@ -2744,7 +2766,7 @@ if ($con->connect_error) {
     <body>
         <div class="container1">
             <div class="container2">
-                <h1 style="text-align: center;">Action Success : <?php echo $accuser; ?>'s account is disabled !</h1>
+                <h1 style="text-align: center;">Action Success : You disabled <?php echo $accuser; ?>'s account !</h1>
                 <div style="text-align: center; font-size: small;">You will be automatically redirected back to the admin page in 4 seconds.</div>
             </div>
         </div>
@@ -2766,7 +2788,7 @@ if ($con->connect_error) {
     <body>
         <div class="container1">
             <div class="container2">
-                <h1 style="text-align: center;">Action Success : <?php echo $accmail; ?>'s account is enabled !</h1>
+                <h1 style="text-align: center;">Action Success : You enabled <?php echo $accmail; ?>'s account !</h1>
                 <div style="text-align: center; font-size: small;">You will be automatically redirected back to the admin page in 4 seconds.</div>
             </div>
         </div>
@@ -2788,7 +2810,7 @@ if ($con->connect_error) {
     <body>
         <div class="container1">
             <div class="container2">
-                <h1 style="text-align: center;">Action Success : <?php echo $accmail; ?>'s account is disabled !</h1>
+                <h1 style="text-align: center;">Action Success : You disabled <?php echo $accmail; ?>'s account !</h1>
                 <div style="text-align: center; font-size: small;">You will be automatically redirected back to the admin page in 4 seconds.</div>
             </div>
         </div>
@@ -2810,7 +2832,7 @@ if ($con->connect_error) {
     <body>
         <div class="container1">
             <div class="container2">
-                <h1 style="text-align: center;">Action Success : <?php echo $accuser; ?> ( <?php echo $accmail; ?> )'s account is enabled !</h1>
+                <h1 style="text-align: center;">Action Success : You enabled <?php echo $accuser; ?> ( <?php echo $accmail; ?> )'s account !</h1>
                 <div style="text-align: center; font-size: small;">You will be automatically redirected back to the admin page in 4 seconds.</div>
             </div>
         </div>
@@ -2832,7 +2854,7 @@ if ($con->connect_error) {
     <body>
         <div class="container1">
             <div class="container2">
-                <h1 style="text-align: center;">Action Success : <?php echo $accuser; ?> ( <?php echo $accmail; ?> )'s account is disabled !</h1>
+                <h1 style="text-align: center;">Action Success : You disabled <?php echo $accuser; ?> ( <?php echo $accmail; ?> )'s account !</h1>
                 <div style="text-align: center; font-size: small;">You will be automatically redirected back to the admin page in 4 seconds.</div>
             </div>
         </div>
