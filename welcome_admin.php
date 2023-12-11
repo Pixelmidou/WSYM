@@ -1351,12 +1351,12 @@ if ($con->connect_error) {
       </form>
     </div>
     <div class="tab-pane fade" id="infomanagment">
-      <form class="infomanagmentcont d-flex flex-column justify-content-center align-items-center">5
+      <form class="infomanagmentcont d-flex flex-column justify-content-center align-items-center">
 
       </form>
     </div>
     <div class="tab-pane fade" id="tickets">
-      <form class="ticketscont d-flex flex-column justify-content-center align-items-center">6
+      <form class="ticketscont d-flex flex-column justify-content-center align-items-center">
 
       </form>
     </div>

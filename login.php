@@ -25,6 +25,7 @@ if ($con->connect_error) {
         if (mysqli_num_rows($admin_query) > 0) { 
             while ($row_admin = mysqli_fetch_array($admin_query, MYSQLI_ASSOC)) { 
                 if (password_verify($password,$row_admin['pass']) && $acc === "1") {
+                    mysqli_query($con,"UPDATE login_credentials set lastlogin = now() WHERE username = '$username'");
                     $_SESSION['admin_username'] = $username;
                     header("Location: admin_redirections.php");
                     exit;
@@ -55,6 +56,7 @@ if ($con->connect_error) {
         } else if (mysqli_num_rows($user_query) > 0) {
             while ($row_user = mysqli_fetch_array($user_query, MYSQLI_ASSOC)) {
                 if (password_verify($password,$row_user['pass']) && $acc === "1") {
+                    mysqli_query($con,"UPDATE login_credentials set lastlogin = now() WHERE username = '$username'");
                     $_SESSION['user_username'] = $username;
                     header("Location: welcome.php");
                     exit;

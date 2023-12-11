@@ -165,7 +165,7 @@ if ($con->connect_error) {
                     $ticket = $row["ticket"];
                 }
             }
-            if ($ticket === "1" && mysqli_query($con,"INSERT INTO ticket VALUES ('$user_username','$tickettext')")) {
+            if ($ticket === "1" && mysqli_query($con,"INSERT INTO ticket VALUES ('$user_username','opened',now(),DEFAULT,'$tickettext')")) {
                 $_SESSION['ticket_verif'] = "success";
                 header("Location: welcome_verif.php");
                 exit;
