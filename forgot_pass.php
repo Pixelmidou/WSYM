@@ -34,7 +34,8 @@ if ($con->connect_error) {
                 </html>
                 <?php $msg = "A Request has been made to change your account's password \n if it is you ignore this message nothing will happen, \n else contact us via the ticket section immediately.";
                 $msg = wordwrap($msg,70);
-                mail("$email","Reset Password Request",$msg);
+                $headers = "From: wsymcorp@gmail.com";
+                mail("$email","Reset Password Request",$msg,$headers);
             } else { ?>
                 <!DOCTYPE html>
                 <html lang="en">

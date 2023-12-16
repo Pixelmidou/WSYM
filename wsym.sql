@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 10, 2023 at 10:17 PM
+-- Generation Time: Dec 13, 2023 at 05:58 PM
 -- Server version: 5.7.17
 -- PHP Version: 5.6.30
 
@@ -102,6 +102,7 @@ CREATE TABLE `login_credentials` (
   `pass` varchar(255) NOT NULL,
   `email` varchar(100) NOT NULL,
   `timecreated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `lastlogin` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `rank` varchar(30) NOT NULL DEFAULT 'none'
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -109,10 +110,10 @@ CREATE TABLE `login_credentials` (
 -- Dumping data for table `login_credentials`
 --
 
-INSERT INTO `login_credentials` (`username`, `pass`, `email`, `timecreated`, `rank`) VALUES
-('pixel', '$2y$10$WycMX9tDWKT8e2D1NIXlYOWBiH1F58Knvh4APEmjIvIvawQR6xJNC', 'pixel@gmail.com', '2023-12-10 20:25:53', 'none'),
-('salah', '$2y$10$sxX6zAoESOPf.HzMcD60rOjxoVWnA66OH9QSByfXQuiql79VFpRpK', 'salah@gmail.com', '2023-12-10 20:26:37', 'superadmin'),
-('yessine', '$2y$10$S9K46zTXio80TovI/2CG9uixvlIIBZNobT4G22F3nTxAp1LXmTS5S', 'yessine@gmail.com', '2023-12-10 20:26:58', 'none');
+INSERT INTO `login_credentials` (`username`, `pass`, `email`, `timecreated`, `lastlogin`, `rank`) VALUES
+('pixel', '$2y$10$WycMX9tDWKT8e2D1NIXlYOWBiH1F58Knvh4APEmjIvIvawQR6xJNC', 'pixel@gmail.com', '2023-12-10 20:25:53', '2023-12-11 17:36:52', 'none'),
+('salah', '$2y$10$sxX6zAoESOPf.HzMcD60rOjxoVWnA66OH9QSByfXQuiql79VFpRpK', 'salah@gmail.com', '2023-12-10 20:26:37', '2023-12-11 17:42:14', 'superadmin'),
+('yessine', '$2y$10$S9K46zTXio80TovI/2CG9uixvlIIBZNobT4G22F3nTxAp1LXmTS5S', 'yessine@gmail.com', '2023-12-10 20:26:58', '2023-12-11 17:34:42', 'none');
 
 -- --------------------------------------------------------
 
@@ -142,6 +143,9 @@ INSERT INTO `ranks` (`rank`, `description`) VALUES
 
 CREATE TABLE `ticket` (
   `username` varchar(30) NOT NULL,
+  `status` varchar(6) NOT NULL,
+  `time_opened` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `time_closed` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   `ticket_content` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -220,7 +224,7 @@ ALTER TABLE `ranks`
 -- Indexes for table `ticket`
 --
 ALTER TABLE `ticket`
-  ADD PRIMARY KEY (`username`);
+  ADD PRIMARY KEY (`username`,`time_opened`);
 
 --
 -- Indexes for table `wire`
@@ -290,12 +294,6 @@ ALTER TABLE `forgot_password`
 --
 ALTER TABLE `login_credentials`
   ADD CONSTRAINT `login_credentials_ibfk_1` FOREIGN KEY (`rank`) REFERENCES `ranks` (`rank`);
-
---
--- Constraints for table `ticket`
---
-ALTER TABLE `ticket`
-  ADD CONSTRAINT `ticket_ibfk_1` FOREIGN KEY (`username`) REFERENCES `login_credentials` (`username`);
 
 --
 -- Constraints for table `wire`

@@ -9,7 +9,7 @@ if ($con->connect_error) {
 } else {
     session_start();
     $_SESSION['start'] = time(); 
-    $_SESSION['expire'] = $_SESSION['start'] + (5 * 60);
+    $_SESSION['expire'] = $_SESSION['start'] + (90 * 60);
     if (isset($_POST['login_submit'])) {
         $username = filter_input(INPUT_POST, 'username1', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         $password = filter_input(INPUT_POST, 'password1', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
