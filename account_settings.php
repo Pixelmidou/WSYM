@@ -1,0 +1,178 @@
+<?php
+require ("linking.php");
+if ($con->connect_error) {
+    die("Connection Failed" . $con->connect_error);
+} else {
+    session_start();
+    if (isset($_SESSION['verif_id'])) {
+        if (isset($_SESSION['user_username'])) {
+            $user_username = $_SESSION['user_username'];
+        }
+        $verif_id = $_SESSION['verif_id'];
+        if (isset($_POST['id_sub'])) {
+            $iduser = filter_input(INPUT_POST,"id_user",FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+            $idmail = filter_input(INPUT_POST,"id_mail",FILTER_SANITIZE_EMAIL);
+            $idpass = filter_input(INPUT_POST,"id_pass",FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+            $idquery = mysqli_query($con,"SELECT pass,email FROM login_credentials WHERE username = '$user_username'");
+            if (mysqli_num_rows($idquery) > 0) {
+                $idarray = mysqli_fetch_all($idquery, MYSQLI_ASSOC);
+                foreach ($idarray as $row) {
+                    $idpassdb = $row['pass'];
+                    $idmaildb = $row['email'];
+                }
+            }
+            if ($iduser === $user_username && $idmail === $idmaildb && password_verify($idpass,$idpassdb)) {
+                $verif_id = true;
+            } else {
+                echo "<script>alert('Error : Check the info provided !')</script>";
+            }
+        }
+    }
+    if (isset($_SESSION["setting"])) {
+        $setting = $_SESSION["setting"];
+    }
+}
+?>
+<?php if (isset($_SESSION['verif_id']) && $verif_id === false) { ?>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>WSYM Banking</title>
+        <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
+        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="./css/account_settings.css">
+        <link href="./bootstrap-5.0.2-dist/css/bootstrap.min.css" rel="stylesheet">
+    </head>
+    <body>
+        <div class="cont1">
+            <form method="post" class="cont2 d-flex flex-column justify-content-center align-items-center">
+                <h3 class="text-center mt-3 text-white">Login again to confirm your identity</h3>
+                <div class="mt-auto mb-auto d-flex flex-column justify-content-center align-items-center">
+                <label class="labbor lab">
+                    <img src="./data/user.svg" alt="">
+                    <input type="text" placeholder="Username" id="" name="id_user" required>
+                </label>
+                <label class="labbor lab">
+                    <img src="./data/mail.svg" alt="">
+                    <input type="email" placeholder="Email" id="" name="id_mail" required>
+                </label>
+                <label class="labbor lab">
+                    <img src="./data/key.svg" alt="">
+                    <input type="password" placeholder="Password" id="passw1" name="id_pass" required>
+                    <input type="checkbox" name="" id="passv1">
+                </label>
+                <span id="err" style="color: red;"></span>
+                </div>
+                <input type="submit" value="Login" class="but" name="id_sub" onclick="">
+            </form>
+        </div>
+        <script src="./bootstrap-5.0.2-dist/js/bootstrap.bundle.min.js"></script>
+        <script src="./js/acc.js"></script>
+    </body>
+    </html>
+<?php } else if (isset($_SESSION['verif_id']) && $verif_id === true) { ?>
+    <?php if (isset($_SESSION['setting']) && $setting === "user"): ?>
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>WSYM Banking</title>
+            <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
+            <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
+            <link rel="stylesheet" href="./css/account_settings.css">
+            <link href="./bootstrap-5.0.2-dist/css/bootstrap.min.css" rel="stylesheet">
+        </head>
+        <body>
+            <div class="cont1">
+                <form method="post" class="cont2 d-flex flex-column justify-content-center align-items-center">
+                    <h1>Change your username</h1>
+                    <div class="mt-auto mb-auto d-flex flex-column justify-content-center align-items-center">
+                    <label class="labbor lab">
+                        <img src="./data/user.svg" alt="">
+                        <input type="text" placeholder="New Username" id="" name="">
+                    </label>
+                    <label class="labbor lab">
+                        <img src="./data/repeat.svg" alt="">
+                        <input type="text" placeholder="Confirm Username" id="" name="">
+                    </label>
+                    </div>
+                    <input type="submit" value="Change your username" class="but" name="" onclick="">
+                </form>
+            </div>
+            <script src="./bootstrap-5.0.2-dist/js/bootstrap.bundle.min.js"></script>
+            <script src="./js/acc.js"></script>
+        </body>
+        </html>
+    <?php endif; ?>
+    <?php if (isset($_SESSION['setting']) && $setting === "mail"): ?>
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>WSYM Banking</title>
+            <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
+            <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
+            <link rel="stylesheet" href="./css/account_settings.css">
+            <link href="./bootstrap-5.0.2-dist/css/bootstrap.min.css" rel="stylesheet">
+        </head>
+        <body>
+            <div class="cont1">
+                <form method="post" class="cont2 d-flex flex-column justify-content-center align-items-center">
+                    <h1>Change your email</h1>
+                    <div class="mt-auto mb-auto d-flex flex-column justify-content-center align-items-center">
+                    <label class="labbor lab">
+                        <img src="./data/mail.svg" alt="">
+                        <input type="text" placeholder="New Email" id="" name="">
+                    </label>
+                    <label class="labbor lab">
+                        <img src="./data/repeat.svg" alt="">
+                        <input type="text" placeholder="Confirm Email" id="" name="">
+                    </label>
+                    </div>
+                    <input type="submit" value="Change your email" class="but" name="" onclick="">
+                </form>
+            </div>
+            <script src="./bootstrap-5.0.2-dist/js/bootstrap.bundle.min.js"></script>
+            <script src="./js/acc.js"></script>
+        </body>
+        </html>
+    <?php endif; ?>
+    <?php if (isset($_SESSION['setting']) && $setting === "pass"): ?>
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>WSYM Banking</title>
+            <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
+            <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
+            <link rel="stylesheet" href="./css/account_settings.css">
+            <link href="./bootstrap-5.0.2-dist/css/bootstrap.min.css" rel="stylesheet">
+        </head>
+        <body>
+            <div class="cont1">
+                <form method="post" class="cont2 d-flex flex-column justify-content-center align-items-center">
+                    <h1>Change your password</h1>
+                    <div class="mt-auto mb-auto d-flex flex-column justify-content-center align-items-center">
+                    <label class="labbor lab">
+                        <img src="./data/key.svg" alt="">
+                        <input type="text" placeholder="New Password" id="" name="">
+                    </label>
+                    <label class="labbor lab">
+                        <img src="./data/repeat.svg" alt="">
+                        <input type="text" placeholder="Confirm Password" id="" name="">
+                    </label>
+                    </div>
+                    <input type="submit" value="Change your password" class="but" name="" onclick="">
+                </form>
+            </div>
+            <script src="./bootstrap-5.0.2-dist/js/bootstrap.bundle.min.js"></script>
+            <script src="./js/acc.js"></script>
+        </body>
+        </html>
+    <?php endif; ?>
+<?php } ?>

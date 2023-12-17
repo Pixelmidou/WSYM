@@ -179,6 +179,18 @@ if ($con->connect_error) {
                 exit;
             }
         }
+        if (isset($_POST['sub_user'])) {
+            $_SESSION['setting'] = "user";
+            header("Location : account_settings.php");
+        }
+        if (isset($_POST['sub_mail'])) {
+            $_SESSION['setting'] = "mail";
+            header("Location : account_settings.php");
+        }
+        if (isset($_POST['sub_pass'])) {
+            $_SESSION['setting'] = "pass";
+            header("Location : account_settings.php");
+        }
         switch ($_SESSION) {
             case isset($_SESSION['dep']):
                 unset($_SESSION['deposit_verif']);
@@ -224,23 +236,32 @@ if ($con->connect_error) {
                 <li class="navitem" id="withdrawv">Withdraw Money</li>
                 <li class="navitem" id="wirev">Wire Money</li>
                 <li class="navitem" id="ticketv">Submit a Ticket</li>
-                <?php if (isset($_SESSION['admin_username'])): ?>
-                    <style>
-                        .x {
-                            text-decoration: none;
-                            color: black;
-                        }
-                    </style>
-                    <a href="admin_redirections.php" class="logoutbut x">Go Back to Redirections</a>
-                <?php endif; ?>
-                <form method="post"><input class="logoutbut" name="logout" type="submit" value="Log out" onclick="return logoutconfirm()" id="log"></form>
+                <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle dr" data-bs-toggle="dropdown" aria-expanded=""fail"">
+                    <img src="./data/favicon.ico" alt="pfp" width="32" height="32" class="rounded-circle me-2" id="output">
+                    <strong><?php echo "$user_username"; ?></strong>
+                </a>
+                <ul class="dropdown-menu text-small shadow">
+                    <?php if (isset($_SESSION['admin_username'])): ?>
+                        <li>
+                            <a href="admin_redirections.php" class="dropdown-item">Go Back to Redirections</a>
+                        </li>
+                    <?php endif; ?>
+                    <li><form method="post"><input class="dropdown-item" name="sub_user" type="submit" value="Change Your Username"></form></li>
+                    <li><form method="post"><input class="dropdown-item" name="sub_mail" type="submit" value="Change Your Email"></form></li>
+                    <li><form method="post"><input class="dropdown-item" name="sub_pass" type="submit" value="Change Your Password"></form></li>
+                    <li>
+                        <label for="file" class="dropdown-item">Upload Your Photo
+                            <input class="invisible" type="file" accept="image/*" name="image" id="file" onchange="loadFile(event)" value="Upload Your Photo" style="width: 0;">
+                        </label>
+                    </li>
+                    <li><form method="post"><input class="dropdown-item" name="logout" type="submit" value="Sign Out" onclick="return logoutconfirm()" id="log"></form></li>
+                </ul>
             </ul>
         </nav>
     </header>
     <main>
         <div class="container4 balance" id="balance">
             <h1>Welcome Back</h1>
-            <h2>You are logged in as <?php echo "$user_username"?></h2>
             <div class="push">Your Balance is : $<?php echo "$balance"?></div>
             <div style="font-size: 15px; text-align: center;"><?php echo "$dep_msg" ?></div>
             <div style="font-size: 15px; text-align: center;"><?php echo "$with_msg" ?></div>
@@ -310,6 +331,12 @@ if ($con->connect_error) {
     </main>
     <script src="./js/welcome.js"></script>
     <script src="./bootstrap-5.0.2-dist/js/bootstrap.bundle.min.js"></script>
+    <script type="text/javascript">
+        var loadFile = function(event) {
+          var image = document.getElementById('output');
+          image.src = URL.createObjectURL(event.target.files[0]);
+        };
+    </script>
 </body>
 </html>
 <?php endif; ?>

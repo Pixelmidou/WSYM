@@ -1206,13 +1206,15 @@ if ($con->connect_error) {
     <hr>
     <div class="dropdown">
       <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded=""fail"">
-        <img src="" alt="pfp" width="32" height="32" class="rounded-circle me-2" id="output">
+        <img src="./data/favicon.ico" alt="pfp" width="32" height="32" class="rounded-circle me-2" id="output">
         <strong><?php echo "$admin_username"; ?></strong>
       </a>
       <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
-        <li><label for="file" class="dropdown-item">Upload Your Photo
-          <input class="invisible" type="file" accept="image/*" name="image" id="file" onchange="loadFile(event)" value="Upload Your Photo" style="width: 0;">
-        </label></li>
+        <li>
+          <label for="file" class="dropdown-item">Upload Your Photo
+            <input class="invisible" type="file" accept="image/*" name="image" id="file" onchange="loadFile(event)" value="Upload Your Photo" style="width: 0;">
+          </label>
+        </li>
         <li><a href="admin_redirections.php" class="dropdown-item">Go Back to Redirections</a></li>
         <li><form method="post"><input class="dropdown-item" name="logout" type="submit" value="Sign Out"></form></li>
       </ul>

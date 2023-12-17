@@ -1,0 +1,88 @@
+body {
+  background: url(../data/background.jpg);
+}
+
+.cont1 {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.cont2 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #474646;
+  background-color: lightgray;
+  padding: 10px 100px 10px 100px;
+  width: 700px;
+  height: 418px;
+  border-top: 10px solid #87cefa;
+  border-bottom: 10px solid #87cefa;
+}
+
+.labbor img {
+  width: 20px;
+  height: 20px;
+}
+
+.labbor {
+  border-bottom: 1px solid #87cefa;
+  width: 300px;
+  height: 50px;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+
+.lab {
+  margin-bottom: 0;
+}
+
+input[type=text], .valbuts, input[type=email], input[type=number], input[type=password] {
+  background: none;
+  border: 0;
+  margin-left: 5px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  padding: 10px;
+  color: white;
+  font-size: medium;
+  width: 240px;
+}
+
+input[type=text]:focus, input[type=email]:focus, .valbuts:hover, input[type=number]:focus, input[type=password]:focus {
+  background: none;
+  border: 0;
+  caret-color: lightskyblue;
+  outline: 0;
+  color: lightskyblue;
+}
+
+.but {
+  width: calc(100% - 180px);
+  margin-bottom: 15px;
+  padding: 10px;
+  border-radius: 5px;
+  background-color: lightskyblue;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  color: white;
+  opacity: 0.7;
+}
+
+.but:hover {
+  opacity: 1;
+}
+
+::-moz-placeholder {
+  color: white;
+  font-size: medium;
+}
+
+::placeholder {
+  color: white;
+  font-size: medium;
+}/*# sourceMappingURL=account_settings.css.map */
