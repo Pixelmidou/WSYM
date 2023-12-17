@@ -210,6 +210,7 @@ if ($con->connect_error) {
     <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="./css/welcome_style.css">
     <link rel="stylesheet" href="./font-awesome-4.7.0/css/font-awesome.min.css">
+    <link href="./bootstrap-5.0.2-dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
     <header>
@@ -308,6 +309,7 @@ if ($con->connect_error) {
         </form>
     </main>
     <script src="./js/welcome.js"></script>
+    <script src="./bootstrap-5.0.2-dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
 <?php endif; ?>

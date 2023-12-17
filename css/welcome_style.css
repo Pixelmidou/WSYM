@@ -37,6 +37,8 @@ main {
   font-size: x-large;
   margin-left: auto;
   cursor: pointer;
+  margin-bottom: 0;
+  padding-left: 0;
 }
 
 .container2 {
@@ -46,6 +48,8 @@ main {
   align-items: center;
   cursor: pointer;
   transition: all 0.4s ease-in-out;
+  margin-bottom: 0;
+  padding-left: 0;
 }
 
 .container2:hover {
