@@ -180,16 +180,22 @@ if ($con->connect_error) {
             }
         }
         if (isset($_POST['sub_user'])) {
+            $_SESSION['verif_id'] = false;
             $_SESSION['setting'] = "user";
-            header("Location : account_settings.php");
+            header("Location: account_settings.php");
+            exit;
         }
         if (isset($_POST['sub_mail'])) {
+            $_SESSION['verif_id'] = false;
             $_SESSION['setting'] = "mail";
-            header("Location : account_settings.php");
+            header("Location: account_settings.php");
+            exit;
         }
         if (isset($_POST['sub_pass'])) {
+            $_SESSION['verif_id'] = false;
             $_SESSION['setting'] = "pass";
-            header("Location : account_settings.php");
+            header("Location: account_settings.php");
+            exit;
         }
         switch ($_SESSION) {
             case isset($_SESSION['dep']):

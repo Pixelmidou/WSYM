@@ -30,6 +30,57 @@ if ($con->connect_error) {
     }
     if (isset($_SESSION["setting"])) {
         $setting = $_SESSION["setting"];
+        if (isset($_SESSION["sub_uuser"])) {
+            $uuser = filter_input(INPUT_POST,"uuser",FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+            $cuuser = filter_input(INPUT_POST,"cuuser",FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+            if ($cuuser !== $uuser) {
+                echo "<script>alert('Error : Confirmation is wrong !')</script>";
+            } else if ($cuuser === $uuser && mysqli_query($con,"UPDATE login_credentials set username = '$cuuser' WHERE username = '$user_username'")) {
+                session_destroy(); ?>
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <meta http-equiv="refresh" content="4; url=index.html">
+                    <title>WSYM Banking</title>
+                    <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
+                    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
+                    <link rel="stylesheet" href="./css/redirections_style.css">
+                </head>
+                <body>
+                    <div class="container1">
+                        <div class="container2">
+                            <h1 style="text-align: center;">Session terminated : You need to login again !</h1>
+                            <div style="text-align: center; font-size: medium;">For security reasons , please login with your new username</div>
+                            <div style="text-align: center; font-size: small;">You will be automatically redirected back to the login page in 4 seconds.</div>
+                        </div>
+                    </div>
+                </body>
+                </html>
+            <?php } else { ?>
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <meta http-equiv="refresh" content="4; url=welcome.php">
+                    <title>WSYM Banking</title>
+                    <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
+                    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
+                    <link rel="stylesheet" href="./css/redirections_style.css">
+                </head>
+                <body>
+                    <div class="container1">
+                        <div class="container2">
+                            <h1 style="text-align: center;">Error 500 : Internal Server Error</h1>
+                            <div style="text-align: center; font-size: small;">You will be automatically redirected back to the welcome page in 4 seconds.</div>
+                        </div>
+                    </div>
+                </body>
+                </html>
+            <?php }
+        }
     }
 }
 ?>
@@ -92,14 +143,14 @@ if ($con->connect_error) {
                     <div class="mt-auto mb-auto d-flex flex-column justify-content-center align-items-center">
                     <label class="labbor lab">
                         <img src="./data/user.svg" alt="">
-                        <input type="text" placeholder="New Username" id="" name="">
+                        <input type="text" placeholder="New Username" id="" name="uuser">
                     </label>
                     <label class="labbor lab">
                         <img src="./data/repeat.svg" alt="">
-                        <input type="text" placeholder="Confirm Username" id="" name="">
+                        <input type="text" placeholder="Confirm Username" id="" name="cuuser">
                     </label>
                     </div>
-                    <input type="submit" value="Change your username" class="but" name="" onclick="">
+                    <input type="submit" value="Change your username" class="but" name="sub_uuser" onclick="">
                 </form>
             </div>
             <script src="./bootstrap-5.0.2-dist/js/bootstrap.bundle.min.js"></script>

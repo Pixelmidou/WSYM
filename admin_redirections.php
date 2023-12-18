@@ -6,7 +6,15 @@ if(empty($_SESSION['admin_username']) || $_SESSION['admin_username'] == ''){
     header("Location: index.html");
     exit;
 }
-$_SESSION['user_username'] = $admin_username;
+if (isset($_POST["adminpage"])) {
+    header("Location: welcome_admin.php");
+    exit;
+}
+if (isset($_POST["userpage"])) {
+    $_SESSION['user_username'] = $admin_username;
+    header("Location: welcome.php");
+    exit;
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -58,14 +66,10 @@ $_SESSION['user_username'] = $admin_username;
         <div class="container2">
             <h2 class="mt-auto">Admin Redirections</h2>
             <h4 class="mt-1 mb-auto">Welcome Back <?php echo $admin_username; ?> !</h4>
-            <div class="mb-auto d-flex gap-3">
-                <form method="post" action="welcome_admin.php">
-                    <input class="but" type="submit" name="adminpage" value="Your Admin Page">
-                </form>
-                <form method="post" action="welcome.php">
-                    <input class="but" type="submit" name="userpage" value="Your User Page">
-                </form>
-            </div>
+            <form method="post" class="mb-auto d-flex gap-3">
+                <input class="but" type="submit" name="adminpage" value="Your Admin Page">
+                <input class="but" type="submit" name="userpage" value="Your User Page">
+            </form>
         </div>
     </div>
     <script src="./bootstrap-5.0.2-dist/js/bootstrap.bundle.min.js"></script>
