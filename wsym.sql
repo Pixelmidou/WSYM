@@ -1,14 +1,13 @@
 -- phpMyAdmin SQL Dump
--- version 4.7.0
+-- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 17, 2023 at 05:45 PM
--- Server version: 5.7.17
--- PHP Version: 5.6.30
+-- Generation Time: Dec 18, 2023 at 08:25 PM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.0.30
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-SET AUTOCOMMIT = 0;
 START TRANSACTION;
 SET time_zone = "+00:00";
 
@@ -31,17 +30,17 @@ SET time_zone = "+00:00";
 CREATE TABLE `balance` (
   `username` varchar(30) NOT NULL,
   `email` varchar(100) NOT NULL,
-  `balance` decimal(6,1) DEFAULT '0.0'
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  `balance` decimal(6,1) DEFAULT 0.0
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
 -- Dumping data for table `balance`
 --
 
 INSERT INTO `balance` (`username`, `email`, `balance`) VALUES
-('pixel', 'pixel@gmail.com', '0.0'),
-('salah', 'salah@gmail.com', '0.0'),
-('yessine', 'yessine@gmail.com', '0.0');
+('pixel', 'pixel@gmail.com', 0.0),
+('salah', 'salah@gmail.com', 0.0),
+('yessine', 'yessine@gmail.com', 0.0);
 
 -- --------------------------------------------------------
 
@@ -51,12 +50,12 @@ INSERT INTO `balance` (`username`, `email`, `balance`) VALUES
 
 CREATE TABLE `blacklist` (
   `username` varchar(30) NOT NULL,
-  `account` tinyint(1) NOT NULL DEFAULT '1',
-  `deposit` tinyint(1) NOT NULL DEFAULT '1',
-  `withdraw` tinyint(1) NOT NULL DEFAULT '1',
-  `wire` tinyint(1) NOT NULL DEFAULT '1',
-  `ticket` tinyint(1) NOT NULL DEFAULT '1'
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  `account` tinyint(1) NOT NULL DEFAULT 1,
+  `deposit` tinyint(1) NOT NULL DEFAULT 1,
+  `withdraw` tinyint(1) NOT NULL DEFAULT 1,
+  `wire` tinyint(1) NOT NULL DEFAULT 1,
+  `ticket` tinyint(1) NOT NULL DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
 -- Dumping data for table `blacklist`
@@ -76,9 +75,9 @@ INSERT INTO `blacklist` (`username`, `account`, `deposit`, `withdraw`, `wire`, `
 CREATE TABLE `deposit` (
   `id` int(11) NOT NULL,
   `username` varchar(30) NOT NULL,
-  `deposit_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `deposit_date` timestamp NOT NULL DEFAULT current_timestamp(),
   `deposit_amount` decimal(6,2) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 -- --------------------------------------------------------
 
@@ -88,8 +87,8 @@ CREATE TABLE `deposit` (
 
 CREATE TABLE `forgot_password` (
   `email` varchar(100) NOT NULL,
-  `forgotpass` tinyint(1) DEFAULT '0'
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  `forgotpass` tinyint(1) DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 -- --------------------------------------------------------
 
@@ -101,17 +100,17 @@ CREATE TABLE `login_credentials` (
   `username` varchar(30) NOT NULL,
   `pass` varchar(255) NOT NULL,
   `email` varchar(100) NOT NULL,
-  `timecreated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `timecreated` timestamp NOT NULL DEFAULT current_timestamp(),
   `lastlogin` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   `rank` varchar(30) NOT NULL DEFAULT 'none'
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
 -- Dumping data for table `login_credentials`
 --
 
 INSERT INTO `login_credentials` (`username`, `pass`, `email`, `timecreated`, `lastlogin`, `rank`) VALUES
-('pixel', '$2y$10$WycMX9tDWKT8e2D1NIXlYOWBiH1F58Knvh4APEmjIvIvawQR6xJNC', 'pixel@gmail.com', '2023-12-10 20:25:53', '2023-12-11 17:36:52', 'none'),
+('pixel', '$2y$10$WycMX9tDWKT8e2D1NIXlYOWBiH1F58Knvh4APEmjIvIvawQR6xJNC', 'pixel@gmail.com', '2023-12-10 20:25:53', '2023-12-18 19:10:28', 'none'),
 ('salah', '$2y$10$sxX6zAoESOPf.HzMcD60rOjxoVWnA66OH9QSByfXQuiql79VFpRpK', 'salah@gmail.com', '2023-12-10 20:26:37', '2023-12-17 07:41:32', 'superadmin'),
 ('yessine', '$2y$10$S9K46zTXio80TovI/2CG9uixvlIIBZNobT4G22F3nTxAp1LXmTS5S', 'yessine@gmail.com', '2023-12-10 20:26:58', '2023-12-11 17:34:42', 'none');
 
@@ -123,8 +122,8 @@ INSERT INTO `login_credentials` (`username`, `pass`, `email`, `timecreated`, `la
 
 CREATE TABLE `ranks` (
   `rank` varchar(30) NOT NULL,
-  `description` text
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  `description` text DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
 -- Dumping data for table `ranks`
@@ -144,10 +143,10 @@ INSERT INTO `ranks` (`rank`, `description`) VALUES
 CREATE TABLE `ticket` (
   `username` varchar(30) NOT NULL,
   `status` varchar(6) NOT NULL,
-  `time_opened` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `time_opened` timestamp NOT NULL DEFAULT current_timestamp(),
   `time_closed` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   `ticket_content` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 -- --------------------------------------------------------
 
@@ -159,9 +158,9 @@ CREATE TABLE `wire` (
   `id` int(11) NOT NULL,
   `username` varchar(30) NOT NULL,
   `receiver` varchar(30) NOT NULL,
-  `wire_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `wire_date` timestamp NOT NULL DEFAULT current_timestamp(),
   `wire_amount` decimal(6,2) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 -- --------------------------------------------------------
 
@@ -172,9 +171,9 @@ CREATE TABLE `wire` (
 CREATE TABLE `withdraw` (
   `id` int(11) NOT NULL,
   `username` varchar(30) NOT NULL,
-  `withdraw_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `withdraw_date` timestamp NOT NULL DEFAULT current_timestamp(),
   `withdraw_amount` decimal(6,2) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
 -- Indexes for dumped tables
@@ -250,16 +249,19 @@ ALTER TABLE `withdraw`
 --
 ALTER TABLE `deposit`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
 --
 -- AUTO_INCREMENT for table `wire`
 --
 ALTER TABLE `wire`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
 --
 -- AUTO_INCREMENT for table `withdraw`
 --
 ALTER TABLE `withdraw`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
 --
 -- Constraints for dumped tables
 --
@@ -281,7 +283,7 @@ ALTER TABLE `blacklist`
 -- Constraints for table `deposit`
 --
 ALTER TABLE `deposit`
-  ADD CONSTRAINT `deposit_ibfk_1` FOREIGN KEY (`username`) REFERENCES `login_credentials` (`username`);
+  ADD CONSTRAINT `deposit_ibfk_1` FOREIGN KEY (`username`) REFERENCES `login_credentials` (`username`) ON UPDATE CASCADE;
 
 --
 -- Constraints for table `forgot_password`
@@ -299,14 +301,14 @@ ALTER TABLE `login_credentials`
 -- Constraints for table `wire`
 --
 ALTER TABLE `wire`
-  ADD CONSTRAINT `wire_ibfk_1` FOREIGN KEY (`username`) REFERENCES `login_credentials` (`username`),
-  ADD CONSTRAINT `wire_ibfk_2` FOREIGN KEY (`receiver`) REFERENCES `login_credentials` (`email`);
+  ADD CONSTRAINT `wire_ibfk_1` FOREIGN KEY (`username`) REFERENCES `login_credentials` (`username`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `wire_ibfk_2` FOREIGN KEY (`receiver`) REFERENCES `login_credentials` (`email`) ON UPDATE CASCADE;
 
 --
 -- Constraints for table `withdraw`
 --
 ALTER TABLE `withdraw`
-  ADD CONSTRAINT `withdraw_ibfk_1` FOREIGN KEY (`username`) REFERENCES `login_credentials` (`username`);
+  ADD CONSTRAINT `withdraw_ibfk_1` FOREIGN KEY (`username`) REFERENCES `login_credentials` (`username`) ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

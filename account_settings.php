@@ -4,12 +4,13 @@ if ($con->connect_error) {
     die("Connection Failed" . $con->connect_error);
 } else {
     session_start();
+    if (isset($_SESSION['user_username'])) {
+        $user_username = $_SESSION['user_username'];
+        echo "<script>var origuser = '$user_username'</script>";
+    }
     if (isset($_SESSION['verif_id'])) {
-        if (isset($_SESSION['user_username'])) {
-            $user_username = $_SESSION['user_username'];
-        }
         $verif_id = $_SESSION['verif_id'];
-        if (isset($_POST['id_sub'])) {
+        if (isset($_POST['id_sub']) && $verif_id === false) {
             $iduser = filter_input(INPUT_POST,"id_user",FILTER_SANITIZE_FULL_SPECIAL_CHARS);
             $idmail = filter_input(INPUT_POST,"id_mail",FILTER_SANITIZE_EMAIL);
             $idpass = filter_input(INPUT_POST,"id_pass",FILTER_SANITIZE_FULL_SPECIAL_CHARS);
@@ -23,6 +24,7 @@ if ($con->connect_error) {
             }
             if ($iduser === $user_username && $idmail === $idmaildb && password_verify($idpass,$idpassdb)) {
                 $verif_id = true;
+                $_SESSION['verif_id'] = true;
             } else {
                 echo "<script>alert('Error : Check the info provided !')</script>";
             }
@@ -30,12 +32,10 @@ if ($con->connect_error) {
     }
     if (isset($_SESSION["setting"])) {
         $setting = $_SESSION["setting"];
-        if (isset($_SESSION["sub_uuser"])) {
+        if (isset($_POST["sub_uuser"])) {
             $uuser = filter_input(INPUT_POST,"uuser",FILTER_SANITIZE_FULL_SPECIAL_CHARS);
             $cuuser = filter_input(INPUT_POST,"cuuser",FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-            if ($cuuser !== $uuser) {
-                echo "<script>alert('Error : Confirmation is wrong !')</script>";
-            } else if ($cuuser === $uuser && mysqli_query($con,"UPDATE login_credentials set username = '$cuuser' WHERE username = '$user_username'")) {
+            if ($cuuser === $uuser && mysqli_query($con,"UPDATE login_credentials set username = '$cuuser' WHERE username = '$user_username'")) {
                 session_destroy(); ?>
                 <!DOCTYPE html>
                 <html lang="en">
@@ -143,14 +143,14 @@ if ($con->connect_error) {
                     <div class="mt-auto mb-auto d-flex flex-column justify-content-center align-items-center">
                     <label class="labbor lab">
                         <img src="./data/user.svg" alt="">
-                        <input type="text" placeholder="New Username" id="" name="uuser">
+                        <input type="text" placeholder="New Username" id="uuser" name="uuser" required>
                     </label>
                     <label class="labbor lab">
                         <img src="./data/repeat.svg" alt="">
-                        <input type="text" placeholder="Confirm Username" id="" name="cuuser">
+                        <input type="text" placeholder="Confirm Username" id="cuuser" name="cuuser" required>
                     </label>
                     </div>
-                    <input type="submit" value="Change your username" class="but" name="sub_uuser" onclick="">
+                    <input type="submit" value="Change your username" class="but" name="sub_uuser" onclick="return confuser()">
                 </form>
             </div>
             <script src="./bootstrap-5.0.2-dist/js/bootstrap.bundle.min.js"></script>
