@@ -4,6 +4,13 @@ if ($con->connect_error) {
     die("Connection Failed" . $con->connect_error);
 } else {
     session_start();
+    if (!isset($_SESSION['setting']) && !isset($_SESSION['verif_id'])) {
+        if (empty($_SESSION['setting']) || $_SESSION['setting'] === "" && empty($_SESSION['verif_id']) || $_SESSION['verif_id'] === "") {
+            session_destroy();
+            header("Location: index.html");
+            exit;
+        } 
+    }
     if (isset($_SESSION['user_username'])) {
         $user_username = $_SESSION['user_username'];
         echo "<script>var origuser = '$user_username'</script>";
@@ -200,6 +207,7 @@ if ($con->connect_error) {
             }
         }
     }
+    $_SESSION['accset'] = "accset";
 }
 ?>
 <?php if (isset($_SESSION['verif_id']) && $verif_id === false) { ?>

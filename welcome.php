@@ -214,6 +214,11 @@ if ($con->connect_error) {
                 unset($_SESSION['ticket_verif']);
                 unset($_SESSION['tick']);
                 break;
+            case isset($_SESSION['accset']):
+                unset($_SESSION['verif_id']);
+                unset($_SESSION['setting']);
+                unset($_SESSION['accset']);
+                break;
         }
     }
 }
