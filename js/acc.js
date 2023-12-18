@@ -5,7 +5,9 @@ function func4(pass) {
       pass.type = "password";
     }
 }
-document.getElementById("passv1").addEventListener("click", function(){ func4(document.getElementById("passw1")); });
+
+document.getElementById("passv2").addEventListener("click", function(){ func4(document.getElementById("pass")); });
+document.getElementById("passv3").addEventListener("click", function(){ func4(document.getElementById("cpass")); });
 
 function confuser() {
   uuser = document.getElementById("uuser").value
@@ -30,7 +32,7 @@ function confmail() {
 function confpass() {
   pass = document.getElementById("pass").value
   cpass = document.getElementById("cpass").value
-  if (pass === "" || cpass === "" || cpass !== pass || origpass) {
+  if (pass === "" || cpass === "" || cpass !== pass) {
     alert("Check the provided Info !")
     return false
   } else {

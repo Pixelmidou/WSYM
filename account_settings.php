@@ -139,8 +139,8 @@ if ($con->connect_error) {
             <?php }
         }
         if (isset($_POST["sub_pass"])) { 
-            $pass = filter_input(INPUT_POST,"mail",FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-            $cpass = filter_input(INPUT_POST,"cmail",FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+            $pass = filter_input(INPUT_POST,"pass",FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+            $cpass = filter_input(INPUT_POST,"cpass",FILTER_SANITIZE_FULL_SPECIAL_CHARS);
             $origpass_query = mysqli_query($con,"SELECT pass FROM login_credentials WHERE username = '$user_username'");
             if (mysqli_num_rows($origpass_query) > 0) {
                 $origpass_array = mysqli_fetch_all($origpass_query, MYSQLI_ASSOC);
@@ -149,56 +149,55 @@ if ($con->connect_error) {
                 }
             }
             if (password_verify($cpass,$origpass)) {
-                echo "<script>var origpass = true</script>";
+                echo "<script>alert('Error : Check the info provided !')</script>";
             } else {
-                echo "<script>var origpass = false</script>";
+                $hpass = password_hash($cpass, PASSWORD_DEFAULT);
+                if ($cpass === $pass && mysqli_query($con,"UPDATE login_credentials set pass = '$hpass' WHERE pass = '$origpass'")) {
+                    session_destroy(); ?>
+                    <!DOCTYPE html>
+                    <html lang="en">
+                    <head>
+                        <meta charset="UTF-8">
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                        <meta http-equiv="refresh" content="4; url=index.html">
+                        <title>WSYM Banking</title>
+                        <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
+                        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
+                        <link rel="stylesheet" href="./css/redirections_style.css">
+                    </head>
+                    <body>
+                        <div class="container1">
+                            <div class="container2">
+                                <h1 style="text-align: center;">Session terminated : You need to login again !</h1>
+                                <div style="text-align: center; font-size: medium;">Password Changed : For security reasons , please login again with your new password</div>
+                                <div style="text-align: center; font-size: small;">You will be automatically redirected back to the login page in 4 seconds.</div>
+                            </div>
+                        </div>
+                    </body>
+                    </html>
+                <?php } else { ?>
+                    <!DOCTYPE html>
+                    <html lang="en">
+                    <head>
+                        <meta charset="UTF-8">
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                        <meta http-equiv="refresh" content="4; url=welcome.php">
+                        <title>WSYM Banking</title>
+                        <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
+                        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
+                        <link rel="stylesheet" href="./css/redirections_style.css">
+                    </head>
+                    <body>
+                        <div class="container1">
+                            <div class="container2">
+                                <h1 style="text-align: center;">Error 500 : Internal Server Error</h1>
+                                <div style="text-align: center; font-size: small;">You will be automatically redirected back to the welcome page in 4 seconds.</div>
+                            </div>
+                        </div>
+                    </body>
+                    </html>
+                <?php }
             }
-            $hpass = password_hash($cpass, PASSWORD_DEFAULT);
-            if (password_verify($cpass,$origpass) === false && $cpass === $pass && mysqli_query($con,"UPDATE login_credentials set pass = '$hpass' WHERE pass = '$origpass'")) {
-                session_destroy(); ?>
-                <!DOCTYPE html>
-                <html lang="en">
-                <head>
-                    <meta charset="UTF-8">
-                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <meta http-equiv="refresh" content="4; url=index.html">
-                    <title>WSYM Banking</title>
-                    <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
-                    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
-                    <link rel="stylesheet" href="./css/redirections_style.css">
-                </head>
-                <body>
-                    <div class="container1">
-                        <div class="container2">
-                            <h1 style="text-align: center;">Session terminated : You need to login again !</h1>
-                            <div style="text-align: center; font-size: medium;">Password Changed : For security reasons , please login again with your new password</div>
-                            <div style="text-align: center; font-size: small;">You will be automatically redirected back to the login page in 4 seconds.</div>
-                        </div>
-                    </div>
-                </body>
-                </html>
-            <?php } else { ?>
-                <!DOCTYPE html>
-                <html lang="en">
-                <head>
-                    <meta charset="UTF-8">
-                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <meta http-equiv="refresh" content="4; url=welcome.php">
-                    <title>WSYM Banking</title>
-                    <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
-                    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
-                    <link rel="stylesheet" href="./css/redirections_style.css">
-                </head>
-                <body>
-                    <div class="container1">
-                        <div class="container2">
-                            <h1 style="text-align: center;">Error 500 : Internal Server Error</h1>
-                            <div style="text-align: center; font-size: small;">You will be automatically redirected back to the welcome page in 4 seconds.</div>
-                        </div>
-                    </div>
-                </body>
-                </html>
-            <?php }
         }
     }
 }
@@ -240,6 +239,9 @@ if ($con->connect_error) {
         </div>
         <script src="./bootstrap-5.0.2-dist/js/bootstrap.bundle.min.js"></script>
         <script src="./js/acc.js"></script>
+        <script>
+            document.getElementById("passv1").addEventListener("click", function(){ func4(document.getElementById("passw1")); });
+        </script>
     </body>
     </html>
 <?php } else if (isset($_SESSION['verif_id']) && $verif_id === true) { ?>
@@ -330,11 +332,13 @@ if ($con->connect_error) {
                     <div class="mt-auto mb-auto d-flex flex-column justify-content-center align-items-center">
                     <label class="labbor lab">
                         <img src="./data/key.svg" alt="">
-                        <input type="text" placeholder="New Password" id="pass" name="pass">
+                        <input type="password" placeholder="New Password" id="pass" name="pass">
+                        <input type="checkbox" name="" id="passv2">
                     </label>
                     <label class="labbor lab">
                         <img src="./data/repeat.svg" alt="">
-                        <input type="text" placeholder="Confirm Password" id="cpass" name="cpass">
+                        <input type="password" placeholder="Confirm Password" id="cpass" name="cpass">
+                        <input type="checkbox" name="" id="passv3">
                     </label>
                     </div>
                     <input type="submit" value="Change your password" class="but" name="sub_pass" onclick="return confpass()">
