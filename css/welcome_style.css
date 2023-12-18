@@ -238,6 +238,10 @@ textarea {
   color: black !important;
 }
 
+.uyp {
+  cursor: pointer;
+}
+
 .deposit, .withdraw, .wire, .ticket {
   display: none;
 }/*# sourceMappingURL=welcome_style.css.map */

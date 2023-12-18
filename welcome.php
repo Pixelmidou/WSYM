@@ -256,7 +256,7 @@ if ($con->connect_error) {
                     <li><form method="post"><input class="dropdown-item" name="sub_mail" type="submit" value="Change Your Email"></form></li>
                     <li><form method="post"><input class="dropdown-item" name="sub_pass" type="submit" value="Change Your Password"></form></li>
                     <li>
-                        <label for="file" class="dropdown-item">Upload Your Photo
+                        <label for="file" class="dropdown-item uyp">Upload Your Photo
                             <input class="invisible" type="file" accept="image/*" name="image" id="file" onchange="loadFile(event)" value="Upload Your Photo" style="width: 0;">
                         </label>
                     </li>
