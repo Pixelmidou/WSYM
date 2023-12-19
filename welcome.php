@@ -252,19 +252,23 @@ if ($con->connect_error) {
                     <strong><?php echo "$user_username"; ?></strong>
                 </a>
                 <ul class="dropdown-menu text-small shadow">
-                    <?php if (isset($_SESSION['admin_username'])): ?>
-                        <li>
-                            <a href="admin_redirections.php" class="dropdown-item">Go Back to Redirections</a>
-                        </li>
-                    <?php endif; ?>
                     <li><form method="post"><input class="dropdown-item" name="sub_user" type="submit" value="Change Your Username"></form></li>
                     <li><form method="post"><input class="dropdown-item" name="sub_mail" type="submit" value="Change Your Email"></form></li>
                     <li><form method="post"><input class="dropdown-item" name="sub_pass" type="submit" value="Change Your Password"></form></li>
                     <li>
-                        <label for="file" class="dropdown-item uyp">Upload Your Photo
-                            <input class="invisible" type="file" accept="image/*" name="image" id="file" onchange="loadFile(event)" value="Upload Your Photo" style="width: 0;">
-                        </label>
+                        <form method="post" action="uploadimg.php" enctype="multipart/form-data" class="dropdown-item">
+                            <hr>
+                            <div>
+                                <div>Upload Your Photo :</div>
+                                <input type="file" accept="image/*" name="imgupload" required>
+                            </div>
+                            <div class="text-center"><input type="submit" value="Upload Image" name="imgsub"></div>
+                            <hr>
+                        </form>
                     </li>
+                    <?php if (isset($_SESSION['admin_username'])): ?>
+                        <li><a href="admin_redirections.php" class="dropdown-item">Go Back to Redirections</a></li>
+                    <?php endif; ?>
                     <li><form method="post"><input class="dropdown-item" name="logout" type="submit" value="Sign Out" onclick="return logoutconfirm()" id="log"></form></li>
                 </ul>
             </ul>
@@ -342,12 +346,6 @@ if ($con->connect_error) {
     </main>
     <script src="./js/welcome.js"></script>
     <script src="./bootstrap-5.0.2-dist/js/bootstrap.bundle.min.js"></script>
-    <script type="text/javascript">
-        var loadFile = function(event) {
-          var image = document.getElementById('output');
-          image.src = URL.createObjectURL(event.target.files[0]);
-        };
-    </script>
 </body>
 </html>
 <?php endif; ?>

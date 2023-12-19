@@ -1,6 +1,7 @@
 <?php
 session_start();
 $admin_username = $_SESSION['admin_username'];
+$_SESSION['user_username'] = $admin_username;
 if(empty($_SESSION['admin_username']) || $_SESSION['admin_username'] == ''){
     session_destroy();
     header("Location: index.html");
@@ -11,7 +12,6 @@ if (isset($_POST["adminpage"])) {
     exit;
 }
 if (isset($_POST["userpage"])) {
-    $_SESSION['user_username'] = $admin_username;
     header("Location: welcome.php");
     exit;
 }

@@ -33,3 +33,6 @@ function verifsub5() {
         return false
     }
 }
+function logoutconfirm() {
+    return confirm("Are you sure you want to logout ?")
+}

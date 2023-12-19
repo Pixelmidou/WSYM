@@ -973,6 +973,24 @@ if ($con->connect_error) {
         }
       }
     }
+    if (isset($_POST['sub_user'])) {
+      $_SESSION['verif_id'] = false;
+      $_SESSION['setting'] = "user";
+      header("Location: account_settings.php");
+      exit;
+    }
+    if (isset($_POST['sub_mail'])) {
+        $_SESSION['verif_id'] = false;
+        $_SESSION['setting'] = "mail";
+        header("Location: account_settings.php");
+        exit;
+    }
+    if (isset($_POST['sub_pass'])) {
+        $_SESSION['verif_id'] = false;
+        $_SESSION['setting'] = "pass";
+        header("Location: account_settings.php");
+        exit;
+    }
     switch ($_SESSION) {
       case isset($_SESSION["balsub"]):
           unset($_SESSION["verif_balance"]);
@@ -1010,6 +1028,11 @@ if ($con->connect_error) {
           unset($_SESSION["verif_acc_action"]);
           unset($_SESSION["accaccount"]);
           break;
+      case isset($_SESSION['accset']):
+            unset($_SESSION['verif_id']);
+            unset($_SESSION['setting']);
+            unset($_SESSION['accset']);
+            break;
     }
   }
 }
@@ -1209,14 +1232,23 @@ if ($con->connect_error) {
         <img src="./data/favicon.ico" alt="pfp" width="32" height="32" class="rounded-circle me-2" id="output">
         <strong><?php echo "$admin_username"; ?></strong>
       </a>
-      <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
+      <ul class="dropdown-menu text-small shadow">
+        <li><form method="post"><input class="dropdown-item" name="sub_user" type="submit" value="Change Your Username"></form></li>
+        <li><form method="post"><input class="dropdown-item" name="sub_mail" type="submit" value="Change Your Email"></form></li>
+        <li><form method="post"><input class="dropdown-item" name="sub_pass" type="submit" value="Change Your Password"></form></li>
         <li>
-          <label for="file" class="dropdown-item">Upload Your Photo
-            <input class="invisible" type="file" accept="image/*" name="image" id="file" onchange="loadFile(event)" value="Upload Your Photo" style="width: 0;">
-          </label>
+          <form method="post" action="uploadimg.php" enctype="multipart/form-data" class="dropdown-item">
+            <hr>
+            <div>
+              <div>Upload Your Photo :</div>
+              <input type="file" accept="image/*" name="imgupload" required>
+            </div>
+            <div class="text-center"><input type="submit" value="Upload Image" name="imgsub"></div>
+            <hr>
+          </form>
         </li>
         <li><a href="admin_redirections.php" class="dropdown-item">Go Back to Redirections</a></li>
-        <li><form method="post"><input class="dropdown-item" name="logout" type="submit" value="Sign Out"></form></li>
+        <li><form method="post"><input class="dropdown-item" name="logout" type="submit" value="Sign Out" onclick="return logoutconfirm()"></form></li>
       </ul>
     </div>
   </div>
@@ -1367,12 +1399,6 @@ if ($con->connect_error) {
     <script src="./bootstrap-5.0.2-dist/js/bootstrap.bundle.min.js"></script>
     <script src="./js/welcome_admin.js"></script>
     <script src="./js/sidebars.js"></script>
-    <script type="text/javascript">
-        var loadFile = function(event) {
-          var image = document.getElementById('output');
-          image.src = URL.createObjectURL(event.target.files[0]);
-        };
-    </script>
   </body>
 </html>
 <?php endif; ?>
