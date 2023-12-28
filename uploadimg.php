@@ -1,50 +1,102 @@
 <?php
 session_start();
 if (isset($_POST["imgsub"])) {
-    $target_dir = "./data/uploads/";
-    $target_file = $target_dir . basename($_FILES["imgupload"]["name"]);
-    $uploadOk = 1;
-    $imageFileType = strtolower(pathinfo($target_file,PATHINFO_EXTENSION));
-    $check = getimagesize($_FILES["imgupload"]["tmp_name"]);
-    if($check !== false) {
-      echo "File is an image - " . $check["mime"] . ".";
-      $uploadOk = 1;
-    } else {
-      echo "File is not an image.";
-      $uploadOk = 0;
-    }
-    // Check if file already exists
-    if (file_exists($target_file)) {
-        echo "Sorry, file already exists.";
-        $uploadOk = 0;
-    }
-    
-    // Check file size
-    if ($_FILES["imgupload"]["size"] > 500000) {
-        echo "Sorry, your file is too large.";
-        $uploadOk = 0;
-    }
-    
-    // Allow certain file formats
-    if($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg" && $imageFileType != "gif" ) {
-        echo "Sorry, only JPG, JPEG, PNG & GIF files are allowed.";
-        $uploadOk = 0;
-    }
-    
-    // Check if $uploadOk is set to 0 by an error
-    if ($uploadOk == 0) {
-        echo "Sorry, your file was not uploaded.";
-    // if everything is ok, try to upload file
-    } else {
-        if (move_uploaded_file($_FILES["imgupload"]["tmp_name"], $target_file)) {
-            echo "The file ". htmlspecialchars( basename( $_FILES["imgupload"]["name"])). " has been uploaded.";
-        } else {
-            echo "Sorry, there was an error uploading your file.";
+    if (!empty($_FILES['imgupload']['name'])) {
+        if (isset($_SESSION['user_username'])) {
+            $username = $_SESSION['user_username'];
         }
+        if (isset($_SESSION['admin_username'])) {
+            $username = $_SESSION['admin_username'];
+        }
+        $allowed_ext = ['png', 'jpg', 'jpeg', 'gif'];
+        $file_name = $_FILES['imgupload']['name'];
+        $file_size = $_FILES['imgupload']['size'];
+        $file_tmp = $_FILES['imgupload']['tmp_name'];
+        $target_dir = "./data/uploads/";
+        $file_ext = strtolower(pathinfo(basename($file_name),PATHINFO_EXTENSION));
+        $checkimagecontent = mime_content_type($file_tmp);
+        $cit_values = explode("/", $checkimagecontent);
+        if (in_array($file_ext, $allowed_ext) && $cit_values[0] === "image" && in_array($cit_values[1],$allowed_ext)) {
+            if ($file_size <= 1000000) {
+                switch ($file_ext) {
+                    case "png":
+                        if (file_exists($target_dir . $username . ".jpg")) {
+                            unlink($target_dir . $username . ".jpg");
+                        }
+                        if (file_exists($target_dir . $username . ".jpeg")) {
+                            unlink($target_dir . $username . ".jpeg");
+                        }
+                        if (file_exists($target_dir . $username . ".gif")) {
+                            unlink($target_dir . $username . ".gif");
+                        }
+                        if (move_uploaded_file($file_tmp, $target_dir . $username . ".png")) {
+                            echo '<p style="color: green;">File uploaded!</p>';
+                        } else {
+
+                        }
+                        break;
+                    case "jpg":
+                        if (file_exists($target_dir . $username . ".png")) {
+                            unlink($target_dir . $username . ".png");
+                        }
+                        if (file_exists($target_dir . $username . ".jpeg")) {
+                            unlink($target_dir . $username . ".jpeg");
+                        }
+                        if (file_exists($target_dir . $username . ".gif")) {
+                            unlink($target_dir . $username . ".gif");
+                        }
+                        if (move_uploaded_file($file_tmp, $target_dir . $username . ".jpg")) {
+                            echo '<p style="color: green;">File uploaded!</p>';
+                        } else {
+
+                        }
+                        break;
+                    case "jpeg":
+                        if (file_exists($target_dir . $username . ".jpg")) {
+                            unlink($target_dir . $username . ".jpg");
+                        }
+                        if (file_exists($target_dir . $username . ".png")) {
+                            unlink($target_dir . $username . ".png");
+                        }
+                        if (file_exists($target_dir . $username . ".gif")) {
+                            unlink($target_dir . $username . ".gif");
+                        }
+                        if (move_uploaded_file($file_tmp, $target_dir . $username . ".jpeg")) {
+                            echo '<p style="color: green;">File uploaded!</p>';
+                        } else {
+
+                        }
+                        break;
+                    case "gif":
+                        if (file_exists($target_dir . $username . ".jpg")) {
+                            unlink($target_dir . $username . ".jpg");
+                        }
+                        if (file_exists($target_dir . $username . ".jpeg")) {
+                            unlink($target_dir . $username . ".jpeg");
+                        }
+                        if (file_exists($target_dir . $username . ".png")) {
+                            unlink($target_dir . $username . ".png");
+                        }
+                        if (move_uploaded_file($file_tmp, $target_dir . $username . ".gif")) {
+                            echo '<p style="color: green;">File uploaded!</p>';
+                        } else {
+
+                        }
+                        break;
+                }
+            } else {
+                echo '<p style="color: red;">File too large!</p>';
+            }
+        } else {
+            echo '<p style="color: red;">Invalid file type!</p>';
+        }
+    } else {
+        echo '<p style="color: red;">Please choose a file</p>';
     }
 } else {
-    session_destroy();
-    header("Location: index.html");
+    // session_destroy();
+    // header("Location: index.html");
+    header("Location: welcome.php");
     exit;
 }
 ?>

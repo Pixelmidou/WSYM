@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 18, 2023 at 08:25 PM
+-- Generation Time: Dec 19, 2023 at 11:06 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -38,7 +38,7 @@ CREATE TABLE `balance` (
 --
 
 INSERT INTO `balance` (`username`, `email`, `balance`) VALUES
-('pixel', 'pixel@gmail.com', 0.0),
+('mohamed', 'mohamed@gmail.com', 0.0),
 ('salah', 'salah@gmail.com', 0.0),
 ('yessine', 'yessine@gmail.com', 0.0);
 
@@ -62,7 +62,7 @@ CREATE TABLE `blacklist` (
 --
 
 INSERT INTO `blacklist` (`username`, `account`, `deposit`, `withdraw`, `wire`, `ticket`) VALUES
-('pixel', 1, 1, 1, 1, 1),
+('mohamed', 1, 1, 1, 1, 1),
 ('salah', 1, 1, 1, 1, 1),
 ('yessine', 1, 1, 1, 1, 1);
 
@@ -110,8 +110,8 @@ CREATE TABLE `login_credentials` (
 --
 
 INSERT INTO `login_credentials` (`username`, `pass`, `email`, `timecreated`, `lastlogin`, `rank`) VALUES
-('pixel', '$2y$10$WycMX9tDWKT8e2D1NIXlYOWBiH1F58Knvh4APEmjIvIvawQR6xJNC', 'pixel@gmail.com', '2023-12-10 20:25:53', '2023-12-18 19:10:28', 'none'),
-('salah', '$2y$10$sxX6zAoESOPf.HzMcD60rOjxoVWnA66OH9QSByfXQuiql79VFpRpK', 'salah@gmail.com', '2023-12-10 20:26:37', '2023-12-17 07:41:32', 'superadmin'),
+('mohamed', '$2y$10$xMe95Dpu6xB4Tysdv/1wIur4Zmbe0LHSXYyGsmkW03obhlhFrj4Wa', 'mohamed@gmail.com', '2023-12-19 14:20:07', '2023-12-19 21:34:13', 'none'),
+('salah', '$2y$10$sxX6zAoESOPf.HzMcD60rOjxoVWnA66OH9QSByfXQuiql79VFpRpK', 'salah@gmail.com', '2023-12-10 20:26:37', '2023-12-19 21:34:43', 'superadmin'),
 ('yessine', '$2y$10$S9K46zTXio80TovI/2CG9uixvlIIBZNobT4G22F3nTxAp1LXmTS5S', 'yessine@gmail.com', '2023-12-10 20:26:58', '2023-12-11 17:34:42', 'none');
 
 -- --------------------------------------------------------
@@ -248,7 +248,7 @@ ALTER TABLE `withdraw`
 -- AUTO_INCREMENT for table `deposit`
 --
 ALTER TABLE `deposit`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `wire`
@@ -280,12 +280,6 @@ ALTER TABLE `blacklist`
   ADD CONSTRAINT `blacklist_ibfk_1` FOREIGN KEY (`username`) REFERENCES `login_credentials` (`username`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Constraints for table `deposit`
---
-ALTER TABLE `deposit`
-  ADD CONSTRAINT `deposit_ibfk_1` FOREIGN KEY (`username`) REFERENCES `login_credentials` (`username`) ON UPDATE CASCADE;
-
---
 -- Constraints for table `forgot_password`
 --
 ALTER TABLE `forgot_password`
@@ -296,19 +290,6 @@ ALTER TABLE `forgot_password`
 --
 ALTER TABLE `login_credentials`
   ADD CONSTRAINT `login_credentials_ibfk_1` FOREIGN KEY (`rank`) REFERENCES `ranks` (`rank`);
-
---
--- Constraints for table `wire`
---
-ALTER TABLE `wire`
-  ADD CONSTRAINT `wire_ibfk_1` FOREIGN KEY (`username`) REFERENCES `login_credentials` (`username`) ON UPDATE CASCADE,
-  ADD CONSTRAINT `wire_ibfk_2` FOREIGN KEY (`receiver`) REFERENCES `login_credentials` (`email`) ON UPDATE CASCADE;
-
---
--- Constraints for table `withdraw`
---
-ALTER TABLE `withdraw`
-  ADD CONSTRAINT `withdraw_ibfk_1` FOREIGN KEY (`username`) REFERENCES `login_credentials` (`username`) ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
