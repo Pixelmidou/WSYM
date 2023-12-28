@@ -1248,8 +1248,7 @@ if ($con->connect_error) {
             <hr>
             <div>
               <div class="mb-2">Upload Your Photo :</div>
-              <input type="hidden" name="MAX_FILE_SIZE" value="1000000"/>
-              <input type="file" accept="image/*" name="imgupload" required>
+              <input type="file" accept="image/png, image/jpeg, image/jpg, image/gif" name="imgupload" required>
             </div>
             <div class="d-flex gap-2 mt-2 align-items-center justify-content-center">
               <input type="submit" value="Upload Image" name="imgsub">
