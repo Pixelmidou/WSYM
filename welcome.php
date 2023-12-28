@@ -41,6 +41,13 @@ if ($con->connect_error) {
     <?php } else {
         $page_load = true;
         $user_username = $_SESSION['user_username'];
+        $pfp_query = mysqli_query($con,"SELECT pfp FROM login_credentials WHERE username = '$user_username'");
+        if (mysqli_num_rows($pfp_query) > 0) {
+            $pfp_array = mysqli_fetch_all($pfp_query, MYSQLI_ASSOC);
+            foreach ($pfp_array as $row) {
+                $pfp = $row["pfp"];
+            }
+        }
         $balance_query = mysqli_query($con,"SELECT balance FROM balance WHERE username = '$user_username'");
         if (mysqli_num_rows($balance_query) > 0) {
             $balance_array = mysqli_fetch_all($balance_query, MYSQLI_ASSOC);
@@ -248,7 +255,7 @@ if ($con->connect_error) {
                 <li class="navitem" id="wirev">Wire Money</li>
                 <li class="navitem" id="ticketv">Submit a Ticket</li>
                 <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle dr" data-bs-toggle="dropdown" aria-expanded=""fail"">
-                    <img src="./data/favicon.ico" alt="pfp" width="32" height="32" class="rounded-circle me-2" id="output">
+                    <img src="./data/uploads/<?php echo $pfp ?>" alt="pfp" width="32" height="32" class="rounded-circle me-2" id="output">
                     <strong><?php echo "$user_username"; ?></strong>
                 </a>
                 <ul class="dropdown-menu text-small shadow">
@@ -259,11 +266,14 @@ if ($con->connect_error) {
                         <form method="post" action="uploadimg.php" enctype="multipart/form-data" class="dropdown-item">
                             <hr>
                             <div>
-                                <div>Upload Your Photo :</div>
+                                <div class="mb-2">Upload Your Photo :</div>
                                 <input type="hidden" name="MAX_FILE_SIZE" value="1000000"/>
                                 <input type="file" accept="image/*" name="imgupload" required>
                             </div>
-                            <div class="text-center"><input type="submit" value="Upload Image" name="imgsub"></div>
+                            <div class="d-flex gap-2 mt-2 align-items-center justify-content-center">
+                                <input type="submit" value="Upload Image" name="imgsub">
+                                <input type="submit" value="Delete Image" name="imgdel" formnovalidate>
+                            </div>
                             <hr>
                         </form>
                     </li>
