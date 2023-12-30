@@ -1304,12 +1304,7 @@ if ($con->connect_error) {
             <img src="./data/user.svg" alt="">
             <input type="text" placeholder="Username" id="user2" name="transusername">
           </label>
-          <!-- <label class="labbor lab">
-            <img src="./data/stop.svg" alt="">
-            <input type="number" placeholder="Nb of records per page" min="1" max="6" required  name="translimit">
-          </label> -->
         </div>
-        <!-- <div class="mb-3 mt-3">P.S. You are limited to only to see the 13 records per page</div> -->
         <div class="d-flex gap-4 mt-2 mb-3">
             <input type="submit" class="but text-center t-but" id="but" value="Deposit Search" name="deposit_transactions_submit" onclick="return verifsub2()">
             <input type="submit" class="but text-center t-but" id="but" value="Withdraw Search" name="withdraw_transactions_submit" onclick="return verifsub2()">
