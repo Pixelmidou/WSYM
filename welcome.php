@@ -265,14 +265,16 @@ if ($con->connect_error) {
                     <li>
                         <form method="post" action="uploadimg.php" enctype="multipart/form-data" class="dropdown-item">
                             <hr>
-                            <div>
-                                <div class="mb-2">Upload Your Photo :</div>
-                                <input type="file" accept="image/png, image/jpeg, image/jpg, image/gif" name="imgupload" required>
-                            </div>
-                            <div class="d-flex gap-2 mt-2 align-items-center justify-content-center">
-                                <input type="submit" value="Upload Image" name="imgsub">
-                                <input type="submit" value="Delete Image" name="imgdel" formnovalidate>
-                            </div>
+                            <label for="lb" class="wh">
+                                <div>
+                                    <div class="mb-2">Upload Your Photo :</div>
+                                    <input id="lb" type="file" accept="image/png, image/jpeg, image/jpg, image/gif" name="imgupload" required>
+                                </div>
+                                <div class="d-flex gap-2 mt-2 align-items-center justify-content-center">
+                                    <input type="submit" value="Upload Image" name="imgsub">
+                                    <input type="submit" value="Delete Image" name="imgdel" formnovalidate>
+                                </div>
+                            </label>
                             <hr>
                         </form>
                     </li>

@@ -101,4 +101,8 @@ input[type=text]:focus, input[type=email]:focus, .valbuts:hover, input[type=numb
 .t-but {
   padding-left: 30px;
   padding-right: 30px;
+}
+
+.wh, #lb {
+  cursor: pointer;
 }/*# sourceMappingURL=welcome_admin.css.map */

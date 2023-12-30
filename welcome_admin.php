@@ -145,11 +145,10 @@ if ($con->connect_error) {
     if (isset($_POST['deposit_transactions_submit'])) { 
       $transemail = filter_input(INPUT_POST, 'transemail', FILTER_SANITIZE_EMAIL);
       $transusername = filter_input(INPUT_POST, 'transusername', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-      $translimit = filter_input(INPUT_POST, 'translimit', FILTER_SANITIZE_NUMBER_FLOAT);
-      $_SESSION['translimit'] = $translimit;
+
       if (!empty($transusername) && empty($transemail)) {
         $_SESSION['transusername'] = $transusername;
-        $deposit_query = mysqli_query($con,"SELECT username,deposit_date,deposit_amount FROM deposit WHERE username LIKE '%$transusername%' LIMIT $translimit");
+        $deposit_query = mysqli_query($con,"SELECT username,deposit_date,deposit_amount FROM deposit WHERE username LIKE '%$transusername%'");
         if (mysqli_num_rows($deposit_query)) {
           $_SESSION['verif_deposit'] = "success";
           $_SESSION['verif_deposit_case'] = "1";
@@ -162,7 +161,7 @@ if ($con->connect_error) {
         }
         } else if (!empty($transemail) && empty($transusername)) {
           $_SESSION['transemail'] = $transemail;
-          $deposit_query = mysqli_query($con,"SELECT deposit.username,email,deposit_date,deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') LIMIT $translimit");
+          $deposit_query = mysqli_query($con,"SELECT deposit.username,email,deposit_date,deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%')");
           if (mysqli_num_rows($deposit_query)) {
             $_SESSION['verif_deposit'] = "success";
             $_SESSION['verif_deposit_case'] = "2";
@@ -176,7 +175,7 @@ if ($con->connect_error) {
         } else if (!empty($transemail) && !empty($transusername)) {
           $_SESSION['transusername'] = $transusername;
           $_SESSION['transemail'] = $transemail;
-          $deposit_query = mysqli_query($con,"SELECT deposit.username,email,deposit_date,deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit.username LIKE '%$transusername%' LIMIT $translimit");
+          $deposit_query = mysqli_query($con,"SELECT deposit.username,email,deposit_date,deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit.username LIKE '%$transusername%'");
           if (mysqli_num_rows($deposit_query)) {
             $_SESSION['verif_deposit'] = "success";
             $_SESSION['verif_deposit_case'] = "3";
@@ -192,11 +191,10 @@ if ($con->connect_error) {
     if (isset($_POST['withdraw_transactions_submit'])) { 
       $transemail = filter_input(INPUT_POST, 'transemail', FILTER_SANITIZE_EMAIL);
       $transusername = filter_input(INPUT_POST, 'transusername', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-      $translimit = filter_input(INPUT_POST, 'translimit', FILTER_SANITIZE_NUMBER_FLOAT);
-      $_SESSION['translimit'] = $translimit;
+
       if (!empty($transusername) && empty($transemail)) {
         $_SESSION['transusername'] = $transusername;
-        $withdraw_query = mysqli_query($con,"SELECT username,withdraw_date,withdraw_amount FROM withdraw WHERE username LIKE '%$transusername%' LIMIT $translimit");
+        $withdraw_query = mysqli_query($con,"SELECT username,withdraw_date,withdraw_amount FROM withdraw WHERE username LIKE '%$transusername%'");
         if (mysqli_num_rows($withdraw_query)) {
           $_SESSION['verif_withdraw'] = "success";
           $_SESSION['verif_withdraw_case'] = "1";
@@ -209,7 +207,7 @@ if ($con->connect_error) {
         }
         } else if (!empty($transemail) && empty($transusername)) {
           $_SESSION['transemail'] = $transemail;
-          $withdraw_query = mysqli_query($con,"SELECT withdraw.username,email,withdraw_date,withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') LIMIT $translimit");
+          $withdraw_query = mysqli_query($con,"SELECT withdraw.username,email,withdraw_date,withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%')");
           if (mysqli_num_rows($withdraw_query)) {
             $_SESSION['verif_withdraw'] = "success";
             $_SESSION['verif_withdraw_case'] = "2";
@@ -223,7 +221,7 @@ if ($con->connect_error) {
         } else if (!empty($transemail) && !empty($transusername)) {
           $_SESSION['transusername'] = $transusername;
           $_SESSION['transemail'] = $transemail;
-          $withdraw_query = mysqli_query($con,"SELECT withdraw.username,email,withdraw_date,withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw.username LIKE '%$transusername%' LIMIT $translimit");
+          $withdraw_query = mysqli_query($con,"SELECT withdraw.username,email,withdraw_date,withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw.username LIKE '%$transusername%'");
           if (mysqli_num_rows($withdraw_query)) {
             $_SESSION['verif_withdraw'] = "success";
             $_SESSION['verif_withdraw_case'] = "3";
@@ -239,11 +237,10 @@ if ($con->connect_error) {
     if (isset($_POST['wire_transactions_submit'])) { 
       $transemail = filter_input(INPUT_POST, 'transemail', FILTER_SANITIZE_EMAIL);
       $transusername = filter_input(INPUT_POST, 'transusername', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-      $translimit = filter_input(INPUT_POST, 'translimit', FILTER_SANITIZE_NUMBER_FLOAT);
-      $_SESSION['translimit'] = $translimit;
+
       if (!empty($transusername) && empty($transemail)) {
         $_SESSION['transusername'] = $transusername;
-        $wire_query = mysqli_query($con,"SELECT username,wire_date,wire_amount FROM wire WHERE username LIKE '%$transusername%' LIMIT $translimit");
+        $wire_query = mysqli_query($con,"SELECT username,wire_date,wire_amount FROM wire WHERE username LIKE '%$transusername%'");
         if (mysqli_num_rows($wire_query)) {
           $_SESSION['verif_wire'] = "success";
           $_SESSION['verif_wire_case'] = "1";
@@ -256,7 +253,7 @@ if ($con->connect_error) {
         }
         } else if (!empty($transemail) && empty($transusername)) {
           $_SESSION['transemail'] = $transemail;
-          $wire_query = mysqli_query($con,"SELECT wire.username,email,wire_date,wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') LIMIT $translimit");
+          $wire_query = mysqli_query($con,"SELECT wire.username,email,wire_date,wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%')");
           if (mysqli_num_rows($wire_query)) {
             $_SESSION['verif_wire'] = "success";
             $_SESSION['verif_wire_case'] = "2";
@@ -270,7 +267,7 @@ if ($con->connect_error) {
         } else if (!empty($transemail) && !empty($transusername)) {
           $_SESSION['transusername'] = $transusername;
           $_SESSION['transemail'] = $transemail;
-          $wire_query = mysqli_query($con,"SELECT wire.username,email,wire_date,wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' LIMIT $translimit");
+          $wire_query = mysqli_query($con,"SELECT wire.username,email,wire_date,wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%'");
           if (mysqli_num_rows($wire_query)) {
             $_SESSION['verif_wire'] = "success";
             $_SESSION['verif_wire_case'] = "3";
@@ -1246,14 +1243,16 @@ if ($con->connect_error) {
         <li>
           <form method="post" action="uploadimg.php" enctype="multipart/form-data" class="dropdown-item">
             <hr>
-            <div>
-              <div class="mb-2">Upload Your Photo :</div>
-              <input type="file" accept="image/png, image/jpeg, image/jpg, image/gif" name="imgupload" required>
-            </div>
-            <div class="d-flex gap-2 mt-2 align-items-center justify-content-center">
-              <input type="submit" value="Upload Image" name="imgsub">
-              <input type="submit" value="Delete Image" name="imgdel" formnovalidate>
-            </div>
+            <label for="lb" class="wh">
+              <div>
+                <div class="mb-2">Upload Your Photo :</div>
+                <input id="lb" type="file" accept="image/png, image/jpeg, image/jpg, image/gif" name="imgupload" required>
+              </div>
+              <div class="d-flex gap-2 mt-2 align-items-center justify-content-center">
+                <input type="submit" value="Upload Image" name="imgsub">
+                <input type="submit" value="Delete Image" name="imgdel" formnovalidate>
+              </div>
+            </label>
             <hr>
           </form>
         </li>
@@ -1305,12 +1304,12 @@ if ($con->connect_error) {
             <img src="./data/user.svg" alt="">
             <input type="text" placeholder="Username" id="user2" name="transusername">
           </label>
-          <label class="labbor lab">
+          <!-- <label class="labbor lab">
             <img src="./data/stop.svg" alt="">
-            <input type="number" placeholder="Nb of records" min="1" max="20" required  name="translimit">
-          </label>
+            <input type="number" placeholder="Nb of records per page" min="1" max="6" required  name="translimit">
+          </label> -->
         </div>
-        <div class="mb-3 mt-3">P.S. You are limited to only to see the 20 recent records</div>
+        <!-- <div class="mb-3 mt-3">P.S. You are limited to only to see the 13 records per page</div> -->
         <div class="d-flex gap-4 mt-2 mb-3">
             <input type="submit" class="but text-center t-but" id="but" value="Deposit Search" name="deposit_transactions_submit" onclick="return verifsub2()">
             <input type="submit" class="but text-center t-but" id="but" value="Withdraw Search" name="withdraw_transactions_submit" onclick="return verifsub2()">

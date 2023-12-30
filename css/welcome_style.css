@@ -244,4 +244,8 @@ textarea {
 
 .deposit, .withdraw, .wire, .ticket {
   display: none;
+}
+
+.wh, #lb {
+  cursor: pointer;
 }/*# sourceMappingURL=welcome_style.css.map */
