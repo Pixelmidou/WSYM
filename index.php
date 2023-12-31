@@ -12,7 +12,7 @@
     <div class="container1" id="loginpage">
         <form action="login.php" method="post">
             <h2 class="ti">Log in</h2>
-            <h2 class="qu">Welcome to <a href="./about_us.html" class="abt">"We Steal Your Money"</a> Banking System</h2>
+            <h2 class="qu">Welcome to <a href="./about_us.php" class="abt">"We Steal Your Money"</a> Banking System</h2>
             <div class="push2">
                 <div class="container2">
                     <label class="labbor">

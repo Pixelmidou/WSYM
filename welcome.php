@@ -6,12 +6,12 @@ if ($con->connect_error) {
     session_start();
     if(empty($_SESSION['user_username']) || $_SESSION['user_username'] == ''){
         session_destroy();
-        header("Location: index.html");
+        header("Location: index.php");
         die();
     }
     if (isset($_POST['logout'])) {
         session_destroy();
-        header("Location: index.html");
+        header("Location: index.php");
         exit;
     }
     $now = time();
@@ -22,7 +22,7 @@ if ($con->connect_error) {
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <meta http-equiv="refresh" content="4; url=index.html">
+            <meta http-equiv="refresh" content="4; url=index.php">
             <title>WSYM Banking</title>
             <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
             <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">

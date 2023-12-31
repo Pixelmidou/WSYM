@@ -1,7 +1,7 @@
 <?php
 if ( $_SERVER['REQUEST_METHOD']=='GET' && realpath(__FILE__) == realpath( $_SERVER['SCRIPT_FILENAME'] ) ) {        
     header( 'HTTP/1.0 403 Forbidden', TRUE, 403 );
-    die( header( 'location: index.html' ) );
+    die( header( 'location: index.php' ) );
 }
 require ("linking.php");
 if ($con->connect_error) {
@@ -15,7 +15,7 @@ if ($con->connect_error) {
             <head>
                 <meta charset="UTF-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <meta http-equiv="refresh" content="4; url=index.html">
+                <meta http-equiv="refresh" content="4; url=index.php">
                 <title>WSYM Banking</title>
                 <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
                 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
@@ -39,7 +39,7 @@ if ($con->connect_error) {
                 <head>
                     <meta charset="UTF-8">
                     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <meta http-equiv="refresh" content="4; url=index.html">
+                    <meta http-equiv="refresh" content="4; url=index.php">
                     <title>WSYM Banking</title>
                     <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
                     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
@@ -60,7 +60,7 @@ if ($con->connect_error) {
                 <head>
                     <meta charset="UTF-8">
                     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <meta http-equiv="refresh" content="4; url=index.html">
+                    <meta http-equiv="refresh" content="4; url=index.php">
                     <title>WSYM Banking</title>
                     <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
                     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">

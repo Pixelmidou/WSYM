@@ -6,12 +6,12 @@ if ($con->connect_error) {
   session_start();
   if(empty($_SESSION['admin_username']) || $_SESSION['admin_username'] == ''){
       session_destroy();
-      header("Location: index.html");
+      header("Location: index.php");
       exit;
   }
   if (isset($_POST['logout'])) {
       session_destroy();
-      header("Location: index.html");
+      header("Location: index.php");
       exit;
   }
   $now = time();
@@ -22,7 +22,7 @@ if ($con->connect_error) {
       <head>
           <meta charset="UTF-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <meta http-equiv="refresh" content="4; url=index.html">
+          <meta http-equiv="refresh" content="4; url=index.php">
           <title>WSYM Banking</title>
           <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
           <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
@@ -42,7 +42,7 @@ if ($con->connect_error) {
     $page_load = true;
     $admin_username = $_SESSION['admin_username'];
     if(empty($_SESSION['admin_username']) || $_SESSION['admin_username'] == ''){
-      header("Location: index.html");
+      header("Location: index.php");
       exit;
     }
     $pfp_query = mysqli_query($con,"SELECT pfp FROM login_credentials WHERE username = '$admin_username'");
@@ -103,7 +103,7 @@ if ($con->connect_error) {
       if (!empty($balanceemail) && empty($balanceusername)) {
         $_SESSION['balanceemail'] = $balanceemail;
         $balance_query = mysqli_query($con,"SELECT * FROM balance WHERE email LIKE '%$balanceemail%'");
-        if (mysqli_num_rows($balance_query)) {
+        if (mysqli_num_rows($balance_query) > 0) {
           $_SESSION['verif_balance'] = "success";
           $_SESSION['verif_balance_case'] = "1";
           header("Location: welcome_admin_forms.php");
@@ -116,7 +116,7 @@ if ($con->connect_error) {
       } else if (!empty($balanceusername) && empty($balanceemail)) {
         $_SESSION['balanceusername'] = $balanceusername;
         $balance_query = mysqli_query($con,"SELECT * FROM balance WHERE username LIKE '%$balanceusername%'");
-        if (mysqli_num_rows($balance_query)) {
+        if (mysqli_num_rows($balance_query) > 0) {
           $_SESSION['verif_balance'] = "success";
           $_SESSION['verif_balance_case'] = "2";
           header("Location: welcome_admin_forms.php");
@@ -130,7 +130,7 @@ if ($con->connect_error) {
         $_SESSION['balanceemail'] = $balanceemail;
         $_SESSION['balanceusername'] = $balanceusername;
         $balance_query = mysqli_query($con,"SELECT * FROM balance WHERE username LIKE '%$balanceusername%' AND email LIKE '%$balanceemail%'");
-        if (mysqli_num_rows($balance_query)) {
+        if (mysqli_num_rows($balance_query) > 0) {
           $_SESSION['verif_balance'] = "success";
           $_SESSION['verif_balance_case'] = "3";
           header("Location: welcome_admin_forms.php");
@@ -149,7 +149,7 @@ if ($con->connect_error) {
       if (!empty($transusername) && empty($transemail)) {
         $_SESSION['transusername'] = $transusername;
         $deposit_query = mysqli_query($con,"SELECT username,deposit_date,deposit_amount FROM deposit WHERE username LIKE '%$transusername%'");
-        if (mysqli_num_rows($deposit_query)) {
+        if (mysqli_num_rows($deposit_query) > 0) {
           $_SESSION['verif_deposit'] = "success";
           $_SESSION['verif_deposit_case'] = "1";
           header("Location: welcome_admin_forms.php");
@@ -162,7 +162,7 @@ if ($con->connect_error) {
         } else if (!empty($transemail) && empty($transusername)) {
           $_SESSION['transemail'] = $transemail;
           $deposit_query = mysqli_query($con,"SELECT deposit.username,email,deposit_date,deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%')");
-          if (mysqli_num_rows($deposit_query)) {
+          if (mysqli_num_rows($deposit_query) > 0) {
             $_SESSION['verif_deposit'] = "success";
             $_SESSION['verif_deposit_case'] = "2";
             header("Location: welcome_admin_forms.php");
@@ -176,7 +176,7 @@ if ($con->connect_error) {
           $_SESSION['transusername'] = $transusername;
           $_SESSION['transemail'] = $transemail;
           $deposit_query = mysqli_query($con,"SELECT deposit.username,email,deposit_date,deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit.username LIKE '%$transusername%'");
-          if (mysqli_num_rows($deposit_query)) {
+          if (mysqli_num_rows($deposit_query) > 0) {
             $_SESSION['verif_deposit'] = "success";
             $_SESSION['verif_deposit_case'] = "3";
             header("Location: welcome_admin_forms.php");
@@ -195,7 +195,7 @@ if ($con->connect_error) {
       if (!empty($transusername) && empty($transemail)) {
         $_SESSION['transusername'] = $transusername;
         $withdraw_query = mysqli_query($con,"SELECT username,withdraw_date,withdraw_amount FROM withdraw WHERE username LIKE '%$transusername%'");
-        if (mysqli_num_rows($withdraw_query)) {
+        if (mysqli_num_rows($withdraw_query) > 0) {
           $_SESSION['verif_withdraw'] = "success";
           $_SESSION['verif_withdraw_case'] = "1";
           header("Location: welcome_admin_forms.php");
@@ -208,7 +208,7 @@ if ($con->connect_error) {
         } else if (!empty($transemail) && empty($transusername)) {
           $_SESSION['transemail'] = $transemail;
           $withdraw_query = mysqli_query($con,"SELECT withdraw.username,email,withdraw_date,withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%')");
-          if (mysqli_num_rows($withdraw_query)) {
+          if (mysqli_num_rows($withdraw_query) > 0) {
             $_SESSION['verif_withdraw'] = "success";
             $_SESSION['verif_withdraw_case'] = "2";
             header("Location: welcome_admin_forms.php");
@@ -222,7 +222,7 @@ if ($con->connect_error) {
           $_SESSION['transusername'] = $transusername;
           $_SESSION['transemail'] = $transemail;
           $withdraw_query = mysqli_query($con,"SELECT withdraw.username,email,withdraw_date,withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw.username LIKE '%$transusername%'");
-          if (mysqli_num_rows($withdraw_query)) {
+          if (mysqli_num_rows($withdraw_query) > 0) {
             $_SESSION['verif_withdraw'] = "success";
             $_SESSION['verif_withdraw_case'] = "3";
             header("Location: welcome_admin_forms.php");
@@ -241,7 +241,7 @@ if ($con->connect_error) {
       if (!empty($transusername) && empty($transemail)) {
         $_SESSION['transusername'] = $transusername;
         $wire_query = mysqli_query($con,"SELECT username,wire_date,wire_amount FROM wire WHERE username LIKE '%$transusername%'");
-        if (mysqli_num_rows($wire_query)) {
+        if (mysqli_num_rows($wire_query) > 0) {
           $_SESSION['verif_wire'] = "success";
           $_SESSION['verif_wire_case'] = "1";
           header("Location: welcome_admin_forms.php");
@@ -254,7 +254,7 @@ if ($con->connect_error) {
         } else if (!empty($transemail) && empty($transusername)) {
           $_SESSION['transemail'] = $transemail;
           $wire_query = mysqli_query($con,"SELECT wire.username,email,wire_date,wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%')");
-          if (mysqli_num_rows($wire_query)) {
+          if (mysqli_num_rows($wire_query) > 0) {
             $_SESSION['verif_wire'] = "success";
             $_SESSION['verif_wire_case'] = "2";
             header("Location: welcome_admin_forms.php");
@@ -268,7 +268,7 @@ if ($con->connect_error) {
           $_SESSION['transusername'] = $transusername;
           $_SESSION['transemail'] = $transemail;
           $wire_query = mysqli_query($con,"SELECT wire.username,email,wire_date,wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%'");
-          if (mysqli_num_rows($wire_query)) {
+          if (mysqli_num_rows($wire_query) > 0) {
             $_SESSION['verif_wire'] = "success";
             $_SESSION['verif_wire_case'] = "3";
             header("Location: welcome_admin_forms.php");

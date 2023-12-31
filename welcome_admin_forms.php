@@ -7,7 +7,7 @@ if ($con->connect_error) {
     if (!isset($_SESSION['verif_balance']) && !isset($_SESSION['verif_deposit']) && !isset($_SESSION['verif_withdraw']) && !isset($_SESSION['verif_wire']) && !isset($_SESSION['verif_dep_action']) && !isset($_SESSION['verif_with_action']) && !isset($_SESSION['verif_wire_action']) && !isset($_SESSION['verif_ticket_action']) && !isset($_SESSION['verif_acc_action'])) {
         if (empty($_SESSION['verif_balance']) || $_SESSION['verif_balance'] === "" && empty($_SESSION['verif_deposit']) || $_SESSION['verif_deposit'] === "" && empty($_SESSION['verif_withdraw']) || $_SESSION['verif_withdraw'] === ""  && empty($_SESSION['verif_wire']) || $_SESSION['verif_wire'] === "" && empty($_SESSION['verif_dep_action']) || $_SESSION['verif_dep_action'] === "" && empty($_SESSION['verif_with_action']) || $_SESSION['verif_with_action'] === "" && empty($_SESSION['verif_wire_action']) || $_SESSION['verif_wire_action'] === "" && empty($_SESSION['verif_ticket_action']) || $_SESSION['verif_ticket_action'] === "" && empty($_SESSION['verif_acc_action']) || $_SESSION['verif_acc_action'] === "") {
             session_destroy();
-            header("Location: index.html");
+            header("Location: index.php");
             exit;
         } 
     }
@@ -57,36 +57,33 @@ if ($con->connect_error) {
         $verif_deposit = $_SESSION["verif_deposit"];
         if($verif_deposit === "success") { 
             $verif_deposit_case = $_SESSION['verif_deposit_case'];
-            //
-            $depstart = 0;
-            $deprowsperpage = 6;
-            $deprecs = mysqli_query($con,"SELECT * FROM deposit");
-            $depnbrows = mysqli_num_rows($deprecs);
-            $depnbpages = ceil($depnbrows / $deprowsperpage);
-            if (isset($_GET["deppagenr"])) {
-                $deppage = $_GET["deppagenr"] - 1;
-                $depstart = $deppage * $deprowsperpage;
+            $start = 0;
+            $rowsperpage = 6;
+            $recs = mysqli_query($con,"SELECT * FROM deposit");
+            $nbrows = mysqli_num_rows($recs);
+            $nbpages = ceil($nbrows / $rowsperpage);
+            if (isset($_GET["pagenr"])) {
+                $start = ($_GET["pagenr"] - 1)  * $rowsperpage;
             }
-            //
             switch ($verif_deposit_case) {
                 case "1":
                     $transusername = $_SESSION["transusername"];
 
-                    $deposit_query1 = mysqli_query($con,"SELECT username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit WHERE username LIKE '%$transusername%' LIMIT $depstart , $deprowsperpage");
-                    $deposit_query2 = mysqli_query($con,"SELECT username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit WHERE username LIKE '%$transusername%' LIMIT $depstart , $deprowsperpage");
+                    $deposit_query1 = mysqli_query($con,"SELECT username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit WHERE username LIKE '%$transusername%' LIMIT $start , $rowsperpage");
+                    $deposit_query2 = mysqli_query($con,"SELECT username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit WHERE username LIKE '%$transusername%' LIMIT $start , $rowsperpage");
                     break;
                 case "2":
                     $transemail = $_SESSION["transemail"];
 
-                    $deposit_query1 = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') LIMIT $depstart , $deprowsperpage");
-                    $deposit_query2 = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') LIMIT $depstart , $deprowsperpage");
+                    $deposit_query1 = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') LIMIT $start , $rowsperpage");
+                    $deposit_query2 = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') LIMIT $start , $rowsperpage");
                     break;
                 case "3":
                     $transemail = $_SESSION["transemail"];
                     $transusername = $_SESSION["transusername"];
 
-                    $deposit_query1 = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit.username LIKE '%$transusername%' LIMIT $depstart , $deprowsperpage");
-                    $deposit_query2 = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit.username LIKE '%$transusername%' LIMIT $depstart , $deprowsperpage");
+                    $deposit_query1 = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit.username LIKE '%$transusername%' LIMIT $start , $rowsperpage");
+                    $deposit_query2 = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit.username LIKE '%$transusername%' LIMIT $start , $rowsperpage");
                     break;
             }
             $deposit_query_array_all = mysqli_fetch_all($deposit_query1, MYSQLI_ASSOC);
@@ -99,13 +96,13 @@ if ($con->connect_error) {
                 if (!empty($depfidate) && empty($depfihour) && empty($depfiamount)) {
                     switch ($verif_deposit_case) { 
                         case "1":
-                            $depfi_query = mysqli_query($con,"SELECT username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit WHERE username LIKE '%$transusername%' HAVING LEFT(deposit_date, 10) LIKE '$depfidate' LIMIT $depstart , $deprowsperpage");
+                            $depfi_query = mysqli_query($con,"SELECT username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit WHERE username LIKE '%$transusername%' HAVING LEFT(deposit_date, 10) LIKE '$depfidate' LIMIT $start , $rowsperpage");
                             break;
                         case "2":
-                            $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') HAVING LEFT(deposit_date, 10) LIKE '$depfidate' LIMIT $depstart , $deprowsperpage");
+                            $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') HAVING LEFT(deposit_date, 10) LIKE '$depfidate' LIMIT $start , $rowsperpage");
                             break;
                         case "3":
-                            $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit.username LIKE '%$transusername%' HAVING LEFT(deposit_date, 10) LIKE '$depfidate' LIMIT $depstart , $deprowsperpage");
+                            $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit.username LIKE '%$transusername%' HAVING LEFT(deposit_date, 10) LIKE '$depfidate' LIMIT $start , $rowsperpage");
                             break;
                     }
                 } else if (!empty($depfidate) && !empty($depfiamount) && empty($depfihour)) {
@@ -121,65 +118,65 @@ if ($con->connect_error) {
                         case "SG":
                             switch ($verif_deposit_case) { 
                                 case "1":
-                                    $depfi_query = mysqli_query($con,"SELECT username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit WHERE username LIKE '%$transusername%' AND deposit_amount > $depfiamount_value HAVING LEFT(deposit_date, 10) LIKE '$depfidate' LIMIT $depstart , $deprowsperpage");
+                                    $depfi_query = mysqli_query($con,"SELECT username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit WHERE username LIKE '%$transusername%' AND deposit_amount > $depfiamount_value HAVING LEFT(deposit_date, 10) LIKE '$depfidate' LIMIT $start , $rowsperpage");
                                     break;
                                 case "2":
-                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit_amount > $depfiamount_value HAVING LEFT(deposit_date, 10) LIKE '$depfidate'  LIMIT $depstart , $deprowsperpage");
+                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit_amount > $depfiamount_value HAVING LEFT(deposit_date, 10) LIKE '$depfidate'  LIMIT $start , $rowsperpage");
                                     break;
                                 case "3":
-                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit.username LIKE '%$transusername%' AND deposit_amount > $depfiamount_value HAVING LEFT(deposit_date, 10) LIKE '$depfidate' LIMIT $depstart , $deprowsperpage");
+                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit.username LIKE '%$transusername%' AND deposit_amount > $depfiamount_value HAVING LEFT(deposit_date, 10) LIKE '$depfidate' LIMIT $start , $rowsperpage");
                                     break;
                             }
                             break;
                         case "G":
                             switch ($verif_deposit_case) { 
                                 case "1":
-                                    $depfi_query = mysqli_query($con,"SELECT username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit WHERE username LIKE '%$transusername%' AND deposit_amount >= $depfiamount_value HAVING LEFT(deposit_date, 10) LIKE '$depfidate' LIMIT $depstart , $deprowsperpage");
+                                    $depfi_query = mysqli_query($con,"SELECT username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit WHERE username LIKE '%$transusername%' AND deposit_amount >= $depfiamount_value HAVING LEFT(deposit_date, 10) LIKE '$depfidate' LIMIT $start , $rowsperpage");
                                     break;
                                 case "2":
-                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit_amount >= $depfiamount_value HAVING LEFT(deposit_date, 10) LIKE '$depfidate' LIMIT $depstart , $deprowsperpage");
+                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit_amount >= $depfiamount_value HAVING LEFT(deposit_date, 10) LIKE '$depfidate' LIMIT $start , $rowsperpage");
                                     break;
                                 case "3":
-                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit.username LIKE '%$transusername%' AND deposit_amount >= $depfiamount_value HAVING LEFT(deposit_date, 10) LIKE '$depfidate' LIMIT $depstart , $deprowsperpage");
+                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit.username LIKE '%$transusername%' AND deposit_amount >= $depfiamount_value HAVING LEFT(deposit_date, 10) LIKE '$depfidate' LIMIT $start , $rowsperpage");
                                     break;
                             }
                             break;
                         case "SL":
                             switch ($verif_deposit_case) { 
                                 case "1":
-                                    $depfi_query = mysqli_query($con,"SELECT username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit WHERE username LIKE '%$transusername%' AND deposit_amount < $depfiamount_value HAVING LEFT(deposit_date, 10) LIKE '$depfidate' LIMIT $depstart , $deprowsperpage");
+                                    $depfi_query = mysqli_query($con,"SELECT username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit WHERE username LIKE '%$transusername%' AND deposit_amount < $depfiamount_value HAVING LEFT(deposit_date, 10) LIKE '$depfidate' LIMIT $start , $rowsperpage");
                                     break;
                                 case "2":
-                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit_amount < $depfiamount_value HAVING LEFT(deposit_date, 10) LIKE '$depfidate' LIMIT $depstart , $deprowsperpage");
+                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit_amount < $depfiamount_value HAVING LEFT(deposit_date, 10) LIKE '$depfidate' LIMIT $start , $rowsperpage");
                                     break;
                                 case "3":
-                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit.username LIKE '%$transusername%' AND deposit_amount < $depfiamount_value HAVING LEFT(deposit_date, 10) LIKE '$depfidate' LIMIT $depstart , $deprowsperpage");
+                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit.username LIKE '%$transusername%' AND deposit_amount < $depfiamount_value HAVING LEFT(deposit_date, 10) LIKE '$depfidate' LIMIT $start , $rowsperpage");
                                     break;
                             }
                             break;
                         case "L":
                             switch ($verif_deposit_case) { 
                                 case "1":
-                                    $depfi_query = mysqli_query($con,"SELECT username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit WHERE username LIKE '%$transusername%' AND deposit_amount <= $depfiamount_value  HAVING LEFT(deposit_date, 10) LIKE '$depfidate' LIMIT $depstart , $deprowsperpage");
+                                    $depfi_query = mysqli_query($con,"SELECT username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit WHERE username LIKE '%$transusername%' AND deposit_amount <= $depfiamount_value  HAVING LEFT(deposit_date, 10) LIKE '$depfidate' LIMIT $start , $rowsperpage");
                                     break;
                                 case "2":
-                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit_amount <= $depfiamount_value  HAVING LEFT(deposit_date, 10) LIKE '$depfidate' LIMIT $depstart , $deprowsperpage");
+                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit_amount <= $depfiamount_value  HAVING LEFT(deposit_date, 10) LIKE '$depfidate' LIMIT $start , $rowsperpage");
                                     break;
                                 case "3":
-                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit.username LIKE '%$transusername%' AND deposit_amount <= $depfiamount_value  HAVING LEFT(deposit_date, 10) LIKE '$depfidate' LIMIT $depstart , $deprowsperpage");
+                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit.username LIKE '%$transusername%' AND deposit_amount <= $depfiamount_value  HAVING LEFT(deposit_date, 10) LIKE '$depfidate' LIMIT $start , $rowsperpage");
                                     break;
                             }
                             break;
                         case "E":
                             switch ($verif_deposit_case) { 
                                 case "1":
-                                    $depfi_query = mysqli_query($con,"SELECT username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit WHERE username LIKE '%$transusername%' AND deposit_amount = $depfiamount_value HAVING LEFT(deposit_date, 10) LIKE '$depfidate' LIMIT $depstart , $deprowsperpage");
+                                    $depfi_query = mysqli_query($con,"SELECT username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit WHERE username LIKE '%$transusername%' AND deposit_amount = $depfiamount_value HAVING LEFT(deposit_date, 10) LIKE '$depfidate' LIMIT $start , $rowsperpage");
                                     break;
                                 case "2":
-                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit_amount = $depfiamount_value HAVING LEFT(deposit_date, 10) LIKE '$depfidate' LIMIT $depstart , $deprowsperpage");
+                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit_amount = $depfiamount_value HAVING LEFT(deposit_date, 10) LIKE '$depfidate' LIMIT $start , $rowsperpage");
                                     break;
                                 case "3":
-                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit.username LIKE '%$transusername%' AND deposit_amount = $depfiamount_value HAVING LEFT(deposit_date, 10) LIKE '$depfidate' LIMIT $depstart , $deprowsperpage");
+                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit.username LIKE '%$transusername%' AND deposit_amount = $depfiamount_value HAVING LEFT(deposit_date, 10) LIKE '$depfidate' LIMIT $start , $rowsperpage");
                                     break;
                             }
                             break;
@@ -187,13 +184,13 @@ if ($con->connect_error) {
                 } else if (!empty($depfidate) && empty($depfiamount) && !empty($depfihour)) {
                     switch ($verif_deposit_case) { 
                         case "1":
-                            $depfi_query = mysqli_query($con,"SELECT username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit WHERE username LIKE '%$transusername%' HAVING LEFT(deposit_date, 10) LIKE '$depfidate' AND RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $depstart , $deprowsperpage");
+                            $depfi_query = mysqli_query($con,"SELECT username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit WHERE username LIKE '%$transusername%' HAVING LEFT(deposit_date, 10) LIKE '$depfidate' AND RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $start , $rowsperpage");
                             break;
                         case "2":
-                            $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') HAVING LEFT(deposit_date, 10) LIKE '$depfidate' AND RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $depstart , $deprowsperpage");
+                            $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') HAVING LEFT(deposit_date, 10) LIKE '$depfidate' AND RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $start , $rowsperpage");
                             break;
                         case "3":
-                            $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit.username LIKE '%$transusername%' HAVING LEFT(deposit_date, 10) LIKE '$depfidate' AND RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $depstart , $deprowsperpage");
+                            $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit.username LIKE '%$transusername%' HAVING LEFT(deposit_date, 10) LIKE '$depfidate' AND RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $start , $rowsperpage");
                             break;
                     }
                 } else if (empty($depfidate) && !empty($depfiamount) && empty($depfihour)) {
@@ -209,65 +206,65 @@ if ($con->connect_error) {
                         case "SG":
                             switch ($verif_deposit_case) { 
                                 case "1":
-                                    $depfi_query = mysqli_query($con,"SELECT username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit WHERE username LIKE '%$transusername%' AND deposit_amount > $depfiamount_value LIMIT $depstart , $deprowsperpage");
+                                    $depfi_query = mysqli_query($con,"SELECT username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit WHERE username LIKE '%$transusername%' AND deposit_amount > $depfiamount_value LIMIT $start , $rowsperpage");
                                     break;
                                 case "2":
-                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit_amount > $depfiamount_value LIMIT $depstart , $deprowsperpage");
+                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit_amount > $depfiamount_value LIMIT $start , $rowsperpage");
                                     break;
                                 case "3":
-                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit.username LIKE '%$transusername%' AND deposit_amount > $depfiamount_value LIMIT $depstart , $deprowsperpage");
+                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit.username LIKE '%$transusername%' AND deposit_amount > $depfiamount_value LIMIT $start , $rowsperpage");
                                     break;
                             }
                             break;
                         case "G":
                             switch ($verif_deposit_case) { 
                                 case "1":
-                                    $depfi_query = mysqli_query($con,"SELECT username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit WHERE username LIKE '%$transusername%' AND deposit_amount >= $depfiamount_value LIMIT $depstart , $deprowsperpage");
+                                    $depfi_query = mysqli_query($con,"SELECT username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit WHERE username LIKE '%$transusername%' AND deposit_amount >= $depfiamount_value LIMIT $start , $rowsperpage");
                                     break;
                                 case "2":
-                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit_amount >= $depfiamount_value LIMIT $depstart , $deprowsperpage");
+                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit_amount >= $depfiamount_value LIMIT $start , $rowsperpage");
                                     break;
                                 case "3":
-                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit.username LIKE '%$transusername%' AND deposit_amount >= $depfiamount_value LIMIT $depstart , $deprowsperpage");
+                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit.username LIKE '%$transusername%' AND deposit_amount >= $depfiamount_value LIMIT $start , $rowsperpage");
                                     break;
                             }
                             break;
                         case "SL":
                             switch ($verif_deposit_case) { 
                                 case "1":
-                                    $depfi_query = mysqli_query($con,"SELECT username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit WHERE username LIKE '%$transusername%' AND deposit_amount < $depfiamount_value LIMIT $depstart , $deprowsperpage");
+                                    $depfi_query = mysqli_query($con,"SELECT username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit WHERE username LIKE '%$transusername%' AND deposit_amount < $depfiamount_value LIMIT $start , $rowsperpage");
                                     break;
                                 case "2":
-                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit_amount < $depfiamount_value LIMIT $depstart , $deprowsperpage");
+                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit_amount < $depfiamount_value LIMIT $start , $rowsperpage");
                                     break;
                                 case "3":
-                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit.username LIKE '%$transusername%' AND deposit_amount < $depfiamount_value LIMIT $depstart , $deprowsperpage");
+                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit.username LIKE '%$transusername%' AND deposit_amount < $depfiamount_value LIMIT $start , $rowsperpage");
                                     break;
                             }
                             break;
                         case "L":
                             switch ($verif_deposit_case) { 
                                 case "1":
-                                    $depfi_query = mysqli_query($con,"SELECT username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit WHERE username LIKE '%$transusername%' AND deposit_amount <= $depfiamount_value LIMIT $depstart , $deprowsperpage");
+                                    $depfi_query = mysqli_query($con,"SELECT username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit WHERE username LIKE '%$transusername%' AND deposit_amount <= $depfiamount_value LIMIT $start , $rowsperpage");
                                     break;
                                 case "2":
-                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit_amount <= $depfiamount_value LIMIT $depstart , $deprowsperpage");
+                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit_amount <= $depfiamount_value LIMIT $start , $rowsperpage");
                                     break;
                                 case "3":
-                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit.username LIKE '%$transusername%' AND deposit_amount <= $depfiamount_value LIMIT $depstart , $deprowsperpage");
+                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit.username LIKE '%$transusername%' AND deposit_amount <= $depfiamount_value LIMIT $start , $rowsperpage");
                                     break;
                             }
                             break;
                         case "E":
                             switch ($verif_deposit_case) { 
                                 case "1":
-                                    $depfi_query = mysqli_query($con,"SELECT username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit WHERE username LIKE '%$transusername%' AND deposit_amount = $depfiamount_value LIMIT $depstart , $deprowsperpage");
+                                    $depfi_query = mysqli_query($con,"SELECT username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit WHERE username LIKE '%$transusername%' AND deposit_amount = $depfiamount_value LIMIT $start , $rowsperpage");
                                     break;
                                 case "2":
-                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit_amount = $depfiamount_value LIMIT $depstart , $deprowsperpage");
+                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit_amount = $depfiamount_value LIMIT $start , $rowsperpage");
                                     break;
                                 case "3":
-                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit.username LIKE '%$transusername%' AND deposit_amount = $depfiamount_value LIMIT $depstart , $deprowsperpage");
+                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit.username LIKE '%$transusername%' AND deposit_amount = $depfiamount_value LIMIT $start , $rowsperpage");
                                     break;
                             }
                             break;
@@ -285,65 +282,65 @@ if ($con->connect_error) {
                         case "SG":
                             switch ($verif_deposit_case) { 
                                 case "1":
-                                    $depfi_query = mysqli_query($con,"SELECT username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit WHERE username LIKE '%$transusername%' AND deposit_amount > $depfiamount_value HAVING RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $depstart , $deprowsperpage");
+                                    $depfi_query = mysqli_query($con,"SELECT username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit WHERE username LIKE '%$transusername%' AND deposit_amount > $depfiamount_value HAVING RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $start , $rowsperpage");
                                     break;
                                 case "2":
-                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit_amount > $depfiamount_value HAVING RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $depstart , $deprowsperpage");
+                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit_amount > $depfiamount_value HAVING RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $start , $rowsperpage");
                                     break;
                                 case "3":
-                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit.username LIKE '%$transusername%' AND deposit_amount > $depfiamount_value HAVING RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $depstart , $deprowsperpage");
+                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit.username LIKE '%$transusername%' AND deposit_amount > $depfiamount_value HAVING RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $start , $rowsperpage");
                                     break;
                             }
                             break;
                         case "G":
                             switch ($verif_deposit_case) { 
                                 case "1":
-                                    $depfi_query = mysqli_query($con,"SELECT username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit WHERE username LIKE '%$transusername%' AND deposit_amount >= $depfiamount_value HAVING RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $depstart , $deprowsperpage");
+                                    $depfi_query = mysqli_query($con,"SELECT username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit WHERE username LIKE '%$transusername%' AND deposit_amount >= $depfiamount_value HAVING RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $start , $rowsperpage");
                                     break;
                                 case "2":
-                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit_amount >= $depfiamount_value HAVING RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $depstart , $deprowsperpage");
+                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit_amount >= $depfiamount_value HAVING RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $start , $rowsperpage");
                                     break;
                                 case "3":
-                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit.username LIKE '%$transusername%' AND deposit_amount >= $depfiamount_value HAVING RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $depstart , $deprowsperpage");
+                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit.username LIKE '%$transusername%' AND deposit_amount >= $depfiamount_value HAVING RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $start , $rowsperpage");
                                     break;
                             }
                             break;
                         case "SL":
                             switch ($verif_deposit_case) { 
                                 case "1":
-                                    $depfi_query = mysqli_query($con,"SELECT username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit WHERE username LIKE '%$transusername%' AND deposit_amount < $depfiamount_value HAVING RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $depstart , $deprowsperpage");
+                                    $depfi_query = mysqli_query($con,"SELECT username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit WHERE username LIKE '%$transusername%' AND deposit_amount < $depfiamount_value HAVING RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $start , $rowsperpage");
                                     break;
                                 case "2":
-                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit_amount < $depfiamount_value HAVING RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $depstart , $deprowsperpage");
+                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit_amount < $depfiamount_value HAVING RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $start , $rowsperpage");
                                     break;
                                 case "3":
-                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit.username LIKE '%$transusername%' AND deposit_amount < $depfiamount_value HAVING RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $depstart , $deprowsperpage");
+                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit.username LIKE '%$transusername%' AND deposit_amount < $depfiamount_value HAVING RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $start , $rowsperpage");
                                     break;
                             }
                             break;
                         case "L":
                             switch ($verif_deposit_case) { 
                                 case "1":
-                                    $depfi_query = mysqli_query($con,"SELECT username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit WHERE username LIKE '%$transusername%' AND deposit_amount <= $depfiamount_value HAVING RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $depstart , $deprowsperpage");
+                                    $depfi_query = mysqli_query($con,"SELECT username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit WHERE username LIKE '%$transusername%' AND deposit_amount <= $depfiamount_value HAVING RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $start , $rowsperpage");
                                     break;
                                 case "2":
-                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit_amount <= $depfiamount_value HAVING RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $depstart , $deprowsperpage");
+                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit_amount <= $depfiamount_value HAVING RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $start , $rowsperpage");
                                     break;
                                 case "3":
-                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit.username LIKE '%$transusername%' AND deposit_amount <= $depfiamount_value HAVING RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $depstart , $deprowsperpage");
+                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit.username LIKE '%$transusername%' AND deposit_amount <= $depfiamount_value HAVING RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $start , $rowsperpage");
                                     break;
                             }
                             break;
                         case "E":
                             switch ($verif_deposit_case) { 
                                 case "1":
-                                    $depfi_query = mysqli_query($con,"SELECT username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit WHERE username LIKE '%$transusername%' AND deposit_amount = $depfiamount_value HAVING RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $depstart , $deprowsperpage");
+                                    $depfi_query = mysqli_query($con,"SELECT username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit WHERE username LIKE '%$transusername%' AND deposit_amount = $depfiamount_value HAVING RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $start , $rowsperpage");
                                     break;
                                 case "2":
-                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit_amount = $depfiamount_value HAVING RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $depstart , $deprowsperpage");
+                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit_amount = $depfiamount_value HAVING RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $start , $rowsperpage");
                                     break;
                                 case "3":
-                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit.username LIKE '%$transusername%' AND deposit_amount = $depfiamount_value HAVING RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $depstart , $deprowsperpage");
+                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit.username LIKE '%$transusername%' AND deposit_amount = $depfiamount_value HAVING RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $start , $rowsperpage");
                                     break;
                             }
                             break;
@@ -351,13 +348,13 @@ if ($con->connect_error) {
                 } else if (empty($depfidate) && empty($depfiamount) && !empty($depfihour)) {
                     switch ($verif_deposit_case) { 
                         case "1":
-                            $depfi_query = mysqli_query($con,"SELECT username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit WRIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $depstart , $deprowsperpage");
+                            $depfi_query = mysqli_query($con,"SELECT username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit WRIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $start , $rowsperpage");
                             break;
                         case "2":
-                            $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') HAVING RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $depstart , $deprowsperpage");
+                            $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') HAVING RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $start , $rowsperpage");
                             break;
                         case "3":
-                            $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit.username LIKE '%$transusername%' HAVING RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $depstart , $deprowsperpage");
+                            $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit.username LIKE '%$transusername%' HAVING RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $start , $rowsperpage");
                             break;
                     }
                 } else if (!empty($depfidate) && !empty($depfiamount) && !empty($depfihour)) {
@@ -373,65 +370,65 @@ if ($con->connect_error) {
                         case "SG":
                             switch ($verif_deposit_case) { 
                                 case "1":
-                                    $depfi_query = mysqli_query($con,"SELECT username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit WHERE username LIKE '%$transusername%' AND deposit_amount > $depfiamount_value HAVING LEFT(deposit_date, 10) LIKE '$depfidate' AND RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $depstart , $deprowsperpage");
+                                    $depfi_query = mysqli_query($con,"SELECT username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit WHERE username LIKE '%$transusername%' AND deposit_amount > $depfiamount_value HAVING LEFT(deposit_date, 10) LIKE '$depfidate' AND RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $start , $rowsperpage");
                                     break;
                                 case "2":
-                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit_amount > $depfiamount_value HAVING LEFT(deposit_date, 10) LIKE '$depfidate' AND RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $depstart , $deprowsperpage");
+                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit_amount > $depfiamount_value HAVING LEFT(deposit_date, 10) LIKE '$depfidate' AND RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $start , $rowsperpage");
                                     break;
                                 case "3":
-                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit.username LIKE '%$transusername%' AND deposit_amount > $depfiamount_value HAVING LEFT(deposit_date, 10) LIKE '$depfidate' AND RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $depstart , $deprowsperpage");
+                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit.username LIKE '%$transusername%' AND deposit_amount > $depfiamount_value HAVING LEFT(deposit_date, 10) LIKE '$depfidate' AND RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $start , $rowsperpage");
                                     break;
                             }
                             break;
                         case "G":
                             switch ($verif_deposit_case) { 
                                 case "1":
-                                    $depfi_query = mysqli_query($con,"SELECT username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit WHERE username LIKE '%$transusername%' AND deposit_amount >= $depfiamount_value HAVING LEFT(deposit_date, 10) LIKE '$depfidate' AND RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $depstart , $deprowsperpage");
+                                    $depfi_query = mysqli_query($con,"SELECT username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit WHERE username LIKE '%$transusername%' AND deposit_amount >= $depfiamount_value HAVING LEFT(deposit_date, 10) LIKE '$depfidate' AND RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $start , $rowsperpage");
                                     break;
                                 case "2":
-                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit_amount >= $depfiamount_value HAVING LEFT(deposit_date, 10) LIKE '$depfidate' AND RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $depstart , $deprowsperpage");
+                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit_amount >= $depfiamount_value HAVING LEFT(deposit_date, 10) LIKE '$depfidate' AND RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $start , $rowsperpage");
                                     break;
                                 case "3":
-                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit.username LIKE '%$transusername%' AND deposit_amount >= $depfiamount_value HAVING LEFT(deposit_date, 10) LIKE '$depfidate' AND RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $depstart , $deprowsperpage");
+                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit.username LIKE '%$transusername%' AND deposit_amount >= $depfiamount_value HAVING LEFT(deposit_date, 10) LIKE '$depfidate' AND RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $start , $rowsperpage");
                                     break;
                             }
                             break;
                         case "SL":
                             switch ($verif_deposit_case) { 
                                 case "1":
-                                    $depfi_query = mysqli_query($con,"SELECT username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit WHERE username LIKE '%$transusername%' AND deposit_amount < $depfiamount_value HAVING LEFT(deposit_date, 10) LIKE '$depfidate' AND RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $depstart , $deprowsperpage");
+                                    $depfi_query = mysqli_query($con,"SELECT username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit WHERE username LIKE '%$transusername%' AND deposit_amount < $depfiamount_value HAVING LEFT(deposit_date, 10) LIKE '$depfidate' AND RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $start , $rowsperpage");
                                     break;
                                 case "2":
-                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit_amount < $depfiamount_value HAVING LEFT(deposit_date, 10) LIKE '$depfidate' AND RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $depstart , $deprowsperpage");
+                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit_amount < $depfiamount_value HAVING LEFT(deposit_date, 10) LIKE '$depfidate' AND RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $start , $rowsperpage");
                                     break;
                                 case "3":
-                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit.username LIKE '%$transusername%' AND deposit_amount < $depfiamount_value HAVING LEFT(deposit_date, 10) LIKE '$depfidate' AND RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $depstart , $deprowsperpage");
+                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit.username LIKE '%$transusername%' AND deposit_amount < $depfiamount_value HAVING LEFT(deposit_date, 10) LIKE '$depfidate' AND RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $start , $rowsperpage");
                                     break;
                             }
                             break;
                         case "L":
                             switch ($verif_deposit_case) { 
                                 case "1":
-                                    $depfi_query = mysqli_query($con,"SELECT username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit WHERE username LIKE '%$transusername%' AND deposit_amount <= $depfiamount_value  HAVING LEFT(deposit_date, 10) LIKE '$depfidate' AND RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $depstart , $deprowsperpage");
+                                    $depfi_query = mysqli_query($con,"SELECT username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit WHERE username LIKE '%$transusername%' AND deposit_amount <= $depfiamount_value  HAVING LEFT(deposit_date, 10) LIKE '$depfidate' AND RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $start , $rowsperpage");
                                     break;
                                 case "2":
-                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit_amount <= $depfiamount_value  HAVING LEFT(deposit_date, 10) LIKE '$depfidate' AND RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $depstart , $deprowsperpage");
+                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit_amount <= $depfiamount_value  HAVING LEFT(deposit_date, 10) LIKE '$depfidate' AND RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $start , $rowsperpage");
                                     break;
                                 case "3":
-                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit.username LIKE '%$transusername%' AND deposit_amount <= $depfiamount_value  HAVING LEFT(deposit_date, 10) LIKE '$depfidate' AND RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $depstart , $deprowsperpage");
+                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit.username LIKE '%$transusername%' AND deposit_amount <= $depfiamount_value  HAVING LEFT(deposit_date, 10) LIKE '$depfidate' AND RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $start , $rowsperpage");
                                     break;
                             }
                             break;
                         case "E":
                             switch ($verif_deposit_case) { 
                                 case "1":
-                                    $depfi_query = mysqli_query($con,"SELECT username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit WHERE username LIKE '%$transusername%' AND deposit_amount = $depfiamount_value HAVING LEFT(deposit_date, 10) LIKE '$depfidate' AND RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $depstart , $deprowsperpage");
+                                    $depfi_query = mysqli_query($con,"SELECT username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit WHERE username LIKE '%$transusername%' AND deposit_amount = $depfiamount_value HAVING LEFT(deposit_date, 10) LIKE '$depfidate' AND RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $start , $rowsperpage");
                                     break;
                                 case "2":
-                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit_amount = $depfiamount_value HAVING LEFT(deposit_date, 10) LIKE '$depfidate' AND RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $depstart , $deprowsperpage");
+                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit_amount = $depfiamount_value HAVING LEFT(deposit_date, 10) LIKE '$depfidate' AND RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $start , $rowsperpage");
                                     break;
                                 case "3":
-                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit.username LIKE '%$transusername%' AND deposit_amount = $depfiamount_value HAVING LEFT(deposit_date, 10) LIKE '$depfidate' AND RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $depstart , $deprowsperpage");
+                                    $depfi_query = mysqli_query($con,"SELECT deposit.username,LEFT(deposit_date, 10),RIGHT(deposit_date, 8),deposit_amount FROM deposit,login_credentials WHERE login_credentials.username = deposit.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND deposit.username LIKE '%$transusername%' AND deposit_amount = $depfiamount_value HAVING LEFT(deposit_date, 10) LIKE '$depfidate' AND RIGHT(deposit_date, 8) LIKE '$depfihour' LIMIT $start , $rowsperpage");
                                     break;
                             }
                             break;
@@ -453,26 +450,34 @@ if ($con->connect_error) {
     if (isset($_SESSION["verif_withdraw"])) { 
         $verif_withdraw = $_SESSION["verif_withdraw"];
         if($verif_withdraw === "success") { 
+            $start = 0;
+            $rowsperpage = 6;
+            $recs = mysqli_query($con,"SELECT * FROM withdraw");
+            $nbrows = mysqli_num_rows($recs);
+            $nbpages = ceil($nbrows / $rowsperpage);
+            if (isset($_GET["pagenr"])) {
+                $start = ($_GET["pagenr"] - 1)  * $rowsperpage;
+            }
             $verif_withdraw_case = $_SESSION['verif_withdraw_case'];
             switch ($verif_withdraw_case) {
                 case "1":
                     $transusername = $_SESSION["transusername"];
 
-                    $withdraw_query1 = mysqli_query($con,"SELECT username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw WHERE username LIKE '%$transusername%' LIMIT $translimit");
-                    $withdraw_query2 = mysqli_query($con,"SELECT username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw WHERE username LIKE '%$transusername%' LIMIT $translimit");
+                    $withdraw_query1 = mysqli_query($con,"SELECT username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw WHERE username LIKE '%$transusername%' LIMIT $start , $rowsperpage");
+                    $withdraw_query2 = mysqli_query($con,"SELECT username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw WHERE username LIKE '%$transusername%' LIMIT $start , $rowsperpage");
                     break;
                 case "2":
                     $transemail = $_SESSION["transemail"];
 
-                    $withdraw_query1 = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') LIMIT $translimit");
-                    $withdraw_query2 = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') LIMIT $translimit");
+                    $withdraw_query1 = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') LIMIT $start , $rowsperpage");
+                    $withdraw_query2 = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') LIMIT $start , $rowsperpage");
                     break;
                 case "3":
                     $transemail = $_SESSION["transemail"];
                     $transusername = $_SESSION["transusername"];
 
-                    $withdraw_query1 = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw.username LIKE '%$transusername%' LIMIT $translimit");
-                    $withdraw_query2 = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw.username LIKE '%$transusername%' LIMIT $translimit");
+                    $withdraw_query1 = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw.username LIKE '%$transusername%' LIMIT $start , $rowsperpage");
+                    $withdraw_query2 = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw.username LIKE '%$transusername%' LIMIT $start , $rowsperpage");
                     break;
             }
             $withdraw_query_array_all = mysqli_fetch_all($withdraw_query1, MYSQLI_ASSOC);
@@ -485,13 +490,13 @@ if ($con->connect_error) {
                 if (!empty($withfidate) && empty($withfihour) && empty($withfiamount)) {
                     switch ($verif_withdraw_case) { 
                         case "1":
-                            $withfi_query = mysqli_query($con,"SELECT username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw WHERE username LIKE '%$transusername%' HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' LIMIT $translimit");
+                            $withfi_query = mysqli_query($con,"SELECT username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw WHERE username LIKE '%$transusername%' HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' LIMIT $start , $rowsperpage");
                             break;
                         case "2":
-                            $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' LIMIT $translimit");
+                            $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' LIMIT $start , $rowsperpage");
                             break;
                         case "3":
-                            $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw.username LIKE '%$transusername%' HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' LIMIT $translimit");
+                            $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw.username LIKE '%$transusername%' HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' LIMIT $start , $rowsperpage");
                             break;
                     }
                 } else if (!empty($withfidate) && !empty($withfiamount) && empty($withfihour)) {
@@ -507,65 +512,65 @@ if ($con->connect_error) {
                         case "SG":
                             switch ($verif_withdraw_case) { 
                                 case "1":
-                                    $withfi_query = mysqli_query($con,"SELECT username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw WHERE username LIKE '%$transusername%' AND withdraw_amount > $withfiamount_value HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' LIMIT $translimit");
+                                    $withfi_query = mysqli_query($con,"SELECT username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw WHERE username LIKE '%$transusername%' AND withdraw_amount > $withfiamount_value HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' LIMIT $start , $rowsperpage");
                                     break;
                                 case "2":
-                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw_amount > $withfiamount_value HAVING LEFT(withdraw_date, 10) LIKE '$withfidate'  LIMIT $translimit");
+                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw_amount > $withfiamount_value HAVING LEFT(withdraw_date, 10) LIKE '$withfidate'  LIMIT $start , $rowsperpage");
                                     break;
                                 case "3":
-                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw.username LIKE '%$transusername%' AND withdraw_amount > $withfiamount_value HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' LIMIT $translimit");
+                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw.username LIKE '%$transusername%' AND withdraw_amount > $withfiamount_value HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' LIMIT $start , $rowsperpage");
                                     break;
                             }
                             break;
                         case "G":
                             switch ($verif_withdraw_case) { 
                                 case "1":
-                                    $withfi_query = mysqli_query($con,"SELECT username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw WHERE username LIKE '%$transusername%' AND withdraw_amount >= $withfiamount_value HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' LIMIT $translimit");
+                                    $withfi_query = mysqli_query($con,"SELECT username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw WHERE username LIKE '%$transusername%' AND withdraw_amount >= $withfiamount_value HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' LIMIT $start , $rowsperpage");
                                     break;
                                 case "2":
-                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw_amount >= $withfiamount_value HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' LIMIT $translimit");
+                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw_amount >= $withfiamount_value HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' LIMIT $start , $rowsperpage");
                                     break;
                                 case "3":
-                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw.username LIKE '%$transusername%' AND withdraw_amount >= $withfiamount_value HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' LIMIT $translimit");
+                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw.username LIKE '%$transusername%' AND withdraw_amount >= $withfiamount_value HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' LIMIT $start , $rowsperpage");
                                     break;
                             }
                             break;
                         case "SL":
                             switch ($verif_withdraw_case) { 
                                 case "1":
-                                    $withfi_query = mysqli_query($con,"SELECT username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw WHERE username LIKE '%$transusername%' AND withdraw_amount < $withfiamount_value HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' LIMIT $translimit");
+                                    $withfi_query = mysqli_query($con,"SELECT username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw WHERE username LIKE '%$transusername%' AND withdraw_amount < $withfiamount_value HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' LIMIT $start , $rowsperpage");
                                     break;
                                 case "2":
-                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw_amount < $withfiamount_value HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' LIMIT $translimit");
+                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw_amount < $withfiamount_value HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' LIMIT $start , $rowsperpage");
                                     break;
                                 case "3":
-                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw.username LIKE '%$transusername%' AND withdraw_amount < $withfiamount_value HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' LIMIT $translimit");
+                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw.username LIKE '%$transusername%' AND withdraw_amount < $withfiamount_value HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' LIMIT $start , $rowsperpage");
                                     break;
                             }
                             break;
                         case "L":
                             switch ($verif_withdraw_case) { 
                                 case "1":
-                                    $withfi_query = mysqli_query($con,"SELECT username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw WHERE username LIKE '%$transusername%' AND withdraw_amount <= $withfiamount_value  HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' LIMIT $translimit");
+                                    $withfi_query = mysqli_query($con,"SELECT username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw WHERE username LIKE '%$transusername%' AND withdraw_amount <= $withfiamount_value  HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' LIMIT $start , $rowsperpage");
                                     break;
                                 case "2":
-                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw_amount <= $withfiamount_value  HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' LIMIT $translimit");
+                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw_amount <= $withfiamount_value  HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' LIMIT $start , $rowsperpage");
                                     break;
                                 case "3":
-                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw.username LIKE '%$transusername%' AND withdraw_amount <= $withfiamount_value  HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' LIMIT $translimit");
+                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw.username LIKE '%$transusername%' AND withdraw_amount <= $withfiamount_value  HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' LIMIT $start , $rowsperpage");
                                     break;
                             }
                             break;
                         case "E":
                             switch ($verif_withdraw_case) { 
                                 case "1":
-                                    $withfi_query = mysqli_query($con,"SELECT username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw WHERE username LIKE '%$transusername%' AND withdraw_amount = $withfiamount_value HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' LIMIT $translimit");
+                                    $withfi_query = mysqli_query($con,"SELECT username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw WHERE username LIKE '%$transusername%' AND withdraw_amount = $withfiamount_value HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' LIMIT $start , $rowsperpage");
                                     break;
                                 case "2":
-                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw_amount = $withfiamount_value HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' LIMIT $translimit");
+                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw_amount = $withfiamount_value HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' LIMIT $start , $rowsperpage");
                                     break;
                                 case "3":
-                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw.username LIKE '%$transusername%' AND withdraw_amount = $withfiamount_value HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' LIMIT $translimit");
+                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw.username LIKE '%$transusername%' AND withdraw_amount = $withfiamount_value HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' LIMIT $start , $rowsperpage");
                                     break;
                             }
                             break;
@@ -573,13 +578,13 @@ if ($con->connect_error) {
                 } else if (!empty($withfidate) && empty($withfiamount) && !empty($withfihour)) {
                     switch ($verif_withdraw_case) { 
                         case "1":
-                            $withfi_query = mysqli_query($con,"SELECT username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw WHERE username LIKE '%$transusername%' HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' AND RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $translimit");
+                            $withfi_query = mysqli_query($con,"SELECT username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw WHERE username LIKE '%$transusername%' HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' AND RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $start , $rowsperpage");
                             break;
                         case "2":
-                            $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' AND RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $translimit");
+                            $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' AND RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $start , $rowsperpage");
                             break;
                         case "3":
-                            $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw.username LIKE '%$transusername%' HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' AND RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $translimit");
+                            $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw.username LIKE '%$transusername%' HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' AND RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $start , $rowsperpage");
                             break;
                     }
                 } else if (empty($withfidate) && !empty($withfiamount) && empty($withfihour)) {
@@ -595,65 +600,65 @@ if ($con->connect_error) {
                         case "SG":
                             switch ($verif_withdraw_case) { 
                                 case "1":
-                                    $withfi_query = mysqli_query($con,"SELECT username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw WHERE username LIKE '%$transusername%' AND withdraw_amount > $withfiamount_value LIMIT $translimit");
+                                    $withfi_query = mysqli_query($con,"SELECT username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw WHERE username LIKE '%$transusername%' AND withdraw_amount > $withfiamount_value LIMIT $start , $rowsperpage");
                                     break;
                                 case "2":
-                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw_amount > $withfiamount_value LIMIT $translimit");
+                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw_amount > $withfiamount_value LIMIT $start , $rowsperpage");
                                     break;
                                 case "3":
-                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw.username LIKE '%$transusername%' AND withdraw_amount > $withfiamount_value LIMIT $translimit");
+                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw.username LIKE '%$transusername%' AND withdraw_amount > $withfiamount_value LIMIT $start , $rowsperpage");
                                     break;
                             }
                             break;
                         case "G":
                             switch ($verif_withdraw_case) { 
                                 case "1":
-                                    $withfi_query = mysqli_query($con,"SELECT username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw WHERE username LIKE '%$transusername%' AND withdraw_amount >= $withfiamount_value LIMIT $translimit");
+                                    $withfi_query = mysqli_query($con,"SELECT username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw WHERE username LIKE '%$transusername%' AND withdraw_amount >= $withfiamount_value LIMIT $start , $rowsperpage");
                                     break;
                                 case "2":
-                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw_amount >= $withfiamount_value LIMIT $translimit");
+                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw_amount >= $withfiamount_value LIMIT $start , $rowsperpage");
                                     break;
                                 case "3":
-                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw.username LIKE '%$transusername%' AND withdraw_amount >= $withfiamount_value LIMIT $translimit");
+                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw.username LIKE '%$transusername%' AND withdraw_amount >= $withfiamount_value LIMIT $start , $rowsperpage");
                                     break;
                             }
                             break;
                         case "SL":
                             switch ($verif_withdraw_case) { 
                                 case "1":
-                                    $withfi_query = mysqli_query($con,"SELECT username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw WHERE username LIKE '%$transusername%' AND withdraw_amount < $withfiamount_value LIMIT $translimit");
+                                    $withfi_query = mysqli_query($con,"SELECT username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw WHERE username LIKE '%$transusername%' AND withdraw_amount < $withfiamount_value LIMIT $start , $rowsperpage");
                                     break;
                                 case "2":
-                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw_amount < $withfiamount_value LIMIT $translimit");
+                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw_amount < $withfiamount_value LIMIT $start , $rowsperpage");
                                     break;
                                 case "3":
-                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw.username LIKE '%$transusername%' AND withdraw_amount < $withfiamount_value LIMIT $translimit");
+                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw.username LIKE '%$transusername%' AND withdraw_amount < $withfiamount_value LIMIT $start , $rowsperpage");
                                     break;
                             }
                             break;
                         case "L":
                             switch ($verif_withdraw_case) { 
                                 case "1":
-                                    $withfi_query = mysqli_query($con,"SELECT username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw WHERE username LIKE '%$transusername%' AND withdraw_amount <= $withfiamount_value LIMIT $translimit");
+                                    $withfi_query = mysqli_query($con,"SELECT username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw WHERE username LIKE '%$transusername%' AND withdraw_amount <= $withfiamount_value LIMIT $start , $rowsperpage");
                                     break;
                                 case "2":
-                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw_amount <= $withfiamount_value LIMIT $translimit");
+                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw_amount <= $withfiamount_value LIMIT $start , $rowsperpage");
                                     break;
                                 case "3":
-                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw.username LIKE '%$transusername%' AND withdraw_amount <= $withfiamount_value LIMIT $translimit");
+                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw.username LIKE '%$transusername%' AND withdraw_amount <= $withfiamount_value LIMIT $start , $rowsperpage");
                                     break;
                             }
                             break;
                         case "E":
                             switch ($verif_withdraw_case) { 
                                 case "1":
-                                    $withfi_query = mysqli_query($con,"SELECT username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw WHERE username LIKE '%$transusername%' AND withdraw_amount = $withfiamount_value LIMIT $translimit");
+                                    $withfi_query = mysqli_query($con,"SELECT username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw WHERE username LIKE '%$transusername%' AND withdraw_amount = $withfiamount_value LIMIT $start , $rowsperpage");
                                     break;
                                 case "2":
-                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw_amount = $withfiamount_value LIMIT $translimit");
+                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw_amount = $withfiamount_value LIMIT $start , $rowsperpage");
                                     break;
                                 case "3":
-                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw.username LIKE '%$transusername%' AND withdraw_amount = $withfiamount_value LIMIT $translimit");
+                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw.username LIKE '%$transusername%' AND withdraw_amount = $withfiamount_value LIMIT $start , $rowsperpage");
                                     break;
                             }
                             break;
@@ -671,65 +676,65 @@ if ($con->connect_error) {
                         case "SG":
                             switch ($verif_withdraw_case) { 
                                 case "1":
-                                    $withfi_query = mysqli_query($con,"SELECT username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw WHERE username LIKE '%$transusername%' AND withdraw_amount > $withfiamount_value HAVING RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $translimit");
+                                    $withfi_query = mysqli_query($con,"SELECT username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw WHERE username LIKE '%$transusername%' AND withdraw_amount > $withfiamount_value HAVING RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $start , $rowsperpage");
                                     break;
                                 case "2":
-                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw_amount > $withfiamount_value HAVING RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $translimit");
+                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw_amount > $withfiamount_value HAVING RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $start , $rowsperpage");
                                     break;
                                 case "3":
-                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw.username LIKE '%$transusername%' AND withdraw_amount > $withfiamount_value HAVING RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $translimit");
+                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw.username LIKE '%$transusername%' AND withdraw_amount > $withfiamount_value HAVING RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $start , $rowsperpage");
                                     break;
                             }
                             break;
                         case "G":
                             switch ($verif_withdraw_case) { 
                                 case "1":
-                                    $withfi_query = mysqli_query($con,"SELECT username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw WHERE username LIKE '%$transusername%' AND withdraw_amount >= $withfiamount_value HAVING RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $translimit");
+                                    $withfi_query = mysqli_query($con,"SELECT username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw WHERE username LIKE '%$transusername%' AND withdraw_amount >= $withfiamount_value HAVING RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $start , $rowsperpage");
                                     break;
                                 case "2":
-                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw_amount >= $withfiamount_value HAVING RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $translimit");
+                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw_amount >= $withfiamount_value HAVING RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $start , $rowsperpage");
                                     break;
                                 case "3":
-                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw.username LIKE '%$transusername%' AND withdraw_amount >= $withfiamount_value HAVING RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $translimit");
+                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw.username LIKE '%$transusername%' AND withdraw_amount >= $withfiamount_value HAVING RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $start , $rowsperpage");
                                     break;
                             }
                             break;
                         case "SL":
                             switch ($verif_withdraw_case) { 
                                 case "1":
-                                    $withfi_query = mysqli_query($con,"SELECT username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw WHERE username LIKE '%$transusername%' AND withdraw_amount < $withfiamount_value HAVING RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $translimit");
+                                    $withfi_query = mysqli_query($con,"SELECT username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw WHERE username LIKE '%$transusername%' AND withdraw_amount < $withfiamount_value HAVING RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $start , $rowsperpage");
                                     break;
                                 case "2":
-                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw_amount < $withfiamount_value HAVING RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $translimit");
+                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw_amount < $withfiamount_value HAVING RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $start , $rowsperpage");
                                     break;
                                 case "3":
-                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw.username LIKE '%$transusername%' AND withdraw_amount < $withfiamount_value HAVING RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $translimit");
+                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw.username LIKE '%$transusername%' AND withdraw_amount < $withfiamount_value HAVING RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $start , $rowsperpage");
                                     break;
                             }
                             break;
                         case "L":
                             switch ($verif_withdraw_case) { 
                                 case "1":
-                                    $withfi_query = mysqli_query($con,"SELECT username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw WHERE username LIKE '%$transusername%' AND withdraw_amount <= $withfiamount_value HAVING RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $translimit");
+                                    $withfi_query = mysqli_query($con,"SELECT username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw WHERE username LIKE '%$transusername%' AND withdraw_amount <= $withfiamount_value HAVING RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $start , $rowsperpage");
                                     break;
                                 case "2":
-                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw_amount <= $withfiamount_value HAVING RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $translimit");
+                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw_amount <= $withfiamount_value HAVING RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $start , $rowsperpage");
                                     break;
                                 case "3":
-                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw.username LIKE '%$transusername%' AND withdraw_amount <= $withfiamount_value HAVING RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $translimit");
+                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw.username LIKE '%$transusername%' AND withdraw_amount <= $withfiamount_value HAVING RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $start , $rowsperpage");
                                     break;
                             }
                             break;
                         case "E":
                             switch ($verif_withdraw_case) { 
                                 case "1":
-                                    $withfi_query = mysqli_query($con,"SELECT username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw WHERE username LIKE '%$transusername%' AND withdraw_amount = $withfiamount_value HAVING RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $translimit");
+                                    $withfi_query = mysqli_query($con,"SELECT username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw WHERE username LIKE '%$transusername%' AND withdraw_amount = $withfiamount_value HAVING RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $start , $rowsperpage");
                                     break;
                                 case "2":
-                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw_amount = $withfiamount_value HAVING RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $translimit");
+                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw_amount = $withfiamount_value HAVING RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $start , $rowsperpage");
                                     break;
                                 case "3":
-                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw.username LIKE '%$transusername%' AND withdraw_amount = $withfiamount_value HAVING RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $translimit");
+                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw.username LIKE '%$transusername%' AND withdraw_amount = $withfiamount_value HAVING RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $start , $rowsperpage");
                                     break;
                             }
                             break;
@@ -737,13 +742,13 @@ if ($con->connect_error) {
                 } else if (empty($withfidate) && empty($withfiamount) && !empty($withfihour)) {
                     switch ($verif_withdraw_case) { 
                         case "1":
-                            $withfi_query = mysqli_query($con,"SELECT username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw WRIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $translimit");
+                            $withfi_query = mysqli_query($con,"SELECT username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw WRIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $start , $rowsperpage");
                             break;
                         case "2":
-                            $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') HAVING RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $translimit");
+                            $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') HAVING RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $start , $rowsperpage");
                             break;
                         case "3":
-                            $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw.username LIKE '%$transusername%' HAVING RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $translimit");
+                            $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw.username LIKE '%$transusername%' HAVING RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $start , $rowsperpage");
                             break;
                     }
                 } else if (!empty($withfidate) && !empty($withfiamount) && !empty($withfihour)) {
@@ -759,65 +764,65 @@ if ($con->connect_error) {
                         case "SG":
                             switch ($verif_withdraw_case) { 
                                 case "1":
-                                    $withfi_query = mysqli_query($con,"SELECT username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw WHERE username LIKE '%$transusername%' AND withdraw_amount > $withfiamount_value HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' AND RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $translimit");
+                                    $withfi_query = mysqli_query($con,"SELECT username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw WHERE username LIKE '%$transusername%' AND withdraw_amount > $withfiamount_value HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' AND RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $start , $rowsperpage");
                                     break;
                                 case "2":
-                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw_amount > $withfiamount_value HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' AND RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $translimit");
+                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw_amount > $withfiamount_value HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' AND RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $start , $rowsperpage");
                                     break;
                                 case "3":
-                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw.username LIKE '%$transusername%' AND withdraw_amount > $withfiamount_value HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' AND RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $translimit");
+                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw.username LIKE '%$transusername%' AND withdraw_amount > $withfiamount_value HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' AND RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $start , $rowsperpage");
                                     break;
                             }
                             break;
                         case "G":
                             switch ($verif_withdraw_case) { 
                                 case "1":
-                                    $withfi_query = mysqli_query($con,"SELECT username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw WHERE username LIKE '%$transusername%' AND withdraw_amount >= $withfiamount_value HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' AND RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $translimit");
+                                    $withfi_query = mysqli_query($con,"SELECT username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw WHERE username LIKE '%$transusername%' AND withdraw_amount >= $withfiamount_value HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' AND RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $start , $rowsperpage");
                                     break;
                                 case "2":
-                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw_amount >= $withfiamount_value HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' AND RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $translimit");
+                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw_amount >= $withfiamount_value HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' AND RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $start , $rowsperpage");
                                     break;
                                 case "3":
-                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw.username LIKE '%$transusername%' AND withdraw_amount >= $withfiamount_value HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' AND RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $translimit");
+                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw.username LIKE '%$transusername%' AND withdraw_amount >= $withfiamount_value HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' AND RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $start , $rowsperpage");
                                     break;
                             }
                             break;
                         case "SL":
                             switch ($verif_withdraw_case) { 
                                 case "1":
-                                    $withfi_query = mysqli_query($con,"SELECT username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw WHERE username LIKE '%$transusername%' AND withdraw_amount < $withfiamount_value HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' AND RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $translimit");
+                                    $withfi_query = mysqli_query($con,"SELECT username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw WHERE username LIKE '%$transusername%' AND withdraw_amount < $withfiamount_value HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' AND RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $start , $rowsperpage");
                                     break;
                                 case "2":
-                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw_amount < $withfiamount_value HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' AND RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $translimit");
+                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw_amount < $withfiamount_value HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' AND RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $start , $rowsperpage");
                                     break;
                                 case "3":
-                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw.username LIKE '%$transusername%' AND withdraw_amount < $withfiamount_value HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' AND RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $translimit");
+                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw.username LIKE '%$transusername%' AND withdraw_amount < $withfiamount_value HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' AND RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $start , $rowsperpage");
                                     break;
                             }
                             break;
                         case "L":
                             switch ($verif_withdraw_case) { 
                                 case "1":
-                                    $withfi_query = mysqli_query($con,"SELECT username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw WHERE username LIKE '%$transusername%' AND withdraw_amount <= $withfiamount_value  HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' AND RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $translimit");
+                                    $withfi_query = mysqli_query($con,"SELECT username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw WHERE username LIKE '%$transusername%' AND withdraw_amount <= $withfiamount_value  HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' AND RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $start , $rowsperpage");
                                     break;
                                 case "2":
-                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw_amount <= $withfiamount_value  HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' AND RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $translimit");
+                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw_amount <= $withfiamount_value  HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' AND RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $start , $rowsperpage");
                                     break;
                                 case "3":
-                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw.username LIKE '%$transusername%' AND withdraw_amount <= $withfiamount_value  HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' AND RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $translimit");
+                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw.username LIKE '%$transusername%' AND withdraw_amount <= $withfiamount_value  HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' AND RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $start , $rowsperpage");
                                     break;
                             }
                             break;
                         case "E":
                             switch ($verif_withdraw_case) { 
                                 case "1":
-                                    $withfi_query = mysqli_query($con,"SELECT username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw WHERE username LIKE '%$transusername%' AND withdraw_amount = $withfiamount_value HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' AND RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $translimit");
+                                    $withfi_query = mysqli_query($con,"SELECT username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw WHERE username LIKE '%$transusername%' AND withdraw_amount = $withfiamount_value HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' AND RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $start , $rowsperpage");
                                     break;
                                 case "2":
-                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw_amount = $withfiamount_value HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' AND RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $translimit");
+                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw_amount = $withfiamount_value HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' AND RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $start , $rowsperpage");
                                     break;
                                 case "3":
-                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw.username LIKE '%$transusername%' AND withdraw_amount = $withfiamount_value HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' AND RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $translimit");
+                                    $withfi_query = mysqli_query($con,"SELECT withdraw.username,LEFT(withdraw_date, 10),RIGHT(withdraw_date, 8),withdraw_amount FROM withdraw,login_credentials WHERE login_credentials.username = withdraw.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND withdraw.username LIKE '%$transusername%' AND withdraw_amount = $withfiamount_value HAVING LEFT(withdraw_date, 10) LIKE '$withfidate' AND RIGHT(withdraw_date, 8) LIKE '$withfihour' LIMIT $start , $rowsperpage");
                                     break;
                             }
                             break;
@@ -840,25 +845,33 @@ if ($con->connect_error) {
         $verif_wire = $_SESSION["verif_wire"];
         if($verif_wire === "success") { 
             $verif_wire_case = $_SESSION['verif_wire_case'];
+            $start = 0;
+            $rowsperpage = 6;
+            $recs = mysqli_query($con,"SELECT * FROM wire");
+            $nbrows = mysqli_num_rows($recs);
+            $nbpages = ceil($nbrows / $rowsperpage);
+            if (isset($_GET["pagenr"])) {
+                $start = ($_GET["pagenr"] - 1)  * $rowsperpage;
+            }
             switch ($verif_wire_case) {
                 case "1":
                     $transusername = $_SESSION["transusername"];
 
-                    $wire_query1 = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' LIMIT $translimit");
-                    $wire_query2 = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' LIMIT $translimit");
+                    $wire_query1 = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' LIMIT $start , $rowsperpage");
+                    $wire_query2 = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' LIMIT $start , $rowsperpage");
                     break;
                 case "2":
                     $transemail = $_SESSION["transemail"];
 
-                    $wire_query1 = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') LIMIT $translimit");
-                    $wire_query2 = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') LIMIT $translimit");
+                    $wire_query1 = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') LIMIT $start , $rowsperpage");
+                    $wire_query2 = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') LIMIT $start , $rowsperpage");
                     break;
                 case "3":
                     $transemail = $_SESSION["transemail"];
                     $transusername = $_SESSION["transusername"];
 
-                    $wire_query1 = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' LIMIT $translimit");
-                    $wire_query2 = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' LIMIT $translimit");
+                    $wire_query1 = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' LIMIT $start , $rowsperpage");
+                    $wire_query2 = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' LIMIT $start , $rowsperpage");
                     break;
             }
             $wire_query_array_all = mysqli_fetch_all($wire_query1, MYSQLI_ASSOC);
@@ -871,13 +884,13 @@ if ($con->connect_error) {
                 if (!empty($wirefidate) && empty($wirefihour) && empty($wirefiamount)) {
                     switch ($verif_wire_case) { 
                         case "1":
-                            $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' HAVING LEFT(wire_date, 10) LIKE '$wirefidate' LIMIT $translimit");
+                            $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' HAVING LEFT(wire_date, 10) LIKE '$wirefidate' LIMIT $start , $rowsperpage");
                             break;
                         case "2":
-                            $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') HAVING LEFT(wire_date, 10) LIKE '$wirefidate' LIMIT $translimit");
+                            $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') HAVING LEFT(wire_date, 10) LIKE '$wirefidate' LIMIT $start , $rowsperpage");
                             break;
                         case "3":
-                            $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' HAVING LEFT(wire_date, 10) LIKE '$wirefidate' LIMIT $translimit");
+                            $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' HAVING LEFT(wire_date, 10) LIKE '$wirefidate' LIMIT $start , $rowsperpage");
                             break;
                     }
                 } else if (!empty($wirefidate) && !empty($wirefiamount) && empty($wirefihour)) {
@@ -893,65 +906,65 @@ if ($con->connect_error) {
                         case "SG":
                             switch ($verif_wire_case) { 
                                 case "1":
-                                    $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' AND wire_amount > $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' LIMIT $translimit");
+                                    $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' AND wire_amount > $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' LIMIT $start , $rowsperpage");
                                     break;
                                 case "2":
-                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire_amount > $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate'  LIMIT $translimit");
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire_amount > $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate'  LIMIT $start , $rowsperpage");
                                     break;
                                 case "3":
-                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' AND wire_amount > $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' LIMIT $translimit");
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' AND wire_amount > $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' LIMIT $start , $rowsperpage");
                                     break;
                             }
                             break;
                         case "G":
                             switch ($verif_wire_case) { 
                                 case "1":
-                                    $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' AND wire_amount >= $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' LIMIT $translimit");
+                                    $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' AND wire_amount >= $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' LIMIT $start , $rowsperpage");
                                     break;
                                 case "2":
-                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire_amount >= $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' LIMIT $translimit");
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire_amount >= $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' LIMIT $start , $rowsperpage");
                                     break;
                                 case "3":
-                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' AND wire_amount >= $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' LIMIT $translimit");
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' AND wire_amount >= $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' LIMIT $start , $rowsperpage");
                                     break;
                             }
                             break;
                         case "SL":
                             switch ($verif_wire_case) { 
                                 case "1":
-                                    $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' AND wire_amount < $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' LIMIT $translimit");
+                                    $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' AND wire_amount < $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' LIMIT $start , $rowsperpage");
                                     break;
                                 case "2":
-                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire_amount < $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' LIMIT $translimit");
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire_amount < $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' LIMIT $start , $rowsperpage");
                                     break;
                                 case "3":
-                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' AND wire_amount < $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' LIMIT $translimit");
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' AND wire_amount < $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' LIMIT $start , $rowsperpage");
                                     break;
                             }
                             break;
                         case "L":
                             switch ($verif_wire_case) { 
                                 case "1":
-                                    $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' AND wire_amount <= $wirefiamount_value  HAVING LEFT(wire_date, 10) LIKE '$wirefidate' LIMIT $translimit");
+                                    $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' AND wire_amount <= $wirefiamount_value  HAVING LEFT(wire_date, 10) LIKE '$wirefidate' LIMIT $start , $rowsperpage");
                                     break;
                                 case "2":
-                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire_amount <= $wirefiamount_value  HAVING LEFT(wire_date, 10) LIKE '$wirefidate' LIMIT $translimit");
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire_amount <= $wirefiamount_value  HAVING LEFT(wire_date, 10) LIKE '$wirefidate' LIMIT $start , $rowsperpage");
                                     break;
                                 case "3":
-                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' AND wire_amount <= $wirefiamount_value  HAVING LEFT(wire_date, 10) LIKE '$wirefidate' LIMIT $translimit");
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' AND wire_amount <= $wirefiamount_value  HAVING LEFT(wire_date, 10) LIKE '$wirefidate' LIMIT $start , $rowsperpage");
                                     break;
                             }
                             break;
                         case "E":
                             switch ($verif_wire_case) { 
                                 case "1":
-                                    $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' AND wire_amount = $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' LIMIT $translimit");
+                                    $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' AND wire_amount = $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' LIMIT $start , $rowsperpage");
                                     break;
                                 case "2":
-                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire_amount = $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' LIMIT $translimit");
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire_amount = $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' LIMIT $start , $rowsperpage");
                                     break;
                                 case "3":
-                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' AND wire_amount = $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' LIMIT $translimit");
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' AND wire_amount = $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' LIMIT $start , $rowsperpage");
                                     break;
                             }
                             break;
@@ -959,13 +972,13 @@ if ($con->connect_error) {
                 } else if (!empty($wirefidate) && empty($wirefiamount) && !empty($wirefihour)) {
                     switch ($verif_wire_case) { 
                         case "1":
-                            $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' HAVING LEFT(wire_date, 10) LIKE '$wirefidate' AND RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                            $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' HAVING LEFT(wire_date, 10) LIKE '$wirefidate' AND RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $start , $rowsperpage");
                             break;
                         case "2":
-                            $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') HAVING LEFT(wire_date, 10) LIKE '$wirefidate' AND RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                            $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') HAVING LEFT(wire_date, 10) LIKE '$wirefidate' AND RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $start , $rowsperpage");
                             break;
                         case "3":
-                            $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' HAVING LEFT(wire_date, 10) LIKE '$wirefidate' AND RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                            $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' HAVING LEFT(wire_date, 10) LIKE '$wirefidate' AND RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $start , $rowsperpage");
                             break;
                     }
                 } else if (empty($wirefidate) && !empty($wirefiamount) && empty($wirefihour)) {
@@ -981,65 +994,65 @@ if ($con->connect_error) {
                         case "SG":
                             switch ($verif_wire_case) { 
                                 case "1":
-                                    $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' AND wire_amount > $wirefiamount_value LIMIT $translimit");
+                                    $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' AND wire_amount > $wirefiamount_value LIMIT $start , $rowsperpage");
                                     break;
                                 case "2":
-                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire_amount > $wirefiamount_value LIMIT $translimit");
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire_amount > $wirefiamount_value LIMIT $start , $rowsperpage");
                                     break;
                                 case "3":
-                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' AND wire_amount > $wirefiamount_value LIMIT $translimit");
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' AND wire_amount > $wirefiamount_value LIMIT $start , $rowsperpage");
                                     break;
                             }
                             break;
                         case "G":
                             switch ($verif_wire_case) { 
                                 case "1":
-                                    $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' AND wire_amount >= $wirefiamount_value LIMIT $translimit");
+                                    $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' AND wire_amount >= $wirefiamount_value LIMIT $start , $rowsperpage");
                                     break;
                                 case "2":
-                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire_amount >= $wirefiamount_value LIMIT $translimit");
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire_amount >= $wirefiamount_value LIMIT $start , $rowsperpage");
                                     break;
                                 case "3":
-                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' AND wire_amount >= $wirefiamount_value LIMIT $translimit");
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' AND wire_amount >= $wirefiamount_value LIMIT $start , $rowsperpage");
                                     break;
                             }
                             break;
                         case "SL":
                             switch ($verif_wire_case) { 
                                 case "1":
-                                    $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' AND wire_amount < $wirefiamount_value LIMIT $translimit");
+                                    $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' AND wire_amount < $wirefiamount_value LIMIT $start , $rowsperpage");
                                     break;
                                 case "2":
-                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire_amount < $wirefiamount_value LIMIT $translimit");
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire_amount < $wirefiamount_value LIMIT $start , $rowsperpage");
                                     break;
                                 case "3":
-                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' AND wire_amount < $wirefiamount_value LIMIT $translimit");
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' AND wire_amount < $wirefiamount_value LIMIT $start , $rowsperpage");
                                     break;
                             }
                             break;
                         case "L":
                             switch ($verif_wire_case) { 
                                 case "1":
-                                    $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' AND wire_amount <= $wirefiamount_value LIMIT $translimit");
+                                    $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' AND wire_amount <= $wirefiamount_value LIMIT $start , $rowsperpage");
                                     break;
                                 case "2":
-                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire_amount <= $wirefiamount_value LIMIT $translimit");
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire_amount <= $wirefiamount_value LIMIT $start , $rowsperpage");
                                     break;
                                 case "3":
-                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' AND wire_amount <= $wirefiamount_value LIMIT $translimit");
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' AND wire_amount <= $wirefiamount_value LIMIT $start , $rowsperpage");
                                     break;
                             }
                             break;
                         case "E":
                             switch ($verif_wire_case) { 
                                 case "1":
-                                    $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' AND wire_amount = $wirefiamount_value LIMIT $translimit");
+                                    $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' AND wire_amount = $wirefiamount_value LIMIT $start , $rowsperpage");
                                     break;
                                 case "2":
-                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire_amount = $wirefiamount_value LIMIT $translimit");
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire_amount = $wirefiamount_value LIMIT $start , $rowsperpage");
                                     break;
                                 case "3":
-                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' AND wire_amount = $wirefiamount_value LIMIT $translimit");
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' AND wire_amount = $wirefiamount_value LIMIT $start , $rowsperpage");
                                     break;
                             }
                             break;
@@ -1057,65 +1070,65 @@ if ($con->connect_error) {
                         case "SG":
                             switch ($verif_wire_case) { 
                                 case "1":
-                                    $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' AND wire_amount > $wirefiamount_value HAVING RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                                    $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' AND wire_amount > $wirefiamount_value HAVING RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $start , $rowsperpage");
                                     break;
                                 case "2":
-                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire_amount > $wirefiamount_value HAVING RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire_amount > $wirefiamount_value HAVING RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $start , $rowsperpage");
                                     break;
                                 case "3":
-                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' AND wire_amount > $wirefiamount_value HAVING RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' AND wire_amount > $wirefiamount_value HAVING RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $start , $rowsperpage");
                                     break;
                             }
                             break;
                         case "G":
                             switch ($verif_wire_case) { 
                                 case "1":
-                                    $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' AND wire_amount >= $wirefiamount_value HAVING RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                                    $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' AND wire_amount >= $wirefiamount_value HAVING RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $start , $rowsperpage");
                                     break;
                                 case "2":
-                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire_amount >= $wirefiamount_value HAVING RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire_amount >= $wirefiamount_value HAVING RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $start , $rowsperpage");
                                     break;
                                 case "3":
-                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' AND wire_amount >= $wirefiamount_value HAVING RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' AND wire_amount >= $wirefiamount_value HAVING RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $start , $rowsperpage");
                                     break;
                             }
                             break;
                         case "SL":
                             switch ($verif_wire_case) { 
                                 case "1":
-                                    $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' AND wire_amount < $wirefiamount_value HAVING RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                                    $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' AND wire_amount < $wirefiamount_value HAVING RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $start , $rowsperpage");
                                     break;
                                 case "2":
-                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire_amount < $wirefiamount_value HAVING RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire_amount < $wirefiamount_value HAVING RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $start , $rowsperpage");
                                     break;
                                 case "3":
-                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' AND wire_amount < $wirefiamount_value HAVING RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' AND wire_amount < $wirefiamount_value HAVING RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $start , $rowsperpage");
                                     break;
                             }
                             break;
                         case "L":
                             switch ($verif_wire_case) { 
                                 case "1":
-                                    $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' AND wire_amount <= $wirefiamount_value HAVING RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                                    $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' AND wire_amount <= $wirefiamount_value HAVING RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $start , $rowsperpage");
                                     break;
                                 case "2":
-                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire_amount <= $wirefiamount_value HAVING RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire_amount <= $wirefiamount_value HAVING RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $start , $rowsperpage");
                                     break;
                                 case "3":
-                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' AND wire_amount <= $wirefiamount_value HAVING RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' AND wire_amount <= $wirefiamount_value HAVING RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $start , $rowsperpage");
                                     break;
                             }
                             break;
                         case "E":
                             switch ($verif_wire_case) { 
                                 case "1":
-                                    $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' AND wire_amount = $wirefiamount_value HAVING RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                                    $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' AND wire_amount = $wirefiamount_value HAVING RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $start , $rowsperpage");
                                     break;
                                 case "2":
-                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire_amount = $wirefiamount_value HAVING RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire_amount = $wirefiamount_value HAVING RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $start , $rowsperpage");
                                     break;
                                 case "3":
-                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' AND wire_amount = $wirefiamount_value HAVING RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' AND wire_amount = $wirefiamount_value HAVING RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $start , $rowsperpage");
                                     break;
                             }
                             break;
@@ -1123,13 +1136,13 @@ if ($con->connect_error) {
                 } else if (empty($wirefidate) && empty($wirefiamount) && !empty($wirefihour)) {
                     switch ($verif_wire_case) { 
                         case "1":
-                            $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WRIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                            $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WRIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $start , $rowsperpage");
                             break;
                         case "2":
-                            $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') HAVING RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                            $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') HAVING RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $start , $rowsperpage");
                             break;
                         case "3":
-                            $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' HAVING RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                            $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' HAVING RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $start , $rowsperpage");
                             break;
                     }
                 } else if (!empty($wirefidate) && !empty($wirefiamount) && !empty($wirefihour)) {
@@ -1145,65 +1158,65 @@ if ($con->connect_error) {
                         case "SG":
                             switch ($verif_wire_case) { 
                                 case "1":
-                                    $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' AND wire_amount > $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' AND RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                                    $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' AND wire_amount > $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' AND RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $start , $rowsperpage");
                                     break;
                                 case "2":
-                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire_amount > $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' AND RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire_amount > $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' AND RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $start , $rowsperpage");
                                     break;
                                 case "3":
-                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' AND wire_amount > $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' AND RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' AND wire_amount > $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' AND RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $start , $rowsperpage");
                                     break;
                             }
                             break;
                         case "G":
                             switch ($verif_wire_case) { 
                                 case "1":
-                                    $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' AND wire_amount >= $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' AND RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                                    $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' AND wire_amount >= $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' AND RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $start , $rowsperpage");
                                     break;
                                 case "2":
-                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire_amount >= $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' AND RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire_amount >= $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' AND RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $start , $rowsperpage");
                                     break;
                                 case "3":
-                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' AND wire_amount >= $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' AND RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' AND wire_amount >= $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' AND RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $start , $rowsperpage");
                                     break;
                             }
                             break;
                         case "SL":
                             switch ($verif_wire_case) { 
                                 case "1":
-                                    $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' AND wire_amount < $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' AND RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                                    $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' AND wire_amount < $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' AND RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $start , $rowsperpage");
                                     break;
                                 case "2":
-                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire_amount < $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' AND RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire_amount < $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' AND RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $start , $rowsperpage");
                                     break;
                                 case "3":
-                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' AND wire_amount < $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' AND RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' AND wire_amount < $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' AND RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $start , $rowsperpage");
                                     break;
                             }
                             break;
                         case "L":
                             switch ($verif_wire_case) { 
                                 case "1":
-                                    $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' AND wire_amount <= $wirefiamount_value  HAVING LEFT(wire_date, 10) LIKE '$wirefidate' AND RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                                    $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' AND wire_amount <= $wirefiamount_value  HAVING LEFT(wire_date, 10) LIKE '$wirefidate' AND RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $start , $rowsperpage");
                                     break;
                                 case "2":
-                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire_amount <= $wirefiamount_value  HAVING LEFT(wire_date, 10) LIKE '$wirefidate' AND RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire_amount <= $wirefiamount_value  HAVING LEFT(wire_date, 10) LIKE '$wirefidate' AND RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $start , $rowsperpage");
                                     break;
                                 case "3":
-                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' AND wire_amount <= $wirefiamount_value  HAVING LEFT(wire_date, 10) LIKE '$wirefidate' AND RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' AND wire_amount <= $wirefiamount_value  HAVING LEFT(wire_date, 10) LIKE '$wirefidate' AND RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $start , $rowsperpage");
                                     break;
                             }
                             break;
                         case "E":
                             switch ($verif_wire_case) { 
                                 case "1":
-                                    $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' AND wire_amount = $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' AND RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                                    $wirefi_query = mysqli_query($con,"SELECT username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire WHERE username LIKE '%$transusername%' AND wire_amount = $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' AND RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $start , $rowsperpage");
                                     break;
                                 case "2":
-                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire_amount = $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' AND RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire_amount = $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' AND RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $start , $rowsperpage");
                                     break;
                                 case "3":
-                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' AND wire_amount = $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' AND RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $translimit");
+                                    $wirefi_query = mysqli_query($con,"SELECT wire.username,receiver,LEFT(wire_date, 10),RIGHT(wire_date, 8),wire_amount FROM wire,login_credentials WHERE login_credentials.username = wire.username AND email IN (SELECT email FROM login_credentials WHERE email LIKE '%$transemail%') AND wire.username LIKE '%$transusername%' AND wire_amount = $wirefiamount_value HAVING LEFT(wire_date, 10) LIKE '$wirefidate' AND RIGHT(wire_date, 8) LIKE '$wirefihour' LIMIT $start , $rowsperpage");
                                     break;
                             }
                             break;
@@ -1374,37 +1387,37 @@ if ($con->connect_error) {
                     </tbody>
                 </table>
                 <?php
-                    if (!isset($_GET["deppagenr"])) { 
-                        $deppage = 1;
+                    if (!isset($_GET["pagenr"])) { 
+                        $page = 1;
                     } else {
-                        $deppage = $_GET["deppagenr"];
+                        $page = $_GET["pagenr"];
                     }
                 ?>
-                <div class="">Showing <?php echo $deppage; ?> out of <?php echo $depnbpages; ?> pages</div>
+                <div class="">Showing <?php echo $page; ?> out of <?php echo $nbpages; ?> pages</div>
                 <ul class="pagination mt-3">
-                    <li class="page-item"><a class="page-link" style="background-color: lightskyblue; border-color: lightgray; opacity: 0.9;" href="?deppagenr=1">First</a></li>
+                    <li class="page-item"><a class="page-link" style="background-color: lightskyblue; border-color: lightgray; opacity: 0.9;" href="?pagenr=1">First</a></li>
                     <?php
-                        if (isset($_GET["deppagenr"]) && $_GET["deppagenr"] > 1 ) { ?>
-                            <li class="page-item"><a class="page-link" style="background-color: lightskyblue; border-color: lightgray; opacity: 0.9;" href="?deppagenr=<?php echo $_GET["deppagenr"] - 1; ?>">Previous</a></li>
+                        if (isset($_GET["pagenr"]) && $_GET["pagenr"] > 1 ) { ?>
+                            <li class="page-item"><a class="page-link" style="background-color: lightskyblue; border-color: lightgray; opacity: 0.9;" href="?pagenr=<?php echo $_GET["pagenr"] - 1; ?>">Previous</a></li>
                         <?php } else { ?>
                             <li class="page-item"><a class="page-link" style="background-color: lightskyblue; border-color: lightgray; opacity: 0.9;" href="">Previous</a></li>
                        <?php }
                     ?>
                     <?php
-                        for ($i = 1; $i <= $depnbpages; $i++) { ?>
-                            <li class="page-item"><a class="page-link" style="background-color: lightskyblue; border-color: lightgray; opacity: 0.9;" href="?deppagenr=<?php echo $i; ?>"><?php echo $i; ?></a></li>
+                        for ($i = 1; $i <= $nbpages; $i++) { ?>
+                            <li class="page-item"><a class="page-link" style="background-color: lightskyblue; border-color: lightgray; opacity: 0.9;" href="?pagenr=<?php echo $i; ?>"><?php echo $i; ?></a></li>
                         <?php }
                     ?>
                     <?php
-                        if (!isset($_GET["deppagenr"])) { ?>
-                            <li class="page-item"><a class="page-link" style="background-color: lightskyblue; border-color: lightgray; opacity: 0.9;" href="?deppagenr=2">Next</a></li>
-                        <?php } else if ($_GET["deppagenr"] >= $depnbpages) { ?>
+                        if (!isset($_GET["pagenr"])) { ?>
+                            <li class="page-item"><a class="page-link" style="background-color: lightskyblue; border-color: lightgray; opacity: 0.9;" href="?pagenr=2">Next</a></li>
+                        <?php } else if ($_GET["pagenr"] >= $nbpages) { ?>
                             <li class="page-item"><a class="page-link" style="background-color: lightskyblue; border-color: lightgray; opacity: 0.9;" href="">Next</a></li>
                        <?php } else { ?>
-                        <li class="page-item"><a class="page-link" style="background-color: lightskyblue; border-color: lightgray; opacity: 0.9;" href="?deppagenr=<?php echo $_GET["deppagenr"] + 1; ?>">Next</a></li>
+                        <li class="page-item"><a class="page-link" style="background-color: lightskyblue; border-color: lightgray; opacity: 0.9;" href="?pagenr=<?php echo $_GET["pagenr"] + 1; ?>">Next</a></li>
                        <?php }
                     ?>
-                    <li class="page-item"><a class="page-link" style="background-color: lightskyblue; border-color: lightgray; opacity: 0.9;" href="?deppagenr=<?php echo $depnbpages; ?>">Last</a></li>
+                    <li class="page-item"><a class="page-link" style="background-color: lightskyblue; border-color: lightgray; opacity: 0.9;" href="?pagenr=<?php echo $nbpages; ?>">Last</a></li>
                 </ul>
                 <div class="mt-2">P.S. : If you just want to check records omit these inputs</div>
                 <div class="d-flex gap-4">
@@ -1536,6 +1549,39 @@ if ($con->connect_error) {
                         <?php endif; ?>
                     </tbody>
                 </table>
+                <?php
+                    if (!isset($_GET["pagenr"])) { 
+                        $page = 1;
+                    } else {
+                        $page = $_GET["pagenr"];
+                    }
+                ?>
+                <div class="">Showing <?php echo $page; ?> out of <?php echo $nbpages; ?> pages</div>
+                <ul class="pagination mt-3">
+                    <li class="page-item"><a class="page-link" style="background-color: lightskyblue; border-color: lightgray; opacity: 0.9;" href="?pagenr=1">First</a></li>
+                    <?php
+                        if (isset($_GET["pagenr"]) && $_GET["pagenr"] > 1 ) { ?>
+                            <li class="page-item"><a class="page-link" style="background-color: lightskyblue; border-color: lightgray; opacity: 0.9;" href="?pagenr=<?php echo $_GET["pagenr"] - 1; ?>">Previous</a></li>
+                        <?php } else { ?>
+                            <li class="page-item"><a class="page-link" style="background-color: lightskyblue; border-color: lightgray; opacity: 0.9;" href="">Previous</a></li>
+                       <?php }
+                    ?>
+                    <?php
+                        for ($i = 1; $i <= $nbpages; $i++) { ?>
+                            <li class="page-item"><a class="page-link" style="background-color: lightskyblue; border-color: lightgray; opacity: 0.9;" href="?pagenr=<?php echo $i; ?>"><?php echo $i; ?></a></li>
+                        <?php }
+                    ?>
+                    <?php
+                        if (!isset($_GET["pagenr"])) { ?>
+                            <li class="page-item"><a class="page-link" style="background-color: lightskyblue; border-color: lightgray; opacity: 0.9;" href="?pagenr=2">Next</a></li>
+                        <?php } else if ($_GET["pagenr"] >= $nbpages) { ?>
+                            <li class="page-item"><a class="page-link" style="background-color: lightskyblue; border-color: lightgray; opacity: 0.9;" href="">Next</a></li>
+                       <?php } else { ?>
+                        <li class="page-item"><a class="page-link" style="background-color: lightskyblue; border-color: lightgray; opacity: 0.9;" href="?pagenr=<?php echo $_GET["pagenr"] + 1; ?>">Next</a></li>
+                       <?php }
+                    ?>
+                    <li class="page-item"><a class="page-link" style="background-color: lightskyblue; border-color: lightgray; opacity: 0.9;" href="?pagenr=<?php echo $nbpages; ?>">Last</a></li>
+                </ul>
                 <div class="mt-2">P.S. : If you just want to check records omit these inputs</div>
                 <div class="d-flex gap-4">
                     <label class="labbor lab">
@@ -1667,6 +1713,39 @@ if ($con->connect_error) {
                         <?php endif; ?>
                     </tbody>
                 </table>
+                <?php
+                    if (!isset($_GET["pagenr"])) { 
+                        $page = 1;
+                    } else {
+                        $page = $_GET["pagenr"];
+                    }
+                ?>
+                <div class="">Showing <?php echo $page; ?> out of <?php echo $nbpages; ?> pages</div>
+                <ul class="pagination mt-3">
+                    <li class="page-item"><a class="page-link" style="background-color: lightskyblue; border-color: lightgray; opacity: 0.9;" href="?pagenr=1">First</a></li>
+                    <?php
+                        if (isset($_GET["pagenr"]) && $_GET["pagenr"] > 1 ) { ?>
+                            <li class="page-item"><a class="page-link" style="background-color: lightskyblue; border-color: lightgray; opacity: 0.9;" href="?pagenr=<?php echo $_GET["pagenr"] - 1; ?>">Previous</a></li>
+                        <?php } else { ?>
+                            <li class="page-item"><a class="page-link" style="background-color: lightskyblue; border-color: lightgray; opacity: 0.9;" href="">Previous</a></li>
+                       <?php }
+                    ?>
+                    <?php
+                        for ($i = 1; $i <= $nbpages; $i++) { ?>
+                            <li class="page-item"><a class="page-link" style="background-color: lightskyblue; border-color: lightgray; opacity: 0.9;" href="?pagenr=<?php echo $i; ?>"><?php echo $i; ?></a></li>
+                        <?php }
+                    ?>
+                    <?php
+                        if (!isset($_GET["pagenr"])) { ?>
+                            <li class="page-item"><a class="page-link" style="background-color: lightskyblue; border-color: lightgray; opacity: 0.9;" href="?pagenr=2">Next</a></li>
+                        <?php } else if ($_GET["pagenr"] >= $nbpages) { ?>
+                            <li class="page-item"><a class="page-link" style="background-color: lightskyblue; border-color: lightgray; opacity: 0.9;" href="">Next</a></li>
+                       <?php } else { ?>
+                        <li class="page-item"><a class="page-link" style="background-color: lightskyblue; border-color: lightgray; opacity: 0.9;" href="?pagenr=<?php echo $_GET["pagenr"] + 1; ?>">Next</a></li>
+                       <?php }
+                    ?>
+                    <li class="page-item"><a class="page-link" style="background-color: lightskyblue; border-color: lightgray; opacity: 0.9;" href="?pagenr=<?php echo $nbpages; ?>">Last</a></li>
+                </ul>
                 <div class="mt-2">P.S. : If you just want to check records omit these inputs</div>
                 <div class="d-flex gap-4">
                     <label class="labbor lab">
@@ -1756,7 +1835,7 @@ if ($con->connect_error) {
     </body>
     </html>
 <?php endif; ?>
-<?php if(isset($verif_balance) && $verif_balance === "fail" || isset($verif_deposit) &&  $verif_deposit === "fail"): ?>
+<?php if(isset($verif_balance) && $verif_balance === "fail" || isset($verif_deposit) &&  $verif_deposit === "fail" || isset($verif_withdraw) && $verif_withdraw === "fail" || isset($verif_wire) && $verif_wire === "fail"): ?>
     <!DOCTYPE html>
     <html lang="en">
     <head>

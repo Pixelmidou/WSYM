@@ -7,7 +7,7 @@ if ($con->connect_error) {
     if (!isset($_SESSION['setting']) && !isset($_SESSION['verif_id'])) {
         if (empty($_SESSION['setting']) || $_SESSION['setting'] === "" && empty($_SESSION['verif_id']) || $_SESSION['verif_id'] === "") {
             session_destroy();
-            header("Location: index.html");
+            header("Location: index.php");
             exit;
         } 
     }
@@ -49,7 +49,7 @@ if ($con->connect_error) {
                 <head>
                     <meta charset="UTF-8">
                     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <meta http-equiv="refresh" content="4; url=index.html">
+                    <meta http-equiv="refresh" content="4; url=index.php">
                     <title>WSYM Banking</title>
                     <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
                     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
@@ -106,7 +106,7 @@ if ($con->connect_error) {
                 <head>
                     <meta charset="UTF-8">
                     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <meta http-equiv="refresh" content="4; url=index.html">
+                    <meta http-equiv="refresh" content="4; url=index.php">
                     <title>WSYM Banking</title>
                     <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
                     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
@@ -166,7 +166,7 @@ if ($con->connect_error) {
                     <head>
                         <meta charset="UTF-8">
                         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                        <meta http-equiv="refresh" content="4; url=index.html">
+                        <meta http-equiv="refresh" content="4; url=index.php">
                         <title>WSYM Banking</title>
                         <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
                         <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">

@@ -4,7 +4,7 @@ $admin_username = $_SESSION['admin_username'];
 $_SESSION['user_username'] = $admin_username;
 if(empty($_SESSION['admin_username']) || $_SESSION['admin_username'] == ''){
     session_destroy();
-    header("Location: index.html");
+    header("Location: index.php");
     exit;
 }
 if (isset($_POST["adminpage"])) {
