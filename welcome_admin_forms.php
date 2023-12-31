@@ -18,19 +18,43 @@ if ($con->connect_error) {
             switch ($verif_balance_case) {
                 case "1":
                     $balanceemail = $_SESSION["balanceemail"];
-                    $balance_query1 = mysqli_query($con,"SELECT * FROM balance WHERE email LIKE '%$balanceemail%'");
-                    $balance_query2 = mysqli_query($con,"SELECT * FROM balance WHERE email LIKE '%$balanceemail%'");
+                    $start = 0;
+                    $rowsperpage = 6;
+                    $recs = mysqli_query($con,"SELECT * FROM balance WHERE email LIKE '%$balanceemail%'");
+                    $nbrows = mysqli_num_rows($recs);
+                    $nbpages = ceil($nbrows / $rowsperpage);
+                    if (isset($_GET["pagenr"])) {
+                        $start = ($_GET["pagenr"] - 1)  * $rowsperpage;
+                    }
+                    $balance_query1 = mysqli_query($con,"SELECT * FROM balance WHERE email LIKE '%$balanceemail%' LIMIT $start , $rowsperpage");
+                    $balance_query2 = mysqli_query($con,"SELECT * FROM balance WHERE email LIKE '%$balanceemail%' LIMIT $start , $rowsperpage");
                     break;
                 case "2":
                     $balanceusername = $_SESSION["balanceusername"];
-                    $balance_query1 = mysqli_query($con,"SELECT * FROM balance WHERE username LIKE '%$balanceusername%'");
-                    $balance_query2 = mysqli_query($con,"SELECT * FROM balance WHERE username LIKE '%$balanceusername%'");
+                    $start = 0;
+                    $rowsperpage = 6;
+                    $recs = mysqli_query($con,"SELECT * FROM balance WHERE username LIKE '%$balanceusername%'");
+                    $nbrows = mysqli_num_rows($recs);
+                    $nbpages = ceil($nbrows / $rowsperpage);
+                    if (isset($_GET["pagenr"])) {
+                        $start = ($_GET["pagenr"] - 1)  * $rowsperpage;
+                    }
+                    $balance_query1 = mysqli_query($con,"SELECT * FROM balance WHERE username LIKE '%$balanceusername%' LIMIT $start , $rowsperpage");
+                    $balance_query2 = mysqli_query($con,"SELECT * FROM balance WHERE username LIKE '%$balanceusername%' LIMIT $start , $rowsperpage");
                     break;
                 case "3":
                     $balanceemail = $_SESSION["balanceemail"];
                     $balanceusername = $_SESSION["balanceusername"];
-                    $balance_query1 = mysqli_query($con,"SELECT * FROM balance WHERE username LIKE '%$balanceusername%' AND email LIKE '%$balanceemail%'");
-                    $balance_query2 = mysqli_query($con,"SELECT * FROM balance WHERE username LIKE '%$balanceusername%' AND email LIKE '%$balanceemail%'");
+                    $start = 0;
+                    $rowsperpage = 6;
+                    $recs = mysqli_query($con,"SELECT * FROM balance WHERE username LIKE '%$balanceusername%' AND email LIKE '%$balanceemail%'");
+                    $nbrows = mysqli_num_rows($recs);
+                    $nbpages = ceil($nbrows / $rowsperpage);
+                    if (isset($_GET["pagenr"])) {
+                        $start = ($_GET["pagenr"] - 1)  * $rowsperpage;
+                    }
+                    $balance_query1 = mysqli_query($con,"SELECT * FROM balance WHERE username LIKE '%$balanceusername%' AND email LIKE '%$balanceemail%' LIMIT $start , $rowsperpage");
+                    $balance_query2 = mysqli_query($con,"SELECT * FROM balance WHERE username LIKE '%$balanceusername%' AND email LIKE '%$balanceemail%' LIMIT $start , $rowsperpage");
                     break;
             }
             $balance_query_array_all = mysqli_fetch_all($balance_query1, MYSQLI_ASSOC);
@@ -1320,6 +1344,39 @@ if ($con->connect_error) {
                     <?php endforeach; ?>
                     </tbody>
                 </table>
+                <?php
+                    if (!isset($_GET["pagenr"])) { 
+                        $page = 1;
+                    } else {
+                        $page = $_GET["pagenr"];
+                    }
+                ?>
+                <div class="">Showing <?php echo $page; ?> out of <?php echo $nbpages; ?> pages</div>
+                <ul class="pagination mt-3">
+                    <li class="page-item"><a class="page-link" style="background-color: lightskyblue; border-color: lightgray; opacity: 0.9;" href="?pagenr=1">First</a></li>
+                    <?php
+                        if (isset($_GET["pagenr"]) && $_GET["pagenr"] > 1 ) { ?>
+                            <li class="page-item"><a class="page-link" style="background-color: lightskyblue; border-color: lightgray; opacity: 0.9;" href="?pagenr=<?php echo $_GET["pagenr"] - 1; ?>">Previous</a></li>
+                        <?php } else { ?>
+                            <li class="page-item"><a class="page-link" style="background-color: lightskyblue; border-color: lightgray; opacity: 0.9;" href="">Previous</a></li>
+                       <?php }
+                    ?>
+                    <?php
+                        for ($i = 1; $i <= $nbpages; $i++) { ?>
+                            <li class="page-item"><a class="page-link" style="background-color: lightskyblue; border-color: lightgray; opacity: 0.9;" href="?pagenr=<?php echo $i; ?>"><?php echo $i; ?></a></li>
+                        <?php }
+                    ?>
+                    <?php
+                        if (!isset($_GET["pagenr"])) { ?>
+                            <li class="page-item"><a class="page-link" style="background-color: lightskyblue; border-color: lightgray; opacity: 0.9;" href="?pagenr=2">Next</a></li>
+                        <?php } else if ($_GET["pagenr"] >= $nbpages) { ?>
+                            <li class="page-item"><a class="page-link" style="background-color: lightskyblue; border-color: lightgray; opacity: 0.9;" href="">Next</a></li>
+                       <?php } else { ?>
+                        <li class="page-item"><a class="page-link" style="background-color: lightskyblue; border-color: lightgray; opacity: 0.9;" href="?pagenr=<?php echo $_GET["pagenr"] + 1; ?>">Next</a></li>
+                       <?php }
+                    ?>
+                    <li class="page-item"><a class="page-link" style="background-color: lightskyblue; border-color: lightgray; opacity: 0.9;" href="?pagenr=<?php echo $nbpages; ?>">Last</a></li>
+                </ul>
                 <div class="mb-2 mt-2">P.S. : If you just want to check balances omit these inputs</div>
                 <div class="d-flex gap-4">
                     <label class="labbor lab">

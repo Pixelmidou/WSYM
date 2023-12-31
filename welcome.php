@@ -204,6 +204,19 @@ if ($con->connect_error) {
             header("Location: account_settings.php");
             exit;
         }
+        // working on it "dephis_submit"
+        if (isset($_POST['dephis_submit'])) {
+            $dephis_query = mysqli_query($con,"SELECT username,deposit_date,deposit_amount FROM deposit WHERE username LIKE '$user_username'");
+            if (mysqli_num_rows($dephis_query) > 0) {
+                $_SESSION["dephis_submit"] = "success";
+                header("Location: welcome_verif.php");
+                exit;
+            } else {
+                $_SESSION['dephis_submit'] = "fail";
+                header("Location: welcome_verif.php");
+                exit;
+            }
+        }
         switch ($_SESSION) {
             case isset($_SESSION['dep']):
                 unset($_SESSION['deposit_verif']);
@@ -308,7 +321,15 @@ if ($con->connect_error) {
                 <input type="button" value="$40" id="forty" class="vals valbuts">
                 <input type="button" value="$50" id="fifty" class="vals valbuts">
             </div>
-            <input type="submit" value="Deposit" class="but" id="depositbut" name="deposit_submit" onclick="return depositconfirm()">
+            <div class="d-flex gap-3 mt-auto">
+                <style>
+                    .x1 {
+                        width: 250px;
+                    }
+                </style>
+                <input type="submit" value="Deposit" class="but x1" id="depositbut" name="deposit_submit" onclick="return depositconfirm()">
+                <input type="submit" value="Deposit History" class="but x1" id="" name="dephis_submit">
+            </div>
         </form>
         <form method="post" class="container4 withdraw" id="withdraw">
             <h1 class="deptitle">Withdraw Money</h1>
@@ -324,7 +345,15 @@ if ($con->connect_error) {
                 <input type="button" value="$40" id="fortyy" class="vals valbuts">
                 <input type="button" value="$50" id="fiftyy" class="vals valbuts">
             </div>
-            <input type="submit" value="Withdraw" class="but" id="withdrawbut" name="withdraw_submit" onclick="return withdrawconfirm()">
+            <div class="d-flex gap-3 mt-auto">
+                <style>
+                    .x2 {
+                        width: 250px;
+                    }
+                </style>
+                <input type="submit" value="Withdraw" class="but x2" id="withdrawbut" name="withdraw_submit" onclick="return withdrawconfirm()">
+                <input type="submit" value="Withdraw History" class="but x2" id="" name="">
+            </div>
         </form>
         <form method="post" class="container4 wire" id="wire">
             <h1>Wire Money</h1>
@@ -345,7 +374,15 @@ if ($con->connect_error) {
                 <input type="button" value="$40" id="fortyyy" class="vals valbuts">
                 <input type="button" value="$50" id="fiftyyy" class="vals valbuts">
             </div>
-            <input type="submit" value="Wire the Money" class="but" id="wirebut" name="wire_submit" onclick="return wireconfirm()">
+            <div class="d-flex gap-3 mt-auto">
+                <style>
+                    .x3 {
+                        width: 250px;
+                    }
+                </style>
+                <input type="submit" value="Wire the Money" class="but x3" id="wirebut" name="wire_submit" onclick="return wireconfirm()">
+                <input type="submit" value="Wire History" class="but x3" id="" name="">
+            </div>
         </form>
         <form method="post" class="container4 ticket" id="ticket">
             <h1 class="deptitle">Submit a ticket</h1>

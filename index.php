@@ -1,3 +1,13 @@
+<?php
+session_start();
+if (isset($_SESSION['admin_username'])) {
+    header("Location: admin_redirections.php");
+    exit;
+} else if (isset($_SESSION['user_username'])) {
+    header("Location: welcome.php");
+    exit;
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
