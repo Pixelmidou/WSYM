@@ -208,11 +208,11 @@ if ($con->connect_error) {
         if (isset($_POST['dephis_submit'])) {
             $dephis_query = mysqli_query($con,"SELECT username,deposit_date,deposit_amount FROM deposit WHERE username LIKE '$user_username'");
             if (mysqli_num_rows($dephis_query) > 0) {
-                $_SESSION["dephis_submit"] = "success";
+                $_SESSION["dephis_show"] = "success";
                 header("Location: welcome_verif.php");
                 exit;
             } else {
-                $_SESSION['dephis_submit'] = "fail";
+                $_SESSION['dephis_show'] = "fail";
                 header("Location: welcome_verif.php");
                 exit;
             }
@@ -238,6 +238,10 @@ if ($con->connect_error) {
                 unset($_SESSION['verif_id']);
                 unset($_SESSION['setting']);
                 unset($_SESSION['accset']);
+                break;
+            case isset($_SESSION['dephis']):
+                unset($_SESSION['dephis_show']);
+                unset($_SESSION['dephis']);
                 break;
         }
     }
@@ -328,7 +332,7 @@ if ($con->connect_error) {
                     }
                 </style>
                 <input type="submit" value="Deposit" class="but x1" id="depositbut" name="deposit_submit" onclick="return depositconfirm()">
-                <input type="submit" value="Deposit History" class="but x1" id="" name="dephis_submit">
+                <input type="submit" value="Deposit History" class="but x1" id="" name="dephis_submit" formnovalidate>
             </div>
         </form>
         <form method="post" class="container4 withdraw" id="withdraw">
@@ -352,7 +356,7 @@ if ($con->connect_error) {
                     }
                 </style>
                 <input type="submit" value="Withdraw" class="but x2" id="withdrawbut" name="withdraw_submit" onclick="return withdrawconfirm()">
-                <input type="submit" value="Withdraw History" class="but x2" id="" name="">
+                <input type="submit" value="Withdraw History" class="but x2" id="" name="" formnovalidate>
             </div>
         </form>
         <form method="post" class="container4 wire" id="wire">
@@ -381,7 +385,7 @@ if ($con->connect_error) {
                     }
                 </style>
                 <input type="submit" value="Wire the Money" class="but x3" id="wirebut" name="wire_submit" onclick="return wireconfirm()">
-                <input type="submit" value="Wire History" class="but x3" id="" name="">
+                <input type="submit" value="Wire History" class="but x3" id="" name="" formnovalidate>
             </div>
         </form>
         <form method="post" class="container4 ticket" id="ticket">
