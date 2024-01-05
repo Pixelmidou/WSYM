@@ -204,15 +204,38 @@ if ($con->connect_error) {
             header("Location: account_settings.php");
             exit;
         }
-        // working on it "dephis_submit"
         if (isset($_POST['dephis_submit'])) {
-            $dephis_query = mysqli_query($con,"SELECT username,deposit_date,deposit_amount FROM deposit WHERE username LIKE '$user_username'");
+            $dephis_query = mysqli_query($con,"SELECT deposit_date,deposit_amount FROM deposit WHERE username LIKE '$user_username'");
             if (mysqli_num_rows($dephis_query) > 0) {
                 $_SESSION["dephis_show"] = "success";
                 header("Location: welcome_verif.php");
                 exit;
             } else {
                 $_SESSION['dephis_show'] = "fail";
+                header("Location: welcome_verif.php");
+                exit;
+            }
+        }
+        if (isset($_POST['withhis_submit'])) {
+            $withhis_query = mysqli_query($con,"SELECT withdraw_date,withdraw_amount FROM withdraw WHERE username LIKE '$user_username'");
+            if (mysqli_num_rows($withhis_query) > 0) {
+                $_SESSION["withhis_show"] = "success";
+                header("Location: welcome_verif.php");
+                exit;
+            } else {
+                $_SESSION['withhis_show'] = "fail";
+                header("Location: welcome_verif.php");
+                exit;
+            }
+        }
+        if (isset($_POST['wirehis_submit'])) {
+            $wirehis_query = mysqli_query($con,"SELECT receiver,wire_date,wire_amount FROM wire WHERE username LIKE '$user_username'");
+            if (mysqli_num_rows($wirehis_query) > 0) {
+                $_SESSION["wirehis_show"] = "success";
+                header("Location: welcome_verif.php");
+                exit;
+            } else {
+                $_SESSION['wirehis_show'] = "fail";
                 header("Location: welcome_verif.php");
                 exit;
             }
@@ -242,6 +265,14 @@ if ($con->connect_error) {
             case isset($_SESSION['dephis']):
                 unset($_SESSION['dephis_show']);
                 unset($_SESSION['dephis']);
+                break;
+            case isset($_SESSION['withhis']):
+                unset($_SESSION['withhis_show']);
+                unset($_SESSION['withhis']);
+                break;
+            case isset($_SESSION['wirehis']):
+                unset($_SESSION['wirehis_show']);
+                unset($_SESSION['wirehis']);
                 break;
         }
     }
@@ -356,7 +387,7 @@ if ($con->connect_error) {
                     }
                 </style>
                 <input type="submit" value="Withdraw" class="but x2" id="withdrawbut" name="withdraw_submit" onclick="return withdrawconfirm()">
-                <input type="submit" value="Withdraw History" class="but x2" id="" name="" formnovalidate>
+                <input type="submit" value="Withdraw History" class="but x2" id="" name="withhis_submit" formnovalidate>
             </div>
         </form>
         <form method="post" class="container4 wire" id="wire">
@@ -385,7 +416,7 @@ if ($con->connect_error) {
                     }
                 </style>
                 <input type="submit" value="Wire the Money" class="but x3" id="wirebut" name="wire_submit" onclick="return wireconfirm()">
-                <input type="submit" value="Wire History" class="but x3" id="" name="" formnovalidate>
+                <input type="submit" value="Wire History" class="but x3" id="" name="wirehis_submit" formnovalidate>
             </div>
         </form>
         <form method="post" class="container4 ticket" id="ticket">

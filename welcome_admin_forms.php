@@ -6,9 +6,14 @@ if ($con->connect_error) {
     session_start();
     if (!isset($_SESSION['verif_balance']) && !isset($_SESSION['verif_deposit']) && !isset($_SESSION['verif_withdraw']) && !isset($_SESSION['verif_wire']) && !isset($_SESSION['verif_dep_action']) && !isset($_SESSION['verif_with_action']) && !isset($_SESSION['verif_wire_action']) && !isset($_SESSION['verif_ticket_action']) && !isset($_SESSION['verif_acc_action'])) {
         if (empty($_SESSION['verif_balance']) || $_SESSION['verif_balance'] === "" && empty($_SESSION['verif_deposit']) || $_SESSION['verif_deposit'] === "" && empty($_SESSION['verif_withdraw']) || $_SESSION['verif_withdraw'] === ""  && empty($_SESSION['verif_wire']) || $_SESSION['verif_wire'] === "" && empty($_SESSION['verif_dep_action']) || $_SESSION['verif_dep_action'] === "" && empty($_SESSION['verif_with_action']) || $_SESSION['verif_with_action'] === "" && empty($_SESSION['verif_wire_action']) || $_SESSION['verif_wire_action'] === "" && empty($_SESSION['verif_ticket_action']) || $_SESSION['verif_ticket_action'] === "" && empty($_SESSION['verif_acc_action']) || $_SESSION['verif_acc_action'] === "") {
-            session_destroy();
-            header("Location: index.php");
-            exit;
+            if (isset($_SESSION['admin_username'])) {
+                header("Location: admin_redirections.php");
+                exit;
+            } else {
+                session_destroy();
+                header("Location: index.php");
+                exit;
+            }
         } 
     }
     if (isset($_SESSION["verif_balance"])) {

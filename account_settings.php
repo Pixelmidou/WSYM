@@ -6,9 +6,17 @@ if ($con->connect_error) {
     session_start();
     if (!isset($_SESSION['setting']) && !isset($_SESSION['verif_id'])) {
         if (empty($_SESSION['setting']) || $_SESSION['setting'] === "" && empty($_SESSION['verif_id']) || $_SESSION['verif_id'] === "") {
-            session_destroy();
-            header("Location: index.php");
-            exit;
+            if (isset($_SESSION['admin_username'])) {
+                header("Location: admin_redirections.php");
+                exit;
+            } else if (isset($_SESSION['user_username'])) {
+                header("Location: welcome.php");
+                exit;
+            } else {
+                session_destroy();
+                header("Location: index.php");
+                exit;
+            }
         } 
     }
     if (isset($_SESSION['user_username'])) {
