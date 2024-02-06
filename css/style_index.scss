@@ -1,0 +1,128 @@
+* {
+    margin: 0;
+    padding: 0;
+    font-family: "Tajawal", sans-serif;
+}
+html {
+    box-sizing: border-box;
+}
+*, *:before, *:after {
+    box-sizing: inherit;
+}
+@mixin flex-center() {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.container1 {
+    @include flex-center;
+    height: 100vh;
+}
+.container2,.container3,.container4,.container5,.container6 {
+    @include flex-center;
+}
+.container5 {
+    gap: 5px;
+}
+.push,.push2 {
+    margin-top: auto;
+    margin-bottom: 25px;
+}
+.container4,.container5,.container6 {
+    margin-top: 10px;
+}
+.contem {
+    margin-top: 0;
+}
+img {
+    width: 20px;
+    height: 20px;
+}
+h2 {
+    color: white;
+    font-weight: bolder;
+}
+.ti {
+    margin-top: 25px;
+    width: max-content;
+}
+.qu {
+    font-size: 20px;
+    margin-bottom: 20px;
+}
+form {
+    display: flex;
+    flex-direction: column;
+    background-color: lightgray;
+    width: 700px;
+    height: 420px;
+    border-top: 10px solid #87cefa;
+    padding-left: 100px;
+    padding-right: 100px;
+}
+input[type=text],input[type=password],input[type=email] {
+    background: none;
+    border: 0;
+    margin-left: 5px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    padding: 10px;
+    color: white;
+    font-size: medium;
+}
+.labbor {
+    border-bottom: 1px solid lightskyblue;
+    width: 300px;
+    height: 50px;
+}
+input[type=text]:focus,input[type=password]:focus,input[type=email]:focus {
+    background: none;
+    border: 0;
+    caret-color: lightskyblue;
+    outline: 0;
+    color: lightskyblue;
+}
+.but {
+    width: calc(50% - 3.75px);
+    margin-top: 12px;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: lightskyblue;
+    transition: all 0.2s ease-in-out;
+    cursor: pointer;
+    border: none;
+    outline: none;
+    color: white;
+    opacity: 0.7;
+}
+.but:hover {
+    opacity: 1;
+}
+::placeholder {
+    color: white;
+    font-size: medium;
+}
+.butt {
+    width: calc(81% - 1.50px);
+}
+.createaccount,.forgotpass {
+    display: none;
+}
+body {
+    background-image: url('../data/background.jpg');
+    background-size: cover;
+}
+input[type=checkbox]:checked {
+    accent-color: lightskyblue;
+    outline: 3px solid lightskyblue;
+    border-radius: 10px;
+}
+.abt {
+    color: white;
+    text-decoration: none;
+    text-align: center;
+    width: max-content;
+}
+.abt:hover {
+    color: lightskyblue;
+}
