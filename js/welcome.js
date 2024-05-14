@@ -85,7 +85,7 @@ document.getElementById("fiftyyy").addEventListener("click", function(){ documen
 
 function depositconfirm() {
     depval = document.getElementById("depval").value
-    if (depval == "") {
+    if (depval == "" || depval <= 0 || isNaN(depval)) {
         return false
     } else {
         return confirm(`You are depositing $${depval} into your account,\n Are you sure ?`)
@@ -93,7 +93,7 @@ function depositconfirm() {
 }
 function withdrawconfirm() {
     withval = document.getElementById("withval").value
-    if (withval == "") {
+    if (withval == "" || withval <= 0 || isNaN(withval)) {
         return false
     } else {
         return confirm(`You are withdrawing $${withval} from your account,\n Are you sure ?`)
@@ -102,7 +102,7 @@ function withdrawconfirm() {
 function wireconfirm() {
     wireval = document.getElementById("wireval").value
     wireres = document.getElementById("wireres").value
-    if (wireval == "" || wireres == "") {
+    if (wireval == "" || wireval <= 0 || wireres == "" || isNaN(wireval)) {
         return false
     } else {
         return confirm(`You are sending $${wireval} to ${wireres} ,\n Are you sure ?`)

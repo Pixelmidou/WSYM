@@ -14,12 +14,17 @@ if ($con->connect_error) {
         $token = bin2hex(random_bytes(16));
         $token_hash = hash("sha256",$token);
         $token_expire = date("Y-m-d H:i:s", time() + 60 * 30);
-        $token_update_query = mysqli_query($con,"UPDATE login_credentials SET email_verif_token = '$token_hash', email_verif_expire = '$token_expire' WHERE username = '$username'");
-        $email_from_username_query = mysqli_query($con,"SELECT email FROM login_credentials WHERE username = '$username'");
-        $email_from_username_array = mysqli_fetch_array($email_from_username_query);
+        $token_update_query = $con -> prepare("UPDATE login_credentials SET email_verif_token = '$token_hash', email_verif_expire = '$token_expire' WHERE username = '$username'");
+        $token_update_query -> bind_param("sss", $token_hash, $token_expire, $username);
+        $token_update_query -> execute();
+        $email_from_username_query = $con -> prepare("SELECT email FROM login_credentials WHERE username = ?");
+        $email_from_username_query -> bind_param("s", $username);
+        $email_from_username_query = $email_from_username_query -> get_result();
+        $email_from_username_array = $email_from_username_query -> fetch_array();
         $email = $email_from_username_array["email"];
-        if (mysqli_affected_rows($con)) {
+        if ($con -> affected_rows) {
             require("mailer.php");
+            $mail->setFrom($_ENV["email_verif_address"]);
             $mail->addAddress($email);
             $mail->Subject = "Email Verification";
             $mail->Body = <<<END
@@ -409,7 +414,50 @@ if ($con->connect_error) {
 
             </html>
 END;
-        $mail->send();
+        if ($mail->send()) { ?>
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <meta http-equiv="refresh" content="4; url=index.php">
+                <title>WSYM Banking</title>
+                <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
+                <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
+                <link rel="stylesheet" href="./css/redirections_style.css">
+            </head>
+            <body>
+                <div class="container1">
+                    <div class="container2">
+                        <h1 style="text-align: center;">Success : Request has been submited !</h1>
+                        <h4 style="text-align: center;">An email with a verification link has been sent</h4>
+                        <div style="text-align: center; font-size: small;">You will be automatically redirected to the welcome page in 4 seconds.</div>
+                    </div>
+                </div>
+            </body>
+            </html>
+        <?php } else { ?>
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <meta http-equiv="refresh" content="4; url=index.php">
+                    <title>WSYM Banking</title>
+                    <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
+                    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
+                    <link rel="stylesheet" href="./css/redirections_style.css">
+                </head>
+                <body>
+                    <div class="container1">
+                        <div class="container2">
+                            <h1 style="text-align: center;">Error 500 : Internal Server Error</h1>
+                            <div style="text-align: center; font-size: small;">You will be automatically redirected back to the login page in 4 seconds.</div>
+                        </div>
+                    </div>
+                </body>
+                </html>
+        <?php }
         header("Location: welcome.php");
         exit;
         }

@@ -11,7 +11,11 @@ if ($con->connect_error) {
     session_destroy();
     if (isset($_POST['register_submit'])) {
         $username = filter_input(INPUT_POST, 'username2', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-        if (mysqli_num_rows(mysqli_query($con, "SELECT username FROM login_credentials WHERE username = '$username'")) > 0) { ?>
+        $acc_exist = $con -> prepare("SELECT username FROM login_credentials WHERE username = ?");
+        $acc_exist -> bind_param("s", $username);
+        $acc_exist -> execute();
+        $acc_exist_result = $acc_exist -> get_result();
+        if ($acc_exist_result -> num_rows > 0) { ?>
             <!DOCTYPE html>
             <html lang="en">
             <head>
@@ -35,13 +39,22 @@ if ($con->connect_error) {
         <?php die(); } else {
             $password = password_hash(filter_input(INPUT_POST, 'password2', FILTER_SANITIZE_FULL_SPECIAL_CHARS), PASSWORD_DEFAULT);
             $email = filter_input(INPUT_POST, 'email2', FILTER_SANITIZE_EMAIL);
-            if (mysqli_query($con,"INSERT INTO login_credentials VALUES ('$username','$password','$email',FALSE,NULL,NULL,now(),NULL,'favicon.ico',NULL,NULL,NULL)") && mysqli_query($con,"INSERT INTO balance VALUES ('$username','$email','0')") && mysqli_query($con,"INSERT INTO blacklist VALUES ('$username', '1', '1', '1', '1', '1')")) { 
+            $loginfo_query = $con -> prepare("INSERT INTO login_credentials VALUES (?,?,?,FALSE,NULL,NULL,now(),NULL,'favicon.ico',NULL,NULL,NULL)");
+            $loginfo_query -> bind_param("sss", $username, $password, $email);
+            $balance_query = $con -> prepare("INSERT INTO balance VALUES (?,?,'0')");
+            $balance_query -> bind_param("ss", $username, $email);
+            $blacklist_query = $con -> prepare("INSERT INTO blacklist VALUES (?, '1', '1', '1', '1', '1')");
+            $blacklist_query -> bind_param("s", $username);
+            if ($loginfo_query -> execute() && $balance_query -> execute() && $blacklist_query -> execute()) { 
                 $token = bin2hex(random_bytes(16));
                 $token_hash = hash("sha256",$token);
                 $token_expire = date("Y-m-d H:i:s", time() + 60 * 30);
-                $token_update_query = mysqli_query($con,"UPDATE login_credentials SET email_verif_token = '$token_hash', email_verif_expire = '$token_expire' WHERE email = '$email'");
-                if (mysqli_affected_rows($con)) {
+                $token_update_query = $con -> prepare("UPDATE login_credentials SET email_verif_token = '$token_hash', email_verif_expire = '$token_expire' WHERE email = ?");
+                $token_update_query -> bind_param("s", $email);
+                $token_update_query -> execute();
+                if ($con -> affected_rows) {
                     require("mailer.php");
+                    $mail->setFrom($_ENV["email_verif_address"]);
                     $mail->addAddress($email);
                     $mail->Subject = "Email Verification";
                     $mail->Body = <<<END

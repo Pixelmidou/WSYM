@@ -7,8 +7,8 @@ if ($con->connect_error) {
     session_destroy();
     $token = filter_input(INPUT_GET,"token",FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     $token_hash = hash("sha256",$token);
-    $token_find_query = mysqli_query($con,"SELECT * FROM login_credentials WHERE email_verif_token = '$token_hash'");
-    $user = mysqli_fetch_array($token_find_query);
+    $token_find_query = $con -> query("SELECT * FROM login_credentials WHERE email_verif_token = '$token_hash'");
+    $user = $token_find_query -> fetch_array();
     if ($user === null) { ?>
         <!DOCTYPE html>
         <html lang="en">
@@ -53,7 +53,7 @@ if ($con->connect_error) {
         </body>
         </html>
     <?php die();}
-    mysqli_query($con,"UPDATE login_credentials SET email_verif = TRUE ,email_verif_token = NULL, email_verif_expire = NULL WHERE email_verif_token = '$token_hash'");
+    $con -> query("UPDATE login_credentials SET email_verif = TRUE ,email_verif_token = NULL, email_verif_expire = NULL WHERE email_verif_token = '$token_hash'");
 }
 ?>
 <!DOCTYPE html>

@@ -40,10 +40,10 @@ if (isset($_SESSION['admin_username'])) {
             </div>
             <div class="push">
                 <div class="container4">
-                    <!-- <label>
+                    <label>
                         <input type="checkbox" name="" id="">
                         <span style="color: white;">Remember Me</span>
-                    </label> -->
+                    </label>
                 </div>
                 <div class="container5">
                     <input type="submit" value="Login" class="but" name="login_submit">

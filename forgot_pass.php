@@ -14,9 +14,12 @@ if ($con->connect_error) {
         $token = bin2hex(random_bytes(16));
         $token_hash = hash("sha256",$token);
         $token_expire = date("Y-m-d H:i:s", time() + 60 * 30);
-        $token_update_query = mysqli_query($con,"UPDATE login_credentials SET token = '$token_hash', token_expire = '$token_expire' WHERE email = '$email'");
-        if (mysqli_affected_rows($con)) {
+        $token_update_query = $con -> prepare("UPDATE login_credentials SET pass_reset_token = ?, pass_reset_token_expire = ? WHERE email = ?");
+        $token_update_query -> bind_param("sss", $token_hash, $token_expire, $email);
+        $token_update_query -> execute();
+        if ($con -> affected_rows) {
             require("mailer.php");
+            $mail->setFrom($_ENV["pass_reset_address"]);
             $mail->addAddress($email);
             $mail->Subject = "Password Reset";
             $mail->Body = <<<END

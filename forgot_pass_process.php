@@ -7,8 +7,8 @@ if ($con->connect_error) {
     session_destroy();
     $token = filter_input(INPUT_GET,"token",FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     $token_hash = hash("sha256",$token);
-    $token_find_query = mysqli_query($con,"SELECT * FROM login_credentials WHERE token = '$token_hash'");
-    $user = mysqli_fetch_array($token_find_query);
+    $token_find_query = $con -> query("SELECT * FROM login_credentials WHERE pass_reset_token = '$token_hash'");
+    $user = $token_find_query -> fetch_array();
     if ($user === null) { ?>
         <!DOCTYPE html>
         <html lang="en">
@@ -31,7 +31,7 @@ if ($con->connect_error) {
         </body>
         </html>
     <?php die(); }
-    if (strtotime($user["token_expire"]) <= time()) {?>
+    if (strtotime($user["pass_reset_token_expire"]) <= time()) {?>
         <!DOCTYPE html>
         <html lang="en">
         <head>
@@ -57,7 +57,7 @@ if ($con->connect_error) {
         $pass = filter_input(INPUT_POST,"pass",FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         $cpass = filter_input(INPUT_POST,"cpass",FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         $hpass = password_hash($cpass, PASSWORD_DEFAULT);
-        if ($cpass === $pass && mysqli_query($con,"UPDATE login_credentials set pass = '$hpass' WHERE token = '$token_hash'") && mysqli_query($con,"UPDATE login_credentials SET token = NULL, token_expire = NULL WHERE token = '$token_hash'")) { ?>
+        if ($cpass === $pass && $con -> query("UPDATE login_credentials set pass = '$hpass' WHERE token = '$token_hash'") && $con -> query("UPDATE login_credentials SET token = NULL, token_expire = NULL WHERE token = '$token_hash'")) { ?>
             <!DOCTYPE html>
             <html lang="en">
             <head>

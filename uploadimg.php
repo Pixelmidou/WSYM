@@ -267,6 +267,8 @@ if ($con->connect_error) {
             $cit_values = explode("/", $checkimagecontent);
             if (in_array($file_ext, $allowed_ext) && $cit_values[0] === "image" && in_array($cit_values[1],$allowed_ext)) {
                 if ($file_size <= 1000000) {
+                    $queryx = $con -> prepare("UPDATE login_credentials SET pfp = ? WHERE username = ?");
+                    $queryx -> bind_param("ss", $a, $username);
                     switch ($file_ext) {
                         case "png":
                             if (file_exists($target_dir . $username . ".jpg")) {
@@ -278,7 +280,9 @@ if ($con->connect_error) {
                             if (file_exists($target_dir . $username . ".gif")) {
                                 unlink($target_dir . $username . ".gif");
                             }
-                            if (mysqli_query($con, "UPDATE login_credentials SET pfp ='$username.png' WHERE username = '$username'") && move_uploaded_file($file_tmp, $target_dir . $username . ".png")) {
+                            $a = "$username.png";
+                            $queryx -> bind_param("ss", $a, $username);
+                            if ($queryx -> execute() && $con -> affected_rows && move_uploaded_file($file_tmp, $target_dir . $username . ".png")) {
                                 uploadsuccess();
                                 die();
                             } else {
@@ -296,7 +300,8 @@ if ($con->connect_error) {
                             if (file_exists($target_dir . $username . ".gif")) {
                                 unlink($target_dir . $username . ".gif");
                             }
-                            if (mysqli_query($con, "UPDATE login_credentials SET pfp ='$username.jpg' WHERE username = '$username'") && move_uploaded_file($file_tmp, $target_dir . $username . ".jpg")) {
+                            $a = "$username.jpg";
+                            if ($queryx -> execute() && $con -> affected_rows && move_uploaded_file($file_tmp, $target_dir . $username . ".jpg")) {
                                 uploadsuccess();
                                 die();
                             } else {
@@ -314,7 +319,8 @@ if ($con->connect_error) {
                             if (file_exists($target_dir . $username . ".gif")) {
                                 unlink($target_dir . $username . ".gif");
                             }
-                            if (mysqli_query($con, "UPDATE login_credentials SET pfp ='$username.jpeg' WHERE username = '$username'") && move_uploaded_file($file_tmp, $target_dir . $username . ".jpeg")) {
+                            $a = "$username.jpeg";
+                            if ($queryx -> execute() && $con -> affected_rows && move_uploaded_file($file_tmp, $target_dir . $username . ".jpeg")) {
                                 uploadsuccess();
                                 die();
                             } else {
@@ -332,7 +338,8 @@ if ($con->connect_error) {
                             if (file_exists($target_dir . $username . ".png")) {
                                 unlink($target_dir . $username . ".png");
                             }
-                            if (mysqli_query($con, "UPDATE login_credentials SET pfp ='$username.gif' WHERE username = '$username'") && move_uploaded_file($file_tmp, $target_dir . $username . ".gif")) {
+                            $a = "$username.gif";
+                            if ($queryx -> execute() && $con -> affected_rows && move_uploaded_file($file_tmp, $target_dir . $username . ".gif")) {
                                 uploadsuccess();
                                 die();
                             } else {
@@ -502,8 +509,10 @@ if ($con->connect_error) {
             }    
         }
         $target_dir = "./data/uploads/";
+        $queryy = $con -> prepare("UPDATE login_credentials SET pfp = 'favicon.ico' WHERE username = ?");
+        $queryy -> bind_param("s", $username);
         if (file_exists($target_dir . $username . ".jpg")) {
-            if (mysqli_query($con, "UPDATE login_credentials SET pfp ='favicon.ico' WHERE username = '$username'") && unlink($target_dir . $username . ".jpg")) {
+            if ($queryy -> execute() && $con -> affected_rows && unlink($target_dir . $username . ".jpg")) {
                 deletesuccess();
                 die();
             } else {
@@ -511,7 +520,7 @@ if ($con->connect_error) {
                 die();
             }
         } else if (file_exists($target_dir . $username . ".jpeg")) {
-            if (mysqli_query($con, "UPDATE login_credentials SET pfp ='favicon.ico' WHERE username = '$username'") && unlink($target_dir . $username . ".jpeg")) {
+            if ($queryy -> execute() && $con -> affected_rows && unlink($target_dir . $username . ".jpeg")) {
                 deletesuccess();
                 die();
             } else {
@@ -519,7 +528,7 @@ if ($con->connect_error) {
                 die();
             }
         } else if (file_exists($target_dir . $username . ".gif")) {
-            if (mysqli_query($con, "UPDATE login_credentials SET pfp ='favicon.ico' WHERE username = '$username'" && unlink($target_dir . $username . ".gif"))) {
+            if ($queryy -> execute() && $con -> affected_rows && unlink($target_dir . $username . ".gif")) {
                 deletesuccess();
                 die();
             } else {
@@ -527,7 +536,7 @@ if ($con->connect_error) {
                 die();
             }
         } else if (file_exists($target_dir . $username . ".png")) {
-            if (mysqli_query($con, "UPDATE login_credentials SET pfp ='favicon.ico' WHERE username = '$username'") && unlink($target_dir . $username . ".png")) {
+            if ($queryy -> execute() && $con -> affected_rows && unlink($target_dir . $username . ".png")) {
                 deletesuccess();
                 die();
             } else {

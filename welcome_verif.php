@@ -51,14 +51,18 @@ if ($con->connect_error) {
             $user_username = $_SESSION['user_username'];
             $start = 0;
             $rowsperpage = 6;
-            $recs = mysqli_query($con,"SELECT * FROM deposit WHERE username = '$user_username'");
-            $nbrows = mysqli_num_rows($recs);
+            $recs = $con -> prepare("SELECT * FROM deposit WHERE username = ?");
+            $recs -> bind_param("s", $user_username);
+            $recs_res = $recs -> get_result();
+            $nbrows = $recs_res -> num_rows;
             $nbpages = ceil($nbrows / $rowsperpage);
             if (isset($_GET["pagenr"])) {
                 $start = ($_GET["pagenr"] - 1)  * $rowsperpage;
             }
-            $dephis_query_date_desc = mysqli_query($con,"SELECT deposit_date,deposit_amount FROM deposit WHERE username LIKE '%$user_username%' ORDER BY deposit_date DESC LIMIT $start , $rowsperpage");
-            $dephis_query_array_all = mysqli_fetch_all($dephis_query_date_desc, MYSQLI_ASSOC);
+            $dephis_query_date_desc = $con -> prepare("SELECT deposit_date,deposit_amount FROM deposit WHERE username LIKE '%?%' ORDER BY deposit_date DESC LIMIT $start , $rowsperpage");
+            $dephis_query_date_desc -> bind_param("s", $user_username);
+            $dephis_query_date_desc_res = $dephis_query_date_desc -> get_result();
+            $dephis_query_array_all = $dephis_query_date_desc_res -> fetch_all(MYSQLI_ASSOC);
         }
         $_SESSION['dephis'] = "dephis";
         if (isset($_POST['dephisback'])) {
@@ -73,14 +77,18 @@ if ($con->connect_error) {
             $user_username = $_SESSION['user_username'];
             $start = 0;
             $rowsperpage = 6;
-            $recs = mysqli_query($con,"SELECT * FROM withdraw WHERE username = '$user_username'");
-            $nbrows = mysqli_num_rows($recs);
+            $recs = $con -> prepare("SELECT * FROM deposit WHERE username = ?");
+            $recs -> bind_param("s", $user_username);
+            $recs_res = $recs -> get_result();
+            $nbrows = $recs_res -> num_rows;
             $nbpages = ceil($nbrows / $rowsperpage);
             if (isset($_GET["pagenr"])) {
                 $start = ($_GET["pagenr"] - 1)  * $rowsperpage;
             }
-            $withhis_query_date_desc = mysqli_query($con,"SELECT withdraw_date,withdraw_amount FROM withdraw WHERE username LIKE '%$user_username%' ORDER BY withdraw_date DESC LIMIT $start , $rowsperpage");
-            $withhis_query_array_all = mysqli_fetch_all($withhis_query_date_desc, MYSQLI_ASSOC);
+            $withhis_query_date_desc = $con -> prepare("SELECT withdraw_date,withdraw_amount FROM withdraw WHERE username LIKE '%?%' ORDER BY withdraw_date DESC LIMIT $start , $rowsperpage");
+            $withhis_query_date_desc -> bind_param("s", $user_username);
+            $withhis_query_date_desc_res = $withhis_query_date_desc -> get_result();
+            $withhis_query_array_all = $withhis_query_date_desc_res -> fetch_all(MYSQLI_ASSOC);
         }
         $_SESSION['withhis'] = "withhis";
         if (isset($_POST['withhisback'])) {
@@ -95,14 +103,18 @@ if ($con->connect_error) {
             $user_username = $_SESSION['user_username'];
             $start = 0;
             $rowsperpage = 6;
-            $recs = mysqli_query($con,"SELECT * FROM wire WHERE username = '$user_username'");
-            $nbrows = mysqli_num_rows($recs);
+            $recs = $con -> prepare("SELECT * FROM deposit WHERE username = ?");
+            $recs -> bind_param("s", $user_username);
+            $recs_res = $recs -> get_result();
+            $nbrows = $recs_res -> num_rows;
             $nbpages = ceil($nbrows / $rowsperpage);
             if (isset($_GET["pagenr"])) {
                 $start = ($_GET["pagenr"] - 1)  * $rowsperpage;
             }
-            $wirehis_query_date_desc = mysqli_query($con,"SELECT receiver,wire_date,wire_amount FROM wire WHERE username LIKE '%$user_username%' ORDER BY wire_date DESC LIMIT $start , $rowsperpage");
-            $wirehis_query_array_all = mysqli_fetch_all($wirehis_query_date_desc, MYSQLI_ASSOC);
+            $wirehis_query_date_desc = $con -> prepare("SELECT receiver,wire_date,wire_amount FROM wire WHERE username LIKE '%?%' ORDER BY wire_date DESC LIMIT $start , $rowsperpage");
+            $wirehis_query_date_desc -> bind_param("s", $user_username);
+            $wirehis_query_date_desc_res = $wirehis_query_date_desc -> get_result();
+            $wirehis_query_array_all = $wirehis_query_date_desc_res -> fetch_all(MYSQLI_ASSOC);
         }
         $_SESSION['wirehis'] = "wirehis";
         if (isset($_POST['wirehisback'])) {
@@ -326,6 +338,27 @@ if ($con->connect_error) {
         </div>
     </body>
     </html>
+<?php } else if (isset($_SESSION['withdraw_verif']) && $withdraw_verif === "faili") { ?>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="refresh" content="4; url=welcome.php">
+        <title>WSYM Banking</title>
+        <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
+        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="./css/redirections_style.css">
+    </head>
+    <body>
+        <div class="container1">
+            <div class="container2">
+                <h1 style="text-align: center;">Action Failed : Insufficient funds </h1>
+                <div style="text-align: center; font-size: small;">You will be automatically redirected back to the welcome page in 4 seconds.</div>
+            </div>
+        </div>
+    </body>
+    </html>
 <?php } ?>
 <?php if (isset($_SESSION['wire_verif']) && $wire_verif === "success") {  ?>
     <!DOCTYPE html>
@@ -428,6 +461,27 @@ if ($con->connect_error) {
         <div class="container1">
             <div class="container2">
                 <h1 style="text-align: center;">Action Failed : You are blocked from wiring money & your email is not verified</h1>
+                <div style="text-align: center; font-size: small;">You will be automatically redirected back to the welcome page in 4 seconds.</div>
+            </div>
+        </div>
+    </body>
+    </html>
+<?php } else if (isset($_SESSION['wire_verif']) && $wire_verif === "faili") { ?>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="refresh" content="4; url=welcome.php">
+        <title>WSYM Banking</title>
+        <link rel="shortcut icon" href="./data/favicon.ico" type="image/x-icon">
+        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="./css/redirections_style.css">
+    </head>
+    <body>
+        <div class="container1">
+            <div class="container2">
+                <h1 style="text-align: center;">Action Failed : Insufficient funds </h1>
                 <div style="text-align: center; font-size: small;">You will be automatically redirected back to the welcome page in 4 seconds.</div>
             </div>
         </div>

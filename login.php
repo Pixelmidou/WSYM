@@ -13,19 +13,30 @@ if ($con->connect_error) {
     if (isset($_POST['login_submit'])) {
         $username = filter_input(INPUT_POST, 'username1', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         $password = filter_input(INPUT_POST, 'password1', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-        $user_query = mysqli_query($con,"SELECT username,pass FROM login_credentials WHERE username = '$username'");
-        $admin_query = mysqli_query($con,"SELECT username,pass FROM login_credentials WHERE username = '$username' AND rank IN (SELECT rank FROM ranks WHERE rank <> 'none')");
-        $acc_query = mysqli_query($con,"SELECT account FROM blacklist WHERE username = '$username'");
-        if (mysqli_num_rows($acc_query) > 0) {
-            $acc_query_array = mysqli_fetch_all($acc_query, MYSQLI_ASSOC);
+        $user_query = $con -> prepare("SELECT username,pass FROM login_credentials WHERE username = ?");
+        $user_query -> bind_param("s", $username);
+        $user_query -> execute();
+        $user_result = $user_query -> get_result();
+        $admin_query = $con -> prepare("SELECT username,pass FROM login_credentials WHERE username = ? AND rank IN (SELECT rank FROM ranks WHERE rank <> 'none')");
+        $admin_query -> bind_param("s", $username);
+        $admin_query -> execute();
+        $admin_result = $admin_query -> get_result();
+        $acc_query = $con -> prepare("SELECT account FROM blacklist WHERE username = ?");
+        $acc_query -> bind_param("s", $username);
+        $acc_query -> execute();
+        $acc_result = $acc_query -> get_result();
+        if ($acc_result -> num_rows > 0) {
+            $acc_query_array = $acc_result -> fetch_all(MYSQLI_ASSOC);
             foreach ($acc_query_array as $row) {
-                $acc = $row["account"];
+                $acc = (string) $row["account"];
             }
         }
-        if (mysqli_num_rows($admin_query) > 0) { 
-            while ($row_admin = mysqli_fetch_array($admin_query, MYSQLI_ASSOC)) { 
+        if ($admin_result -> num_rows > 0) {
+            while ($row_admin = $admin_result -> fetch_array(MYSQLI_ASSOC)) {
                 if (password_verify($password,$row_admin['pass']) && $acc === "1") {
-                    mysqli_query($con,"UPDATE login_credentials set lastlogin = now() WHERE username = '$username'");
+                    $up = $con -> prepare("UPDATE login_credentials set lastlogin = now() WHERE username = ?");
+                    $up -> bind_param("s", $username);
+                    $up -> execute();
                     $_SESSION['admin_username'] = $username;
                     header("Location: admin_redirections.php");
                     exit;
@@ -53,10 +64,12 @@ if ($con->connect_error) {
                     </html>
                 <?php die();}
             }
-        } else if (mysqli_num_rows($user_query) > 0) {
-            while ($row_user = mysqli_fetch_array($user_query, MYSQLI_ASSOC)) {
+        } else if ($user_result -> num_rows > 0) {
+            while ($row_user = $user_result -> fetch_array(MYSQLI_ASSOC)) {
                 if (password_verify($password,$row_user['pass']) && $acc === "1") {
-                    mysqli_query($con,"UPDATE login_credentials set lastlogin = now() WHERE username = '$username'");
+                    $up = $con -> prepare("UPDATE login_credentials set lastlogin = now() WHERE username = ?");
+                    $up -> bind_param("s", $username);
+                    $up -> execute();
                     $_SESSION['user_username'] = $username;
                     header("Location: welcome.php");
                     exit;

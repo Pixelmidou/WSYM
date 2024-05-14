@@ -16,7 +16,6 @@ $mail->Username = $_ENV["mailer_username"];
 $mail->Password = $_ENV["mailer_password"];
 $mail->SMTPSecure = "ssl";
 $mail->Port = 465;
-$mail->setFrom("wsymcorp@gmail.com");
 $mail->isHTML(true);
 return $mail
 ?>
