@@ -31,7 +31,7 @@
           <div class="card" style="width:400px;">
             <img class="card-img-top" src="./Untitled.jpeg" alt="Card image" style="width:100%">
             <div class="card-body">
-              <h4 class="card-title">Yessine Gargouri</h4>
+              <h4 class="card-title"></h4>
               <p class="card-text m-0">Participation : 
                 <ul>
                   <li>Security Consulting <button data-bs-toggle="collapse" data-bs-target="#yg1" style="all: unset; cursor: pointer;">&#9661;</button></li>
@@ -42,7 +42,7 @@
                   <li class="invisible" style="all: unset;">placeholder</li>
                 </ul>
               </p>
-              <a href="https://www.linkedin.com/in/yassine-gargouri-0653a824b/" target="_blank" class="btn btn-primary">See Profile</a>
+              <a href="" target="_blank" class="btn btn-primary">See Profile</a>
             </div>
           </div>
     </div>

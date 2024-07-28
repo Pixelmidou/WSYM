@@ -17,7 +17,7 @@ if ($con->connect_error) {
         $user_query -> bind_param("s", $username);
         $user_query -> execute();
         $user_result = $user_query -> get_result();
-        $admin_query = $con -> prepare("SELECT username,pass FROM login_credentials WHERE username = ? AND rank IN (SELECT rank FROM ranks WHERE rank <> 'none')");
+        $admin_query = $con -> prepare("SELECT username,pass FROM login_credentials WHERE username = ? AND rankname IN (SELECT rankname FROM ranks WHERE rankname <> 'none')");
         $admin_query -> bind_param("s", $username);
         $admin_query -> execute();
         $admin_result = $admin_query -> get_result();

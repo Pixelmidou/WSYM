@@ -52,11 +52,11 @@ if ($con->connect_error) {
             $pfp = $row["pfp"];
         }
     }
-    $admin_type_query = $con -> query("SELECT rank FROM login_credentials WHERE username = '$admin_username'");
+    $admin_type_query = $con -> query("SELECT rankname FROM login_credentials WHERE username = '$admin_username'");
     if ($admin_type_query -> num_rows > 0) {
         $admin_type_array = $admin_type_query -> fetch_all(MYSQLI_ASSOC);
         foreach ($admin_type_array as $row) {
-            $admin_type = $row["rank"];
+            $admin_type = $row["rankname"];
         }
     }
     $clients_number_query = $con -> query("SELECT count(*) AS clients_number FROM login_credentials");
