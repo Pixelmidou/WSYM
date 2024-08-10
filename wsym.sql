@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.0
+-- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Jul 28, 2024 at 11:18 PM
--- Server version: 8.0.30
--- PHP Version: 8.1.10
+-- Generation Time: Aug 10, 2024 at 08:09 PM
+-- Server version: 11.4.2-MariaDB-log
+-- PHP Version: 8.3.10
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -28,10 +28,10 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `balance` (
-  `username` varchar(30) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,
-  `email` varchar(100) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,
-  `balance` decimal(6,1) DEFAULT '0.0'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `username` varchar(30) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `balance` decimal(6,1) DEFAULT 0.0
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 -- --------------------------------------------------------
 
@@ -41,12 +41,12 @@ CREATE TABLE `balance` (
 
 CREATE TABLE `blacklist` (
   `username` varchar(30) NOT NULL,
-  `account` tinyint(1) NOT NULL DEFAULT '1',
-  `deposit` tinyint(1) NOT NULL DEFAULT '1',
-  `withdraw` tinyint(1) NOT NULL DEFAULT '1',
-  `wire` tinyint(1) NOT NULL DEFAULT '1',
-  `ticket` tinyint(1) NOT NULL DEFAULT '1'
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  `account` tinyint(1) NOT NULL DEFAULT 1,
+  `deposit` tinyint(1) NOT NULL DEFAULT 1,
+  `withdraw` tinyint(1) NOT NULL DEFAULT 1,
+  `wire` tinyint(1) NOT NULL DEFAULT 1,
+  `ticket` tinyint(1) NOT NULL DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 -- --------------------------------------------------------
 
@@ -56,9 +56,9 @@ CREATE TABLE `blacklist` (
 
 CREATE TABLE `deposit` (
   `username` varchar(30) NOT NULL,
-  `deposit_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `deposit_date` timestamp NOT NULL DEFAULT current_timestamp(),
   `deposit_amount` decimal(6,2) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 -- --------------------------------------------------------
 
@@ -68,8 +68,8 @@ CREATE TABLE `deposit` (
 
 CREATE TABLE `forgot_password` (
   `email` varchar(100) NOT NULL,
-  `forgotpass` tinyint(1) DEFAULT '0'
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  `forgotpass` tinyint(1) DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 -- --------------------------------------------------------
 
@@ -81,16 +81,16 @@ CREATE TABLE `login_credentials` (
   `username` varchar(30) NOT NULL,
   `pass` varchar(255) NOT NULL,
   `email` varchar(100) NOT NULL,
-  `email_verif` tinyint(1) NOT NULL DEFAULT '0',
+  `email_verif` tinyint(1) NOT NULL DEFAULT 0,
   `email_verif_token` varchar(64) DEFAULT NULL,
   `email_verif_expire` datetime DEFAULT NULL,
-  `timecreated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `timecreated` timestamp NOT NULL DEFAULT current_timestamp(),
   `lastlogin` timestamp NULL DEFAULT NULL,
   `pfp` varchar(40) NOT NULL DEFAULT 'favicon.ico',
-  `rankname` varchar(30) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT 'none',
+  `rankname` varchar(30) NOT NULL DEFAULT 'none',
   `pass_reset_token` varchar(64) DEFAULT NULL,
   `pass_reset_token_expire` datetime DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 -- --------------------------------------------------------
 
@@ -99,9 +99,9 @@ CREATE TABLE `login_credentials` (
 --
 
 CREATE TABLE `ranks` (
-  `rankname` varchar(30) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,
-  `description` text
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  `rankname` varchar(30) NOT NULL,
+  `description` text DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
 -- Dumping data for table `ranks`
@@ -121,10 +121,10 @@ INSERT INTO `ranks` (`rankname`, `description`) VALUES
 CREATE TABLE `ticket` (
   `username` varchar(30) NOT NULL,
   `status` varchar(6) NOT NULL,
-  `time_opened` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `time_opened` timestamp NOT NULL DEFAULT current_timestamp(),
   `time_closed` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   `ticket_content` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 -- --------------------------------------------------------
 
@@ -135,9 +135,9 @@ CREATE TABLE `ticket` (
 CREATE TABLE `wire` (
   `username` varchar(30) NOT NULL,
   `receiver` varchar(30) NOT NULL,
-  `wire_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `wire_date` timestamp NOT NULL DEFAULT current_timestamp(),
   `wire_amount` decimal(6,2) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 -- --------------------------------------------------------
 
@@ -147,9 +147,9 @@ CREATE TABLE `wire` (
 
 CREATE TABLE `withdraw` (
   `username` varchar(30) NOT NULL,
-  `withdraw_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `withdraw_date` timestamp NOT NULL DEFAULT current_timestamp(),
   `withdraw_amount` decimal(6,2) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
 -- Indexes for dumped tables
