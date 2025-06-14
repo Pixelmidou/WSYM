@@ -1,11 +1,26 @@
 <?php
-require ("linking.php");
+require("linking.php");
 if ($con->connect_error) {
     die("Connection Failed" . $con->connect_error);
 } else {
     session_start();
-    if (!isset($_SESSION['deposit_verif']) && !isset($_SESSION['withdraw_verif']) && !isset($_SESSION['wire_verif']) && !isset($_SESSION['ticket_verif']) && !isset($_SESSION['dephis_show']) && !isset($_SESSION['withhis_show']) && !isset($_SESSION['wirehis_show'])) {
-        if (empty($_SESSION['deposit_verif']) || $_SESSION['deposit_verif'] === "" && empty($_SESSION['withdraw_verif']) || $_SESSION['withdraw_verif'] === "" && empty($_SESSION['wire_verif']) || $_SESSION['wire_verif'] === ""  && empty($_SESSION['ticket_verif']) || $_SESSION['ticket_verif'] === "" && empty($_SESSION['withhis_show']) || $_SESSION['withhis_show'] === "" && empty($_SESSION['wirehis_show']) || $_SESSION['wirehis_show'] === "") {
+    if (
+        !isset($_SESSION['deposit_verif']) &&
+        !isset($_SESSION['withdraw_verif']) &&
+        !isset($_SESSION['wire_verif']) &&
+        !isset($_SESSION['ticket_verif']) &&
+        !isset($_SESSION['dephis_show']) &&
+        !isset($_SESSION['withhis_show']) &&
+        !isset($_SESSION['wirehis_show'])
+    ) {
+        if (
+            (empty($_SESSION['deposit_verif']) || $_SESSION['deposit_verif'] === "") &&
+            (empty($_SESSION['withdraw_verif']) || $_SESSION['withdraw_verif'] === "") &&
+            (empty($_SESSION['wire_verif']) || $_SESSION['wire_verif'] === "") &&
+            (empty($_SESSION['ticket_verif']) || $_SESSION['ticket_verif'] === "") &&
+            (empty($_SESSION['withhis_show']) || $_SESSION['withhis_show'] === "") &&
+            (empty($_SESSION['wirehis_show']) || $_SESSION['wirehis_show'] === "")
+        ) {
             if (isset($_SESSION['admin_username'])) {
                 header("Location: admin_redirections.php");
                 exit;
@@ -17,8 +32,9 @@ if ($con->connect_error) {
                 header("Location: index.php");
                 exit;
             }
-        } 
+        }
     }
+
     if (isset($_SESSION['deposit_verif'])) {
         $deposit_verif = $_SESSION['deposit_verif'];
         if ($deposit_verif === "success") {
@@ -26,6 +42,7 @@ if ($con->connect_error) {
         }
         $_SESSION['dep'] = "dep";
     }
+
     if (isset($_SESSION['withdraw_verif'])) {
         $withdraw_verif = $_SESSION['withdraw_verif'];
         if ($withdraw_verif === "success") {
@@ -33,6 +50,7 @@ if ($con->connect_error) {
         }
         $_SESSION['withd'] = "withd";
     }
+
     if (isset($_SESSION['wire_verif'])) {
         $wire_verif = $_SESSION['wire_verif'];
         if ($wire_verif === "success") {
@@ -41,28 +59,33 @@ if ($con->connect_error) {
         }
         $_SESSION['wire'] = "wire";
     }
+
     if (isset($_SESSION['ticket_verif'])) {
         $ticket_verif = $_SESSION['ticket_verif'];
         $_SESSION['tick'] = "tick";
     }
+
     if (isset($_SESSION['dephis_show'])) {
         $dephis_show = $_SESSION['dephis_show'];
         if ($dephis_show === "success") {
             $user_username = $_SESSION['user_username'];
             $start = 0;
             $rowsperpage = 6;
-            $recs = $con -> prepare("SELECT * FROM deposit WHERE username = ?");
-            $recs -> bind_param("s", $user_username);
-            $recs_res = $recs -> get_result();
-            $nbrows = $recs_res -> num_rows;
+            $recs = $con->prepare("SELECT * FROM deposit WHERE username = ?");
+            $recs->bind_param("s", $user_username);
+            $recs->execute();
+            $recs_res = $recs->get_result();
+            $nbrows = $recs_res->num_rows;
             $nbpages = ceil($nbrows / $rowsperpage);
             if (isset($_GET["pagenr"])) {
-                $start = ($_GET["pagenr"] - 1)  * $rowsperpage;
+                $start = ($_GET["pagenr"] - 1) * $rowsperpage;
             }
-            $dephis_query_date_desc = $con -> prepare("SELECT deposit_date,deposit_amount FROM deposit WHERE username LIKE '%?%' ORDER BY deposit_date DESC LIMIT $start , $rowsperpage");
-            $dephis_query_date_desc -> bind_param("s", $user_username);
-            $dephis_query_date_desc_res = $dephis_query_date_desc -> get_result();
-            $dephis_query_array_all = $dephis_query_date_desc_res -> fetch_all(MYSQLI_ASSOC);
+            $like_username = "%{$user_username}%";
+            $dephis_query_date_desc = $con->prepare("SELECT deposit_date, deposit_amount FROM deposit WHERE username LIKE ? ORDER BY deposit_date DESC LIMIT ?, ?");
+            $dephis_query_date_desc->bind_param("sii", $like_username, $start, $rowsperpage);
+            $dephis_query_date_desc->execute();
+            $dephis_query_date_desc_res = $dephis_query_date_desc->get_result();
+            $dephis_query_array_all = $dephis_query_date_desc_res->fetch_all(MYSQLI_ASSOC);
         }
         $_SESSION['dephis'] = "dephis";
         if (isset($_POST['dephisback'])) {
@@ -71,24 +94,28 @@ if ($con->connect_error) {
             exit;
         }
     }
+
     if (isset($_SESSION['withhis_show'])) {
         $withhis_show = $_SESSION['withhis_show'];
         if ($withhis_show === "success") {
             $user_username = $_SESSION['user_username'];
             $start = 0;
             $rowsperpage = 6;
-            $recs = $con -> prepare("SELECT * FROM deposit WHERE username = ?");
-            $recs -> bind_param("s", $user_username);
-            $recs_res = $recs -> get_result();
-            $nbrows = $recs_res -> num_rows;
+            $recs = $con->prepare("SELECT * FROM withdraw WHERE username = ?");
+            $recs->bind_param("s", $user_username);
+            $recs->execute();
+            $recs_res = $recs->get_result();
+            $nbrows = $recs_res->num_rows;
             $nbpages = ceil($nbrows / $rowsperpage);
             if (isset($_GET["pagenr"])) {
-                $start = ($_GET["pagenr"] - 1)  * $rowsperpage;
+                $start = ($_GET["pagenr"] - 1) * $rowsperpage;
             }
-            $withhis_query_date_desc = $con -> prepare("SELECT withdraw_date,withdraw_amount FROM withdraw WHERE username LIKE '%?%' ORDER BY withdraw_date DESC LIMIT $start , $rowsperpage");
-            $withhis_query_date_desc -> bind_param("s", $user_username);
-            $withhis_query_date_desc_res = $withhis_query_date_desc -> get_result();
-            $withhis_query_array_all = $withhis_query_date_desc_res -> fetch_all(MYSQLI_ASSOC);
+            $like_username = "%{$user_username}%";
+            $withhis_query_date_desc = $con->prepare("SELECT withdraw_date, withdraw_amount FROM withdraw WHERE username LIKE ? ORDER BY withdraw_date DESC LIMIT ?, ?");
+            $withhis_query_date_desc->bind_param("sii", $like_username, $start, $rowsperpage);
+            $withhis_query_date_desc->execute();
+            $withhis_query_date_desc_res = $withhis_query_date_desc->get_result();
+            $withhis_query_array_all = $withhis_query_date_desc_res->fetch_all(MYSQLI_ASSOC);
         }
         $_SESSION['withhis'] = "withhis";
         if (isset($_POST['withhisback'])) {
@@ -97,24 +124,28 @@ if ($con->connect_error) {
             exit;
         }
     }
+
     if (isset($_SESSION['wirehis_show'])) {
         $wirehis_show = $_SESSION['wirehis_show'];
         if ($wirehis_show === "success") {
             $user_username = $_SESSION['user_username'];
             $start = 0;
             $rowsperpage = 6;
-            $recs = $con -> prepare("SELECT * FROM deposit WHERE username = ?");
-            $recs -> bind_param("s", $user_username);
-            $recs_res = $recs -> get_result();
-            $nbrows = $recs_res -> num_rows;
+            $recs = $con->prepare("SELECT * FROM wire WHERE username = ?");
+            $recs->bind_param("s", $user_username);
+            $recs->execute();
+            $recs_res = $recs->get_result();
+            $nbrows = $recs_res->num_rows;
             $nbpages = ceil($nbrows / $rowsperpage);
             if (isset($_GET["pagenr"])) {
-                $start = ($_GET["pagenr"] - 1)  * $rowsperpage;
+                $start = ($_GET["pagenr"] - 1) * $rowsperpage;
             }
-            $wirehis_query_date_desc = $con -> prepare("SELECT receiver,wire_date,wire_amount FROM wire WHERE username LIKE '%?%' ORDER BY wire_date DESC LIMIT $start , $rowsperpage");
-            $wirehis_query_date_desc -> bind_param("s", $user_username);
-            $wirehis_query_date_desc_res = $wirehis_query_date_desc -> get_result();
-            $wirehis_query_array_all = $wirehis_query_date_desc_res -> fetch_all(MYSQLI_ASSOC);
+            $like_username = "%{$user_username}%";
+            $wirehis_query_date_desc = $con->prepare("SELECT receiver, wire_date, wire_amount FROM wire WHERE username LIKE ? ORDER BY wire_date DESC LIMIT ?, ?");
+            $wirehis_query_date_desc->bind_param("sii", $like_username, $start, $rowsperpage);
+            $wirehis_query_date_desc->execute();
+            $wirehis_query_date_desc_res = $wirehis_query_date_desc->get_result();
+            $wirehis_query_array_all = $wirehis_query_date_desc_res->fetch_all(MYSQLI_ASSOC);
         }
         $_SESSION['wirehis'] = "wirehis";
         if (isset($_POST['wirehisback'])) {
