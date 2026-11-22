@@ -5,6 +5,10 @@ A fictional banking-system project built as a hands-on PHP/MySQL portfolio demo.
 > **Try it live:** [https://wsym.nysr.host/](https://wsym.nysr.host/index.php)  
 > This is a simulation only—no real banking, money, payments, or financial services.
 
+## Demo Limitations
+
+- Users cannot upload images and change them due to the hosting service's limitations.
+
 ---
 
 ## Purpose
