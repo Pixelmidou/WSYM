@@ -1,6 +1,6 @@
 # WSYM Banking System
 
-A fictional banking-system project built as a hands-on PHP/MySQL portfolio demo. WSYM ("We Steal Your Money") showcases account flows, simulated transactions, and user/admin interfaces.
+A fictional banking-system project built as a hands-on PHP/MySQL portfolio demo. WSYM showcases account flows, simulated transactions, and user/admin interfaces.
 
 > **Try it live:** [https://wsym.nysr.host/](https://wsym.nysr.host/index.php)  
 > This is a simulation only—no real banking, money, payments, or financial services.
@@ -46,7 +46,7 @@ WSYM/
 ├── email_verif_process.php        # Email-verification handler
 ├── resend_email_verif.php         # Resend verification email
 ├── uploadimg.php                  # Profile-image upload handling
-├── wsym_hosted.sql                # Database schema and demo seed data
+├── wsym.sql                       # Database schema and demo seed data
 ├── css/ and js/                   # Stylesheets and client-side scripts
 ├── bootstrap-5.0.2-dist/          # Local Bootstrap assets
 └── phpmailer/src/                 # PHPMailer source files used by the app
@@ -72,7 +72,7 @@ email_verif_address=WSYM Demo <no-reply@example.com>
 
 The mailer expects authenticated SMTP over SSL on port `465`; email sending also depends on valid SMTP credentials and outbound SMTP access. Email templates contain hard-coded `localhost` URLs, so update those to match your local host and project path if testing verification links.
 
-Import `wsym_hosted.sql` into a new, empty demo database using XAMPP's phpMyAdmin or another MySQL client. **The SQL file includes `DROP TABLE IF EXISTS` statements and sample data—never import it into a database containing data you need to keep.**
+Import `wsym.sql` into a new, empty demo database using XAMPP's phpMyAdmin or another MySQL client. **The SQL file includes `DROP TABLE IF EXISTS` statements and sample data—never import it into a database containing data you need to keep.**
 
 ---
 

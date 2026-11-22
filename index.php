@@ -22,7 +22,7 @@ if (isset($_SESSION['admin_username'])) {
     <div class="container1" id="loginpage">
         <form action="login.php" method="post">
             <h2 class="ti">Log in</h2>
-            <h2 class="qu">Welcome to <a href="./about_us.php" class="abt">"We Steal Your Money"</a> Banking System</h2>
+            <h2 class="qu">Welcome to <a href="" class="abt">WSYM</a> — A Banking System Simulator</h2>
             <div class="push2">
                 <div class="container2">
                     <label class="labbor">
@@ -58,7 +58,7 @@ if (isset($_SESSION['admin_username'])) {
     <div id="createaccount" class="createaccount container1">
         <form action="register.php" method="post">
             <h2 class="ti">Create Account</h2>
-            <h2 class="qu">Welcome to <a href="./about_us.html" class="abt">"We Steal Your Money"</a> Banking System</h2>
+            <h2 class="qu">Welcome to <a href="" class="abt">WSYM</a> — A Banking System Simulator</h2>
             <div class="push2">
                 <div class="container2">
                     <label class="labbor">
@@ -91,7 +91,7 @@ if (isset($_SESSION['admin_username'])) {
     <div id="forgotpass" class="forgotpass container1" action="forgot_pass.php">
         <form action="forgot_pass.php" method="post">
             <h2 class="ti">Request a New Password</h2>
-            <h2 class="qu">Welcome to <a href="./about_us.html" class="abt">"We Steal Your Money"</a> Banking System</h2>
+            <h2 class="qu">Welcome to <a href="" class="abt">WSYM</a> — A Banking System Simulator</h2>
             <div class="push2">
                 <div class="container4 contem">
                     <label class="labbor">
