@@ -18,9 +18,13 @@ This project demonstrates a database-driven PHP application, including user auth
 - User registration, login, and email-verification/resend flows
 - Account settings, password changes, and profile-image management
 - Simulated balance, deposit, withdrawal, and wire-transfer workflows
-- Support-ticket workflow
-- Admin interface for reviewing accounts and transactions, adjusting demo balances, managing access, and handling tickets
+- Admin interface for reviewing accounts and transactions, adjusting demo balances, and managing access
 - Responsive pages with client-side JavaScript interactions
+
+## Not Implemented Yet
+
+- Users cannot send support tickets to admins.
+- Admin-side information management and ticket handling are not implemented.
 
 ---
 
@@ -78,7 +82,7 @@ Import `wsym.sql` into a new, empty demo database using XAMPP's phpMyAdmin or an
 
 ## Demo Safety
 
-This is a fictional learning project, **not production-ready banking software**. Do not use real money, payment services, personal information, or real account credentials. The repository includes demo-account material; assume it is public and disposable. Keep `.env` out of Git. Before any public deployment, review the application's security, remove or change demo accounts, secure or remove `adminer.php`, configure HTTPS, and protect uploaded files.
+This is a fictional learning project, **not production-ready banking software**. Do not use real money, payment services, personal information, or real account credentials. The repository includes demo-account material; assume it is public and disposable. Keep `.env` out of Git. Before any public deployment, review the application's security, remove or change demo accounts, configure HTTPS, and protect uploaded files.
 
 ---
 
