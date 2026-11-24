@@ -39,3 +39,4 @@ function confpass() {
     return confirm(`You are changing your password to "${cpass}" ,\n Are you sure ?`)
   }
 }
+

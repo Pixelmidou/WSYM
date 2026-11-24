@@ -14,7 +14,12 @@ html {
 }
 
 body {
-  background-image: url(../data/background.jpg);
+  background-image: url("../data/background.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+/* the page picture: data/background.jpg, one folder up from css/ */
   display: flex;
   flex-direction: column;
   height: 100vh;
@@ -248,4 +253,18 @@ textarea {
 
 .wh, #lb {
   cursor: pointer;
-}/*# sourceMappingURL=welcome_style.css.map */
+}
+
+/* ---------------------------------------------------------------------------
+   Avatar slot: the header shows the uploaded photo in a 32x32 circle. object-fit
+   keeps the photo's own proportions and crops it to the circle instead of
+   squashing a tall portrait into the square.
+   --------------------------------------------------------------------------- */
+#output {
+  object-fit: cover;
+  object-position: center;
+  flex: 0 0 auto;
+  background-color: transparent;
+}
+/*# sourceMappingURL=welcome_style.css.map */
+

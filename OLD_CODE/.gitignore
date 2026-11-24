@@ -1,0 +1,6 @@
+bootstrap-5.0.2-dist
+phpmailer
+.env
+composer.json
+composer.lock
+vendor

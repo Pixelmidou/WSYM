@@ -1,8 +1,13 @@
 body {
-  background: url(../data/background.jpg);
+  background-image: url("../data/background.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+/* the page picture: data/background.jpg, one folder up from css/ */
 }
 
-.cont1 {
+.cont1, .pageinside {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -18,6 +23,7 @@ body {
   padding: 10px 100px 10px 100px;
   width: 700px;
   height: 418px;
+  overflow-y: auto;
   border-top: 10px solid #87cefa;
   border-bottom: 10px solid #87cefa;
 }
@@ -49,6 +55,14 @@ input[type=text], .valbuts, input[type=email], input[type=number], input[type=pa
   color: white;
   font-size: medium;
   width: 240px;
+}
+
+/* the confirm/change button of the settings and reset forms: the narrow rule above
+   made it a few pixels wide, so nothing was clickable */
+.cont2 .but {
+  width: 300px;
+  max-width: 100%;
+  margin-bottom: 15px;
 }
 
 input[type=text]:focus, input[type=email]:focus, .valbuts:hover, input[type=number]:focus, input[type=password]:focus {
@@ -86,3 +100,4 @@ input[type=text]:focus, input[type=email]:focus, .valbuts:hover, input[type=numb
   color: white;
   font-size: medium;
 }/*# sourceMappingURL=account_settings.css.map */
+

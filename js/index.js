@@ -1,42 +1,25 @@
-function func1() {
-    document.getElementById("loginpage").style.display = "none";
-    document.getElementById("forgotpass").style.display = "none";
-    document.getElementById("createaccount").style.display = "flex";
-    document.getElementById("user1").value = ""
-    document.getElementById("passw1").value = ""
-    document.getElementById("user2").value = ""
-    document.getElementById("passw2").value = ""
-    document.getElementById("email2").value = ""
-    document.getElementById("email3").value = ""
+/* js/index.js - switch between the three panels of the front page. */
+function showPanel(which) {
+    ["loginpage", "createaccount", "forgotpass"].forEach(function (id) {
+        const el = document.getElementById(id);
+        if (el) { el.style.display = (id === which) ? "flex" : "none"; }
+    });
+    ["user1", "passw1", "user2", "passw2", "email2", "email3"].forEach(function (id) {
+        const el = document.getElementById(id);
+        if (el) { el.value = ""; }
+    });
 }
-function func2() {
-    document.getElementById("loginpage").style.display = "none";
-    document.getElementById("createaccount").style.display = "none";
-    document.getElementById("forgotpass").style.display = "flex";
-    document.getElementById("user1").value = ""
-    document.getElementById("passw1").value = ""
-    document.getElementById("user2").value = ""
-    document.getElementById("passw2").value = ""
-    document.getElementById("email2").value = ""
-    document.getElementById("email3").value = ""
-}
-function func3() {
-    document.getElementById("forgotpass").style.display = "none";
-    document.getElementById("createaccount").style.display = "none";
-    document.getElementById("loginpage").style.display = "flex";
-    document.getElementById("user1").value = ""
-    document.getElementById("passw1").value = ""
-    document.getElementById("user2").value = ""
-    document.getElementById("passw2").value = ""
-    document.getElementById("email2").value = ""
-    document.getElementById("email3").value = ""
-}
-function func4(pass) {
-    if (pass.type === "password") {
-      pass.type = "text";
-    } else {
-      pass.type = "password";
-    }
-}
-document.getElementById("passv1").addEventListener("click", function(){ func4(document.getElementById("passw1")); });
-document.getElementById("passv2").addEventListener("click", function(){ func4(document.getElementById("passw2")); });
+
+function func1() { showPanel("createaccount"); }
+function func2() { showPanel("forgotpass"); }
+function func3() { showPanel("loginpage"); }
+
+/* the little eye checkbox next to a password field */
+function func4(pass) { pass.type = (pass.type === "password") ? "text" : "password"; }
+
+document.addEventListener("DOMContentLoaded", function () {
+    const eye1 = document.getElementById("passv1");
+    const eye2 = document.getElementById("passv2");
+    if (eye1) { eye1.addEventListener("click", function () { func4(document.getElementById("passw1")); }); }
+    if (eye2) { eye2.addEventListener("click", function () { func4(document.getElementById("passw2")); }); }
+});

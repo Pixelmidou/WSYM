@@ -1,6 +1,39 @@
-bootstrap-5.0.2-dist
-phpmailer
+# ---------------------------------------------------------------------------
+# WSYM - what Git must never see.
+# Everything below is either a secret, generated at runtime, or a file the
+# application itself writes (mail, logs, uploaded pictures).
+# ---------------------------------------------------------------------------
+
+# the real configuration: database password, Gmail App Password
 .env
-composer.json
+.env.*
+!.env.example
+
+# profile pictures uploaded by users (keep the folder, not its contents)
+data/uploads/*
+!data/uploads/.gitkeep
+
+# anything the app or a tool writes while running
+*.log
+*.tmp
+/tmp/
+
+# PHP
+vendor/
 composer.lock
-vendor
+.phpunit.result.cache
+
+# Windows / macOS junk
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
+._*
+
+# editors and IDEs
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*~

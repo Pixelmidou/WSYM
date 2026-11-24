@@ -1,0 +1,108 @@
+body {
+  background: url(../data/background.jpg);
+}
+
+.containerdiv {
+  background-color: #9FCAE5;
+}
+
+.homeseccont, .balancecont, .transactionscont, .blockactionscont, .infomanagmentcont, .ticketscont, .balancesubcont, .blockaccountcont {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #474646;
+  background-color: lightgray;
+  padding: 10px 100px 10px 100px;
+  width: 700px;
+  height: 418px;
+  border-top: 10px solid #87cefa;
+  border-bottom: 10px solid #87cefa;
+}
+
+.blockactionscont {
+  height: 436px;
+}
+
+.push {
+  margin-top: auto;
+  margin-bottom: auto;
+  box-shadow: 0px 13px 27px -5px rgba(50, 50, 93, 0.25), 0px 8px 16px -8px rgba(0, 0, 0, 0.3), 0px -6px 16px -6px rgba(0, 0, 0, 0.025);
+  padding: 30px;
+  border-radius: 10px;
+  font-weight: bolder;
+  font-size: large;
+}
+
+.labbor img {
+  width: 20px;
+  height: 20px;
+}
+
+.labbor {
+  border-bottom: 1px solid #87cefa;
+  width: 300px;
+  height: 50px;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+
+.lab {
+  margin-bottom: 0;
+}
+
+input[type=text], .valbuts, input[type=email], input[type=number] {
+  background: none;
+  border: 0;
+  margin-left: 5px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  padding: 10px;
+  color: white;
+  font-size: medium;
+  width: 270px;
+}
+
+input[type=text]:focus, input[type=email]:focus, .valbuts:hover, input[type=number]:focus {
+  background: none;
+  border: 0;
+  caret-color: lightskyblue;
+  outline: 0;
+  color: lightskyblue;
+}
+
+.but {
+  width: calc(100% - 180px);
+  margin-bottom: auto;
+  padding: 10px;
+  border-radius: 5px;
+  background-color: lightskyblue;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  color: white;
+  opacity: 0.7;
+}
+
+.but:hover {
+  opacity: 1;
+}
+
+::-moz-placeholder {
+  color: white;
+  font-size: medium;
+}
+
+::placeholder {
+  color: white;
+  font-size: medium;
+}
+
+.t-but {
+  padding-left: 30px;
+  padding-right: 30px;
+}
+
+.wh, #lb {
+  cursor: pointer;
+}/*# sourceMappingURL=welcome_admin.css.map */

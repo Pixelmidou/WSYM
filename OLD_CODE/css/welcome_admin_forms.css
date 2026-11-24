@@ -1,0 +1,91 @@
+body {
+  background: url(../data/background.jpg);
+}
+
+.container1 {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.container2 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #474646;
+  background-color: lightgray;
+  padding: 10px 100px 10px 100px;
+  min-width: -moz-max-content;
+  min-width: max-content;
+  min-height: -moz-max-content;
+  min-height: max-content;
+  border-top: 10px solid #87cefa;
+  border-bottom: 10px solid #87cefa;
+}
+
+.but {
+  width: calc(100% - 180px);
+  margin-bottom: auto;
+  padding: 10px;
+  border-radius: 5px;
+  background-color: lightskyblue;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  color: white;
+  opacity: 0.7;
+}
+
+.but:hover {
+  opacity: 1;
+}
+
+input[type=text]:focus, input[type=email]:focus, .valbuts:hover {
+  background: none;
+  border: 0;
+  caret-color: lightskyblue;
+  outline: 0;
+  color: lightskyblue;
+}
+
+input[type=text], .valbuts, input[type=email] {
+  background: none;
+  border: 0;
+  margin-left: 5px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  padding: 10px;
+  color: white;
+  font-size: medium;
+}
+
+.labbor {
+  border-bottom: 1px solid #87cefa;
+  width: 300px;
+  height: 50px;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+
+.labbor img {
+  width: 20px;
+  height: 20px;
+}
+
+::-moz-placeholder {
+  color: white;
+  font-size: medium;
+}
+
+::placeholder {
+  color: white;
+  font-size: medium;
+}
+
+#but {
+  width: 100%;
+  padding-left: 50px;
+  padding-right: 50px;
+}/*# sourceMappingURL=welcome_admin_forms.css.map */

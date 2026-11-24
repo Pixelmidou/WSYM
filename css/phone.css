@@ -1,0 +1,467 @@
+/* ---------------------------------------------------------------------------
+   phone.css - the same design, on a narrow screen.
+
+   Nothing here changes a colour, a font or a card. It only does what the fixed
+   pixel widths could not do on a phone: the 700px cards become fluid, the top
+   bar wraps instead of running off the screen, the console sidebar turns into a
+   collapsible menu, and tables scroll sideways inside their card instead of
+   pushing the page.
+
+   This file is loaded AFTER the page's own stylesheet, so every rule below wins
+   only where it needs to.
+
+   Breakpoints: 900px (tablet) and 600px (phone).
+   --------------------------------------------------------------------------- */
+
+/* the "Console menu" button only exists below 900px (it is drawn by lib/html.php) */
+.menu-toggle {
+  display: none;
+}
+
+/* the background picture is fixed on a desktop; on a phone that makes it jump
+   while you scroll, so it is allowed to scroll with the page */
+@media (max-width: 900px) {
+  body {
+    background-attachment: scroll;
+  }
+
+  /* a fixed picture that is a real element instead of a background-attachment:
+     it covers the whole screen however long the page is, and iOS Safari does not
+     zoom it the way it does with background-attachment: fixed */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background: url("../data/background.jpg") center / cover no-repeat;
+  }
+}
+
+/* --------------------------------------------------------------- the cards
+   every section of this app is one of three card classes. They all had
+   "width: 700px; height: 418px", which is wider than a phone. */
+@media (max-width: 900px) {
+  .container4,
+  .cont2, .cont1 > .cont2,
+  .adminpanel,
+  .homeseccont, .balancecont, .transactionscont, .blockactionscont,
+  .blockaccountcont, .infomanagmentcont, .ticketscont {
+    width: 100%;
+    max-width: 700px;
+    height: auto;
+    min-height: 0;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  /* the page-inside cards (history, settings, reset): one centred flex parent for
+     all three, so each page keeps the same 100vh wrapper it always had */
+  .pageinside {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: auto;
+    min-height: 100vh;
+    padding: 16px;
+  }
+
+  /* the outer flex boxes of index.php are vertically centred with a hard 100vh: on
+     a phone the card is taller than the screen, so centring pushed its top out of
+     reach. ("body >" keeps the header's own <ul class="container1"> out of this.) */
+  body > .container1 {
+    height: auto;
+    min-height: 100vh;
+    padding: 16px;
+  }
+
+  .tabarea {
+    padding: 16px;
+    min-height: 0;
+  }
+
+  /* history.php: the card there is .container2 inside .pageinside, and it was
+     "min-width: max-content" with 100px side padding */
+  .pageinside > .container2 {
+    width: 100%;
+    max-width: 700px;
+    min-width: 0;
+    height: auto;
+    padding: 16px 20px;
+  }
+
+  .pageinside .d-flex.gap-2 {
+    flex-wrap: wrap;
+  }
+}
+
+/* ----------------------------------------------------------------- the head
+   welcome.php / tickets.php put five links in one row next to the balance
+   button; on a phone that row is twice the width of the screen. */
+@media (max-width: 900px) {
+  header {
+    padding: 14px 16px;
+  }
+
+  header nav.container3 {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+  }
+
+  header .container1 {
+    flex-wrap: wrap;
+    gap: 4px 16px;
+    font-size: 17px;
+    margin-left: 0;
+  }
+
+  header .container2 {
+    font-size: 16px;
+  }
+
+  /* the account menu opens as a normal block under the header instead of a
+     floating box that would hang off the right edge */
+  header .dropdown-menu {
+    position: static !important;
+    top: auto !important;
+    left: auto !important;
+    float: none;
+    width: 100%;
+    margin-top: 6px;
+  }
+
+  /* the account menu of the console opens downwards there, under the button */
+  aside .dropdown.dropup .dropdown-menu {
+    top: 100% !important;
+    bottom: auto !important;
+    margin-bottom: 0;
+    margin-top: .125rem;
+  }
+}
+
+/* ------------------------------------------------------------- the console
+   The sidebar was a 280px column with the cards to its right. Below 900px it
+   becomes a full-width bar with a "Console menu" button; the links are hidden
+   until you tap it. The switch is done with CSS only, so no extra script. */
+@media (max-width: 900px) {
+  /* the console was "sidebar | cards" in a row; on a phone the sidebar goes on top
+     and the cards take the full width underneath */
+  .adminwrap {
+    flex-direction: column;
+  }
+
+  .adminpanel {
+    /* the card must be free to grow: the sidebar no longer shares its height */
+    align-self: stretch;
+    margin: 0 auto;
+  }
+
+  aside:has(.nav-pills) {
+    width: 100% !important;
+    padding: 10px 14px !important;
+  }
+
+  /* the logo row: keep it, but smaller */
+  aside:has(.nav-pills) > a img {
+    width: 26px;
+    height: 26px;
+  }
+
+  /* "Console menu" appears here (see lib/html.php) */
+  .menu-toggle {
+    display: block;
+    width: 100%;
+    margin: 6px 0 0;
+    padding: 9px 12px;
+    border: 0;
+    border-radius: 5px;
+    background: #8abedf;
+    color: #0d3f8f;
+    font-size: 16px;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .menu-toggle::after {
+    content: "\25BE";
+    float: right;
+  }
+
+  .menu-open .menu-toggle::after {
+    content: "\25B4";
+  }
+
+  aside:has(.nav-pills) .nav-pills {
+    display: none;
+    margin-top: 6px;
+  }
+
+  .menu-open aside:has(.nav-pills) .nav-pills {
+    display: flex;
+  }
+
+  aside:has(.nav-pills) .nav-pills .nav-link {
+    padding: 8px 10px;
+    font-size: 16px;
+  }
+
+  /* the account row at the bottom of the sidebar */
+  aside:has(.nav-pills) hr {
+    margin: 10px 0;
+  }
+}
+
+/* older browsers without :has() keep the old sidebar - it still works, it is
+   just wider than a phone. Everything else on the page is already fluid. */
+
+/* --------------------------------------------------------------- the tables
+   history.php and the admin lists. Scrolling the table sideways inside its card
+   is better than letting it stretch the whole page. */
+@media (max-width: 900px) {
+  .container2 table,
+  .adminlist {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  .adminrow {
+    gap: 8px;
+    padding: 8px 10px;
+    font-size: 14px;
+  }
+
+  .adminrow .amount {
+    min-width: 0;
+  }
+
+  /* a list row (a client, a ticket) stacks its two sides instead of squeezing */
+  .adminrow.wrap {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  /* the four Allow/Block buttons and the three transactions buttons are in a
+     flex row; let them wrap instead of shrinking the labels to nothing */
+  .adminpanel .d-flex.gap-2 {
+    flex-wrap: wrap;
+  }
+
+  .adminpanel .but {
+    width: 100%;
+    max-width: 320px;
+  }
+
+  .adminpanel .push {
+    margin: 8px 0;
+    padding: 18px 22px;
+    font-size: 17px;
+    white-space: normal;
+  }
+
+  .adminpanel h1 {
+    font-size: 30px;
+  }
+
+  .adminpanel form {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .bigsearch {
+    width: 100%;
+  }
+}
+
+/* a list row on a phone: the name and the state get the first line, the buttons the
+   second one, so nothing has to be scrolled sideways to be reached */
+@media (max-width: 600px) {
+  .adminlist { white-space: normal; }
+
+  .adminlist .adminrow:not(.thread) {
+    flex-wrap: wrap;
+  }
+
+  .adminlist .adminrow:not(.thread) > .flex-grow-1 {
+    flex: 1 1 100%;
+  }
+
+  .adminlist .adminrow:not(.thread) .minibut,
+  .adminlist .adminrow:not(.thread) form {
+    flex: 1 1 100%;
+  }
+
+  .adminlist .adminrow:not(.thread) form {
+    display: flex;
+  }
+
+  .adminlist .adminrow:not(.thread) form .minibut {
+    width: 100%;
+  }
+}
+
+/* the conversation bubbles: they were fine, just tighter */
+@media (max-width: 600px) {
+  .bubble-row {
+    margin: 6px 0;
+  }
+
+  .bubble {
+    padding: 8px 10px;
+    font-size: 14px;
+  }
+
+  .adminrow.thread {
+    max-height: 300px;
+  }
+}
+
+/* ------------------------------------------------------------- the small bits */
+@media (max-width: 600px) {
+  /* the login / register / forgot forms: 700px wide with 100px side padding */
+  form {
+    width: 100%;
+    max-width: 700px;
+    height: auto;
+    min-height: 0;
+    padding: 18px;
+  }
+
+  .ti {
+    margin-top: 8px;
+    text-align: center;
+  }
+
+  .qu {
+    font-size: 16px;
+    text-align: center;
+    margin-bottom: 14px;
+  }
+
+  /* the two buttons that sat side by side (Login / Create a new account) */
+  .container4, .container5, .container6 {
+    flex-wrap: wrap;
+  }
+
+  /* full width each, so "Create a new account" is not cut off */
+  .container5 .but, .container6 .but {
+    width: 100%;
+  }
+
+  .butt {
+    width: 100%;
+  }
+
+  /* the underline fields: icon, input and the show-password box stay on one line */
+  .labbor {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .labbor input[type=text],
+  .labbor input[type=email],
+  .labbor input[type=password] {
+    flex: 1 1 auto;
+    width: auto;
+    min-width: 0;
+  }
+
+  .labbor input[type=checkbox] {
+    flex: 0 0 auto;
+    margin: 0;
+  }
+
+  .labbor {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .testacc {
+    font-size: 13px;
+  }
+
+  /* welcome.php / tickets.php: the buttons under a card go one under the other and
+     take the width of the card, instead of sitting 250px side by side */
+  .container4 .d-flex.gap-2,
+  .container4 .d-flex.gap-3 {
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+
+  .container4 .but,
+  .container4 input[type=submit] {
+    width: 100% !important;
+    max-width: 320px;
+  }
+
+  /* welcome.php: Deposit / Withdraw buttons are 250px each in a row */
+  /* "Predefined Values : $10 $20 $30 $40 $50" - they may wrap under the label */
+  .container4 div > span {
+    display: inline-block;
+    margin-right: 6px;
+  }
+
+  .container4 .vals {
+    display: inline-block;
+    margin: 4px 2px;
+  }
+
+  .container4 .d-flex.gap-3 {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px !important;
+  }
+
+  .container4 .but {
+    width: 100% !important;
+    max-width: 250px;
+  }
+
+  .push {
+    padding: 20px;
+    font-size: 19px;
+    text-align: center;
+  }
+
+  /* about.php: the two 400px cards go one under the other */
+  .card {
+    width: 100% !important;
+    max-width: 400px;
+  }
+
+  /* admin_redirect.php and the answer pages */
+  .panel {
+    width: 100%;
+    max-width: 700px;
+    height: auto;
+    min-height: 0;
+    padding: 24px 16px;
+  }
+
+  .panel .d-flex.gap-3 {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  /* statement.php and the admin redirection panel */
+  body > .container1 {
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .cont1 > .cont2 {
+    width: 100%;
+    max-width: 700px;
+    height: auto;
+    min-height: 0;
+    padding: 24px 16px;
+    gap: 16px;
+  }
+
+  .cont1 {
+    height: auto;
+    min-height: 100vh;
+  }
+}

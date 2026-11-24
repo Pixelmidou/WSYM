@@ -1,8 +1,13 @@
 body {
-  background: url(../data/background.jpg);
+  background-image: url("../data/background.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+/* the page picture: data/background.jpg, one folder up from css/ */
 }
 
-.container1 {
+.container1, .pageinside {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -89,3 +94,4 @@ input[type=text], .valbuts, input[type=email] {
   padding-left: 50px;
   padding-right: 50px;
 }/*# sourceMappingURL=welcome_admin_forms.css.map */
+

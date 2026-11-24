@@ -13,7 +13,12 @@ html {
 }
 
 body {
-  background-image: url(../data/background.jpg);
+  background-image: url("../data/background.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+/* the page picture: data/background.jpg, one folder up from css/ */
 }
 
 .container1 {
@@ -35,3 +40,4 @@ body {
   border-top: 10px solid #87cefa;
   border-bottom: 10px solid #87cefa;
 }/*# sourceMappingURL=redirections_style.css.map */
+

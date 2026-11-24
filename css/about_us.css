@@ -13,6 +13,15 @@ html {
   box-sizing: inherit;
 }
 
+body {
+  background-image: url("../data/background.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  /* the page picture: data/background.jpg, one folder up from css/ */
+}
+
 main {
   display: flex;
   flex-direction: column;
@@ -49,3 +58,4 @@ main {
   grid-row-start: 1;
   grid-row-end: 3;
 }/*# sourceMappingURL=about_us.css.map */
+

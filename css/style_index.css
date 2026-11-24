@@ -68,7 +68,7 @@ form {
   flex-direction: column;
   background-color: lightgray;
   width: 700px;
-  height: 420px;
+  height: 510px; /* Increased height to fit 3 test accounts */
   border-top: 10px solid #87cefa;
   padding-left: 100px;
   padding-right: 100px;
@@ -139,6 +139,10 @@ input[type=text]:focus, input[type=password]:focus, input[type=email]:focus {
 body {
   background-image: url("../data/background.jpg");
   background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+/* the page picture: data/background.jpg, one folder up from css/ */
 }
 
 input[type=checkbox]:checked {
@@ -157,4 +161,22 @@ input[type=checkbox]:checked {
 
 .abt:hover {
   color: lightskyblue;
-}/*# sourceMappingURL=style_index.css.map */
+}
+
+.testacc {
+  margin-top: -5px;
+  text-align: center;
+  font-family: "Tajawal", sans-serif;
+  font-size: 14px;
+  color: #333;
+}
+.testacc p {
+  margin: 0;
+  line-height: 1.5;
+}
+.testacc b {
+  color: #000;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+}
+
