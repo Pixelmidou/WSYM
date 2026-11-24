@@ -47,6 +47,17 @@ function previous_conversation(string $username): ?array
  * conversation (number + 1), which is what keeps the earlier messages readable.
  * Returns 'ok' | 'empty' | 'closed' (an admin cannot start somebody's conversation).
  */
+/** A one-line subject for a new conversation: the first 120 characters of the message.
+ *  preg with /u counts characters, so it still works on a host without mbstring. */
+function short_text(string $text, int $limit = 120): string
+{
+    $flat = trim(preg_replace('/\s+/', ' ', $text));
+    if (preg_match('/^.{0,' . $limit . '}/us', $flat, $m)) {
+        return $m[0];
+    }
+    return substr($flat, 0, $limit);
+}
+
 function thread_post(string $username, string $sender, string $body, bool $isAdmin = false): string
 {
     $body = trim($body);
@@ -60,14 +71,14 @@ function thread_post(string $username, string $sender, string $body, bool $isAdm
         if ($isAdmin) {
             return 'closed';
         }
-        $subject = mb_substr(preg_replace('/\s+/', ' ', $body), 0, 120);
+        $subject = short_text($body);
         db_run("INSERT INTO ticket (username, status, subject, last_message, conversation)
                 VALUES (?, 'opened', ?, NOW(6), 1)", [$username, $subject]);
     } elseif ($thread['status'] !== 'opened') {
         if ($isAdmin) {
             return 'closed';
         }
-        $subject = mb_substr(preg_replace('/\s+/', ' ', $body), 0, 120);
+        $subject = short_text($body);
         db_run("UPDATE ticket SET status = 'opened', time_closed = NULL, subject = ?,
                        time_opened = NOW(6), conversation = conversation + 1
                 WHERE username = ?", [$subject, $username]);

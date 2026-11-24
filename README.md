@@ -18,6 +18,23 @@ a bank.
 
 ---
 
+## Table of contents
+
+1. [Features](#1-features)
+2. [Screenshots](#2-screenshots)
+3. [Role walkthrough](#3-role-walkthrough)
+4. [Install on XAMPP (Windows)](#4-install-on-xampp-windows)
+5. [Email — pick one of three ways](#5-email--pick-one-of-three-ways)
+6. [The `.env` file](#6-the-env-file)
+7. [What is in the folder](#7-what-is-in-the-folder)
+8. [How it is built (and why)](#8-how-it-is-built-and-why)
+9. [Troubleshooting & glossary](#9-troubleshooting--glossary)
+10. [Deliberately not implemented](#10-deliberately-not-implemented)
+11. [Safety](#11-safety)
+12. [Credits & author](#12-credits--author)
+
+---
+
 ## 1. Features
 
 **Customer**
@@ -50,7 +67,50 @@ setup doctor (`check.php`) that lists every setting and file with a plain-Englis
 
 ---
 
-## 2. Install on XAMPP (Windows)
+## 2. Screenshots
+
+### 1. Authentication & Customer Dashboard
+| Login | Customer dashboard |
+|---|---|
+| ![Login](screenshots/01-login.png) | ![Customer dashboard](screenshots/03-customer-dashboard.png) |
+| **Login** (`index.php`) — Clean sign-in card with "Remember me" and password reset; demo credentials live in this README. | **Dashboard** (`welcome.php`) — Balance, recent movement summary, and quick links to history, CSV export, and support. |
+
+### 2. Transaction History & Support
+| Full history & CSV | Support conversation |
+|---|---|
+| ![History](screenshots/05-history.png) | ![Customer tickets](screenshots/14-tickets-customer.png) |
+| **History** (`history.php`) — Paged ledger of deposits, withdrawals, and wires with one-click CSV statement download. | **Support** (`tickets.php`) — Chat-bubble conversation with support; reply in place or close the thread. |
+
+### 3. Administrator Console
+| Admin home | Admin tickets |
+|---|---|
+| ![Admin home](screenshots/10-admin-home.png) | ![Admin tickets](screenshots/13-admin-tickets.png) |
+| **Home** (`admin.php`) — Live totals for clients, stored money, 24-hour activity, and open tickets. | **Tickets** (`admin.php?tab=tickets`) — Read open customer threads, reply in place, or close conversations. |
+
+---
+
+## 3. Role walkthrough
+
+### Testing as a Customer (`VerifiedUser` / `VerifiedUser123`)
+1. Sign in on `index.php` with `VerifiedUser` / `VerifiedUser123`.
+2. On the dashboard (`welcome.php`), click **Deposit Money**, pick a quick amount (or type one), and submit.
+3. Try **Withdraw Money** or **Wire Money** (you can wire to `nonVerifiedUser@example.com`).
+4. Click **Full history** (`history.php`) to inspect the ledger or download a **CSV statement**.
+5. Click **Message Support** (`tickets.php`) to start a conversation with support.
+6. Open the top-right user menu to upload a profile picture or update your username/email/password.
+
+### Testing as an Administrator (`Admin` / `Admin123`)
+1. Sign in with `Admin` / `Admin123` (or switch to `admin.php`).
+2. **Home** shows total clients, stored money, 24-hour counts, and waiting tickets.
+3. **Balances** lets you search for a client and edit their balance.
+4. **Actions Blocking** / **Accounts Blocking** let you restrict specific actions or disable an entire account.
+5. **Info management** lets you force re-verification, force a password reset, end a client's active session, or rename them.
+6. **Tickets** lets you read and reply to customer conversations.
+7. **Audit log** (`admin_audit.php`) records every admin action with timestamp and target.
+
+---
+
+## 4. Install on XAMPP (Windows)
 
 1. Copy the whole `wsym` folder into **`C:\xampp\htdocs\stuff\wsym`**
    (rename it or move it, the code works out its own URL).
@@ -82,7 +142,7 @@ The same three accounts work on the hosted demo: <https://wsym.nysr.host/index.p
 
 ---
 
-## 3. Email — pick one of three ways
+## 5. Email — pick one of three ways
 
 The app sends three kinds of mail: the verification link after registering, the
 "forgot password" link, and the optional test message from `tools/mail_test.php`.
@@ -241,7 +301,7 @@ mailbox. One install also shares one temp folder, so it assumes one install = on
 
 ---
 
-## 4. The `.env` file
+## 6. The `.env` file
 
 ```dotenv
 database_hostname=localhost
@@ -263,7 +323,7 @@ base_url=                      # empty = worked out from the request
 
 ---
 
-## 5. What is in the folder
+## 7. What is in the folder
 
 ```
 wsym/
@@ -328,7 +388,7 @@ If you change the folder layout, that `../` is the part to update.
 
 ---
 
-## 6. How it is built (and why)
+## 8. How it is built (and why)
 
 * **One action, one page.** Every form posts to the page that shows its result, so a
   refresh never repeats a bank transfer.
@@ -349,7 +409,23 @@ If you change the folder layout, that `../` is the part to update.
 
 ---
 
-## 7. Deliberately not implemented
+## 9. Troubleshooting & glossary
+
+### Common issues
+* **`check.php` shows red rows:** Follow the plain-English fix printed next to each red row. Most often it is a missing `.env` file (copy `.env.example` to `.env`) or `wsym.sql` not yet imported into MySQL.
+* **No verification or reset email arrives:** By default `mailer_transport=file` writes emails to disk instead of sending them. Open `tools/mailbox.php` inside the app to read them.
+* **PHP `mbstring` is not installed:** WSYM does not require `mbstring`; `check.php` marks it as optional and all string truncation works without it.
+* **Locked out or stuck session:** Visit `logout.php` to clear the current session, or use **Info management → End session** from the Admin console.
+
+### Glossary
+* **`check.php`** — Built-in setup doctor that verifies PHP, extensions, `.env`, database tables, demo accounts, and file permissions.
+* **`mailer_transport`** — `.env` setting (`file`, `smtp`, `gmail`, or `mail`) that controls how `wf_mail()` delivers emails.
+* **Audit log** — Append-only record (`admin_audit.php`) of every administrative change (balance edits, blocks, renames, session terminations).
+* **CSRF token** — Hidden per-session token included on every form to prevent cross-site request forgery.
+
+---
+
+## 10. Deliberately not implemented
 
 * No HTTPS setup, no rate limiting beyond the 60-second "resend email" cooldown.
 * No in-app inbox except `tools/mailbox.php`, and that reader only has something to show
@@ -368,7 +444,7 @@ If you change the folder layout, that `../` is the part to update.
 
 ---
 
-## 8. Safety
+## 11. Safety
 
 This is a learning project, **not production-ready banking software**. Do not use real
 money, real payment services, personal information or real credentials. The demo accounts
@@ -380,7 +456,7 @@ password in `.env`, serve it over HTTPS, keep `.env` out of Git, and protect
 
 ---
 
-## 9. Credits
+## 12. Credits
 
 * **PHPMailer 6.9.3** — <https://github.com/PHPMailer/PHPMailer> — LGPL-2.1, included
   unmodified in `lib/phpmailer/` (its licence file is next to it).
@@ -388,7 +464,7 @@ password in `.env`, serve it over HTTPS, keep `.env` out of Git, and protect
 
 ---
 
-## 10. Author
+### Author
 
 **Mohamed Khabou**
 Computer Science Student — Faculté des Sciences de Sfax (FSS), Sfax, Tunisia

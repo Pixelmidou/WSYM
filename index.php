@@ -60,10 +60,8 @@ page_top('WSYM Banking', $css, false);
                 </div>
             </div>
             <div class="container7 testacc">
-                <p><b>Test Accounts:</b></p>
-                <p>Username : <b>VerifiedUser</b> &nbsp;|&nbsp; Password : <b>VerifiedUser123</b></p>
-                <p>Username : <b>nonVerifiedUser</b> &nbsp;|&nbsp; Password : <b>nonVerifiedUser123</b></p>
-                <p>Username : <b>Admin</b> &nbsp;|&nbsp; Password : <b>Admin123</b></p>
+                <p><b>New here?</b> Create an account in a few seconds.</p>
+                <p>The sample logins are in the README.</p>
             </div>
         </form>
     </div>

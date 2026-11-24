@@ -12,10 +12,14 @@ $add = function (string $what, bool $ok, string $fix = '') use (&$rows) {
 
 // ---- php
 $add('PHP ' . PHP_VERSION . ' (this app needs 8.1 or newer)', PHP_VERSION_ID >= 80100, 'Install a newer XAMPP.');
-foreach (['mysqli', 'mbstring', 'openssl'] as $ext) {
+foreach (['mysqli', 'openssl'] as $ext) {
     $add('PHP extension "' . $ext . '"', extension_loaded($ext),
          'Open php.ini and remove the ";" before extension=' . $ext);
 }
+// mbstring is optional: the app has its own short_text() fallback for the one place that
+// could have used it, so a host without it still passes every check.
+$add('PHP extension "mbstring" (optional)', true,
+     extension_loaded('mbstring') ? 'Loaded.' : 'Not loaded — not needed, the app works without it.');
 
 // ---- .env
 $add('.env file exists', is_file(APP_ROOT . '/.env'), 'Copy .env.example to .env in this folder.');
