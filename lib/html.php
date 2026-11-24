@@ -20,7 +20,13 @@ function base(): string
         return $base;
     }
     $dir = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '/index.php'));
-    $base = $dir === '/' || $dir === '.' ? '' : rtrim($dir, '/');
+    // pages that live in a sub-folder (tools/mailbox.php) must still link to the app root
+    foreach (['/tools', '/lib'] as $sub) {
+        if (str_ends_with($dir, $sub)) {
+            $dir = substr($dir, 0, -strlen($sub));
+        }
+    }
+    $base = $dir === '/' || $dir === '.' || $dir === '' ? '' : rtrim($dir, '/');
     return $base;
 }
 
@@ -33,7 +39,11 @@ function url(string $path = ''): string
 /** Send the browser somewhere else and stop. redirect('welcome.php') */
 function redirect(string $path): void
 {
-    header('Location: ' . $path);
+    // keep the sub-folder: inside /stuff/wsym/ a bare 'index.php' would leave the app
+    if (!preg_match('#^(https?:|/)#i', $path)) {
+        $path = url($path);
+    }
+    header('Location: ' . $path, true, 302);
     exit;
 }
 

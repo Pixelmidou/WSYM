@@ -56,6 +56,12 @@ $add('data/uploads/ is writable', is_writable(APP_ROOT . '/data/uploads'),
 $add('Photo cropping (optional): ' . (extension_loaded('gd') ? 'done by PHP (GD)' : 'done by the browser'),
      true, '');
 
+// ---- the mail library (only used for gmail and smtp)
+foreach (['PHPMailer.php', 'SMTP.php', 'Exception.php'] as $file) {
+    $add('PHPMailer: lib/phpmailer/src/' . $file, is_file(APP_ROOT . '/lib/phpmailer/src/' . $file),
+         'Unzip the archive again - the whole lib/phpmailer folder is needed for Gmail.');
+}
+
 // ---- mail
 $transport = env('mailer_transport', 'file');
 if ($transport === 'gmail') {
@@ -63,6 +69,13 @@ if ($transport === 'gmail') {
          'Set mailer_username in .env.');
     $add('App Password is 16 characters (spaces are ignored)', strlen(str_replace(' ', '', env('mailer_password'))) === 16,
          'Google > Security > App passwords creates one. Your normal password never works.');
+} elseif ($transport === 'smtp') {
+    $host = env('mailer_host');
+    $add('SMTP host = "' . ($host !== '' ? $host : '(empty)') . ':' . env('mailer_port', '465') . '"',
+         $host !== '', 'Set mailer_host in .env: 127.0.0.1 for a local relay, or a remote server name.');
+    $local = in_array($host, ['127.0.0.1', 'localhost', '::1'], true);
+    $add('SMTP encryption = "' . (env('mailer_secure') !== '' ? env('mailer_secure') : 'none (plain)') . '"',
+         true, $local ? 'A local catcher usually wants mailer_secure empty and its own port.' : '');
 } else {
     $add('mail transport "' . $transport . '" needs no password', true);
 }

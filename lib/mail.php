@@ -8,8 +8,10 @@
  *   mail   PHP mail(), needs sendmail.exe on XAMPP
  *
  * wf_mail() returns true/false and leaves the reason in wf_mail_error().
- * Nothing here needs Composer: the mail is built as plain text/HTML and sent over a
- * socket, which is all PHPMailer did for us.
+ *
+ * Gmail and SMTP are sent with PHPMailer (lib/phpmailer/, the 3 files it needs, no
+ * Composer). Nothing else in the app uses PHPMailer, and nothing else has to change if
+ * you swap in your own copy.
  */
 
 /** Where the "file" transport writes. Outside the web root, created on demand. */
@@ -76,8 +78,84 @@ function wf_mail(string $to, string $subject, string $html): bool
         return $ok;
     }
 
-    // gmail and smtp both speak SMTP; only the host/port/encryption differ
-    return mail_smtp($to, $subject, $html);
+    // gmail and smtp both go through PHPMailer; only host/port/encryption differ
+    return mail_phpmailer($to, $subject, $html);
+}
+
+/**
+ * Gmail / SMTP with PHPMailer.
+ *
+ * Gmail wants: smtp.gmail.com, an App Password (not your normal password),
+ * port 465 with `ssl` or port 587 with `tls`, and a From: that is your own address.
+ * All of that comes from .env - see README section 3.
+ */
+
+/** Load lib/phpmailer once (no Composer). False + error message when a file is gone. */
+function phpmailer_load(): bool
+{
+    if (class_exists('PHPMailer\\PHPMailer\\PHPMailer')) {
+        return true;
+    }
+    $base = __DIR__ . '/phpmailer/src/';
+    foreach (['Exception.php', 'PHPMailer.php', 'SMTP.php'] as $file) {
+        if (!is_file($base . $file)) {
+            wf_mail_error('PHPMailer is missing: lib/phpmailer/src/' . $file
+                        . ' not found. Unzip the archive again.');
+            return false;
+        }
+        require_once $base . $file;
+    }
+    return class_exists('PHPMailer\\PHPMailer\\PHPMailer');
+}
+
+function mail_phpmailer(string $to, string $subject, string $html): bool
+{
+    if (!phpmailer_load()) {
+        return false;
+    }
+
+    $transport = strtolower(env('mailer_transport', 'gmail'));
+    $host      = $transport === 'gmail' ? 'smtp.gmail.com' : env('mailer_host', '');
+    $secure    = strtolower(env('mailer_secure', 'ssl'));       // ssl | tls | (empty)
+    $port      = (int)env('mailer_port', $secure === 'tls' ? '587' : '465');
+    $user      = env('mailer_username');
+    $pass      = str_replace(' ', '', env('mailer_password'));  // App Passwords print in groups of four
+    $from      = mail_from();
+
+    if ($host === '') {
+        wf_mail_error('mailer_host is empty in .env (only needed when mailer_transport=smtp).');
+        return false;
+    }
+
+    $mail = new PHPMailer\PHPMailer\PHPMailer(true);
+    try {
+        $mail->isSMTP();
+        $mail->Host        = $host;
+        $mail->Port        = $port;
+        $mail->SMTPAuth    = $user !== '';
+        $mail->Username    = $user;
+        $mail->Password    = $pass;
+        $mail->SMTPSecure  = $secure === 'tls' ? PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS
+                        : ($secure === 'ssl' ? PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_SMTPS
+                        : '');
+        $mail->Timeout     = (int)env('mailer_timeout', '20');
+        $mail->CharSet     = 'UTF-8';
+        $mail->setFrom($from, env('mailer_from_name', 'WSYM Banking'));
+        $mail->addAddress($to);
+        $mail->isHTML(true);
+        $mail->Subject = $subject;
+        $mail->Body    = $html;
+        $mail->AltBody = trim(strip_tags(str_replace(['<br>', '</p>'], "\n", $html)));
+        $mail->send();
+        return true;
+    } catch (Throwable $e) {
+        $why = $mail->ErrorInfo !== '' ? $mail->ErrorInfo : $e->getMessage();
+        if (stripos($why, 'authenticate') !== false || stripos($why, '535') !== false) {
+            $why .= ' - for Gmail this almost always means "use an App Password, not your normal password".';
+        }
+        wf_mail_error('PHPMailer: ' . $why);
+        return false;
+    }
 }
 
 /** Write the mail into the temp mailbox so it can be read with no internet. */
@@ -114,115 +192,6 @@ function mail_to_file(string $to, string $subject, string $html): bool
 
     if (@file_put_contents($file, $page) === false) {
         wf_mail_error('Could not write to the temp mailbox folder.');
-        return false;
-    }
-    return true;
-}
-
-/**
- * Minimal SMTP client: connect, EHLO, STARTTLS or SSL, AUTH LOGIN, MAIL, RCPT, DATA.
- * Enough for Gmail, Mailtrap and any normal provider; no dependencies.
- */
-function mail_smtp(string $to, string $subject, string $html): bool
-{
-    $host   = env('mailer_transport') === 'gmail' ? 'smtp.gmail.com' : env('mailer_host', '');
-    $port   = (int)env('mailer_port', '465');
-    $secure = strtolower(env('mailer_secure', 'ssl'));       // ssl | tls | (empty)
-    $user   = env('mailer_username');
-    $pass   = str_replace(' ', '', env('mailer_password'));  // Google shows the App Password in groups of four
-    $from   = mail_from();
-
-    if ($host === '') {
-        wf_mail_error('mailer_host is empty in .env.');
-        return false;
-    }
-
-    $remote = ($secure === 'ssl' ? 'ssl://' : '') . $host . ':' . $port;
-    $socket = @stream_socket_client($remote, $errno, $errstr, (int)env('mailer_timeout', '15'));
-    if (!$socket) {
-        wf_mail_error("Cannot connect to $host:$port - $errstr. "
-                    . 'If this is port 465, check mailer_secure=ssl; if 587, use mailer_secure=tls.');
-        return false;
-    }
-    stream_set_timeout($socket, (int)env('mailer_timeout', '15'));
-
-    $read = function () use ($socket): string {
-        $data = '';
-        while (($line = fgets($socket, 515)) !== false) {
-            $data .= $line;
-            if (strlen($line) < 4 || $line[3] === ' ') {
-                break;
-            }
-        }
-        return $data;
-    };
-    $say = function (string $command) use ($socket, &$read): string {
-        fwrite($socket, $command . "\r\n");
-        return $read();
-    };
-
-    if (!str_starts_with($read(), '220')) {
-        wf_mail_error('The mail server did not greet us. Wrong host or port?');
-        fclose($socket);
-        return false;
-    }
-    $reply = $say('EHLO ' . ($_SERVER['SERVER_NAME'] ?? 'localhost'));
-
-    if ($secure === 'tls') {
-        $reply = $say('STARTTLS');
-        if (!str_starts_with($reply, '220')) {
-            wf_mail_error("STARTTLS was refused: " . trim($reply));
-            fclose($socket);
-            return false;
-        }
-        if (!stream_socket_enable_crypto($socket, true, STREAM_CRYPTO_METHOD_TLS_CLIENT)) {
-            wf_mail_error('TLS handshake failed. mailer_secure=tls needs port 587.');
-            fclose($socket);
-            return false;
-        }
-        $say('EHLO ' . ($_SERVER['SERVER_NAME'] ?? 'localhost'));
-    }
-
-    if ($user !== '') {
-        $say('AUTH LOGIN');
-        $say(base64_encode($user));
-        $reply = $say(base64_encode($pass));
-        if (!str_starts_with($reply, '235')) {
-            wf_mail_error('The server rejected the login (' . trim($reply) . '). '
-                        . 'For Gmail this almost always means "use an App Password, not your normal password".');
-            fclose($socket);
-            return false;
-        }
-    }
-
-    $reply = $say('MAIL FROM:<' . $from . '>');
-    if (!str_starts_with($reply, '250')) {
-        wf_mail_error('Sender refused (' . trim($reply) . '). In Gmail mode the From: must be your own address.');
-        fclose($socket);
-        return false;
-    }
-    $reply = $say('RCPT TO:<' . $to . '>');
-    if (!str_starts_with($reply, '250') && !str_starts_with($reply, '251')) {
-        wf_mail_error('Recipient refused (' . trim($reply) . ').');
-        fclose($socket);
-        return false;
-    }
-    $say('DATA');
-
-    $headers = 'From: ' . env('mailer_from_name', 'WSYM Banking') . ' <' . $from . ">\r\n"
-             . 'To: <' . $to . ">\r\n"
-             . 'Subject: =?UTF-8?B?' . base64_encode($subject) . "?=\r\n"
-             . 'Date: ' . date('r') . "\r\n"
-             . "MIME-Version: 1.0\r\n"
-             . "Content-Type: text/html; charset=UTF-8\r\n"
-             . "Content-Transfer-Encoding: base64\r\n";
-    $body = chunk_split(base64_encode($html), 76, "\r\n");
-
-    $reply = $say($headers . "\r\n" . $body . '.');     // a lone "." ends the data
-    fclose($socket);
-
-    if (!str_starts_with($reply, '250')) {
-        wf_mail_error('The server refused the message: ' . trim($reply));
         return false;
     }
     return true;

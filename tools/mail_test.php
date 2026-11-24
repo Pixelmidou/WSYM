@@ -3,7 +3,9 @@
  * tools/mail_test.php - find out why email does or does not work.
  *   (no parameters)            inspect the settings only
  *   ?to=you@gmail.com          send one real message
- *   &verbose=1                 print the whole SMTP dialogue
+ *
+ * Gmail and SMTP go through PHPMailer; when it fails, PHPMailer's own answer (the SMTP
+ * reply code and text) is printed below.
  */
 require __DIR__ . '/../bootstrap.php';
 
@@ -26,6 +28,11 @@ $settings = [
                           (strlen(str_replace(' ', '', env('mailer_password'))) === 16 ? 'set, 16 characters - looks right'
                                                                                      : 'set, but not 16 characters - a normal password will NOT work'),
     'From: address'    => mail_from(),
+    'sending with'     => $transport === 'gmail' || $transport === 'smtp'
+                          ? (phpmailer_load()
+                              ? 'PHPMailer ' . PHPMailer\PHPMailer\PHPMailer::VERSION
+                              : 'PHP SMTP - lib/phpmailer is missing!')
+                          : 'PHP ' . $transport,
     'temp mailbox'     => mailbox_dir(),
 ];
 
